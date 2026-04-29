@@ -1147,7 +1147,7 @@ tr:hover td { background: rgba(201,169,110,0.03); }
 // CONFIGURATION — ΑΛΛΑΞΕ ΕΔΩ ΤΑ ΣΤΟΙΧΕΙΑ ΣΟΥ
 // ============================================================
 const CONFIG = {
-  AIRTABLE_TOKEN: 'YOUR_AIRTABLE_TOKEN_HERE', // ← Βάλε εδώ το token σου
+  AIRTABLE_TOKEN: localStorage.getItem('airtable_token') || '',
   BASE_ID: 'app3fUC1uIoQsX2DP',
   TABLES: {
     AKINITA: 'ΑΚΙΝΗΤΑ',
@@ -1230,6 +1230,7 @@ async function deleteRecord(table, recordId) {
 // AUTH — LOGIN/LOGOUT
 // ============================================================
 async function handleLogin() {
+  CONFIG.AIRTABLE_TOKEN = 'ΒΑΛΕ_ΕΔΩ_ΤΟ_TOKEN_ΣΟΥ';
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value.trim();
 
@@ -1240,11 +1241,9 @@ async function handleLogin() {
 
   showLoading(true);
   try {
-    // Fetch all users and find by email client-side
-    const allUsers = await getAllRecords(CONFIG.TABLES.USERS);
-    const records = allUsers.filter(r => 
-      (r.fields['Email'] || '').toLowerCase().trim() === email.toLowerCase().trim()
-    );
+    // Fetch user from USERS table
+    const formula = `{Email}="${email}"`;
+    const records = await getAllRecords(CONFIG.TABLES.USERS, formula);
 
     if (records.length === 0) {
       showLoginError('Δεν βρέθηκε χρήστης με αυτό το email');
@@ -1268,7 +1267,7 @@ async function handleLogin() {
       id: user.id,
       name: fields['Name'] || fields['Ονοματεπώνυμο'] || email,
       email: email,
-      role: (fields['Role'] || fields['Ρόλος'] || 'agent').toLowerCase(),
+      role: fields['Role'] || fields['Ρόλος'] || 'agent',
       phone: fields['Phone'] || fields['Κινητό'] || ''
     };
 
