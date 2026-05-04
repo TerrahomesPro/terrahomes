@@ -1056,6 +1056,10 @@ tr:hover td { background: rgba(201,169,110,0.03); }
       <label>Κωδικός</label>
       <input type="password" id="loginPassword" placeholder="••••••••">
     </div>
+    <div class="form-group">
+      <label>Airtable Token</label>
+      <input type="password" id="loginToken" placeholder="patXXXXXX.YYYYYY">
+    </div>
     <button class="btn-login" onclick="handleLogin()">Σύνδεση →</button>
     <div class="login-error" id="loginError">Email ή κωδικός λανθασμένος</div>
   </div>
@@ -1147,7 +1151,7 @@ tr:hover td { background: rgba(201,169,110,0.03); }
 // CONFIGURATION — ΑΛΛΑΞΕ ΕΔΩ ΤΑ ΣΤΟΙΧΕΙΑ ΣΟΥ
 // ============================================================
 const CONFIG = {
-  AIRTABLE_TOKEN:'patyuRymx923eZEo5.485e709ac0bf3304b7f6905b759c859b43470226273b1c14675285a0f0da5962'
+  AIRTABLE_TOKEN: '',
   BASE_ID: 'app3fUC1uIoQsX2DP',
   TABLES: {
     AKINITA: 'ΑΚΙΝΗΤΑ',
@@ -1230,14 +1234,17 @@ async function deleteRecord(table, recordId) {
 // AUTH — LOGIN/LOGOUT
 // ============================================================
 async function handleLogin() {
-  CONFIG.AIRTABLE_TOKEN = 'patyuRymx923eZEo5.485e709ac0bf3304b7f6905b759c859b43470226273b1c14675285a0f0da5962'
+  const token = document.getElementById('loginToken').value.trim();
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value.trim();
 
-  if (!email || !password) {
-    showLoginError('Συμπλήρωσε email και κωδικό');
+  if (!token || !email || !password) {
+    showLoginError('Συμπληρωσε ολα τα πεδια');
     return;
   }
+
+  CONFIG.AIRTABLE_TOKEN = token;
+  localStorage.setItem('at', token);
 
   showLoading(true);
   try {
@@ -2698,6 +2705,7 @@ window.addEventListener('load', async function() {
   if (saved) {
     try {
       currentUser = JSON.parse(saved);
+      CONFIG.AIRTABLE_TOKEN = localStorage.getItem('at') || '';
       await initApp();
     } catch(e) {
       localStorage.removeItem('terraUser');
