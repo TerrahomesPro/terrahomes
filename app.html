@@ -1917,7 +1917,7 @@ async function saveAkinito(id) {
   if (!fields['Αποθήκη']) delete fields['Αποθήκη'];
 
   // Remove null values
-  Object.keys(fields).forEach(k => (fields[k] === null || fields[k] === '') && delete fields[k]);
+  Object.keys(fields).forEach(k => (fields[k] === null || fields[k] === '') && delete fields[k]);console.log('Sending fields:', JSON.stringify(fields));
 
   showLoading(true);
   try {
