@@ -1073,9 +1073,16 @@ tr:hover td { background: rgba(201,169,110,0.03); }
 
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <h2>Terra<span>Homes</span></h2>
-        <small>Real Estate CRM</small>
+      <div class="sidebar-logo" style="padding:16px 24px;cursor:pointer" onclick="document.getElementById('logoUpload').click()" title="Κλικ για αλλαγή λογότυπου">
+        <input type="file" id="logoUpload" accept="image/jpeg,image/png" style="display:none" onchange="uploadLogo(this)">
+        <div id="logoContainer" style="width:100%;height:60px;display:flex;align-items:center;justify-content:center">
+          <img id="logoImg" src="" alt="" style="max-width:100%;max-height:60px;object-fit:contain;display:none;border-radius:6px">
+          <div id="logoPlaceholder" style="text-align:center">
+            <h2 style="font-family:var(--font-display);font-size:22px;font-weight:400;color:#fff;letter-spacing:1px">Terra<span style="color:var(--accent)">Homes</span></h2>
+            <small style="display:block;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-top:2px">Real Estate CRM</small>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:4px;font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:1px">ΚΛΙΚ ΓΙΑ ΑΛΛΑΓΗ LOGO</div>
       </div>
       <div class="sidebar-user">
         <div class="user-avatar" id="userAvatar">K</div>
@@ -1290,6 +1297,34 @@ async function handleLogin() {
   showLoading(false);
 }
 
+function uploadLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('logoImg');
+    const placeholder = document.getElementById('logoPlaceholder');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+    localStorage.setItem('companyLogo', e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadSavedLogo() {
+  const saved = localStorage.getItem('companyLogo');
+  if (saved) {
+    const img = document.getElementById('logoImg');
+    const placeholder = document.getElementById('logoPlaceholder');
+    if (img && placeholder) {
+      img.src = saved;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+    }
+  }
+}
+
 function handleLogout() {
   currentUser = null;
   localStorage.removeItem('terraUser');
@@ -1314,6 +1349,7 @@ async function initApp() {
 
   // Set user info in sidebar
   document.getElementById('userName').textContent = currentUser.name;
+  loadSavedLogo();
   document.getElementById('userRole').textContent = currentUser.role.toUpperCase();
   document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
 
@@ -1684,9 +1720,14 @@ async function openAkinitoForm(id = null) {
   const f = record?.fields || {};
   const isEdit = !!id;
 
-  // Get options from existing data
   const perioches = [...new Set(allData.akinita.map(r => r.fields['Περιοχή'] || r.fields['ΠΕΡΙΟΧΗ']).filter(Boolean))];
   const eidi = [...new Set(allData.akinita.map(r => r.fields['Είδος ακινήτου'] || r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']).filter(Boolean))];
+  const userOptions = allData.users.map(u => `<option value="${u.id}" ${JSON.stringify(f['User']||[]).includes(u.id)?'selected':''}>${u.fields['Name']||u.fields['Ονοματεπώνυμο']||''}</option>`).join('');
+  
+  const today = new Date().toISOString().split('T')[0];
+  const timiVal = f['Τιμή'] || '';
+  const emvadoVal = f['Εμβ. Μεικτό'] || '';
+  const timiMetro = timiVal && emvadoVal ? (timiVal/emvadoVal).toFixed(2) : '';
 
   openModal(isEdit ? '✏️ Επεξεργασία Ακινήτου' : '+ Νέο Ακίνητο', `
     <div class="form-grid">
@@ -1694,7 +1735,7 @@ async function openAkinitoForm(id = null) {
         <label>Περιοχή *</label>
         <select id="f_periochi">
           <option value="">Επιλογή...</option>
-          ${perioches.map(p=>`<option value="${p}" ${f['Περιοχή']===p?'selected':''}>${p}</option>`).join('')}
+          ${perioches.map(p=>`<option value="${p}" ${(f['Περιοχή']||'')==p?'selected':''}>${p}</option>`).join('')}
           <option value="__new__">+ Νέα Περιοχή</option>
         </select>
       </div>
@@ -1702,36 +1743,55 @@ async function openAkinitoForm(id = null) {
         <label>Είδος Ακινήτου *</label>
         <select id="f_eidos">
           <option value="">Επιλογή...</option>
-          ${eidi.map(e=>`<option value="${e}" ${(f['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'])===e?'selected':''}>${e}</option>`).join('')}
+          ${eidi.map(e=>`<option value="${e}" ${((f['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'])||'')==e?'selected':''}>${e}</option>`).join('')}
           <option value="__new__">+ Νέο Είδος</option>
         </select>
       </div>
       <div class="form-group">
         <label>Status</label>
         <select id="f_status">
-          <option value="Διαθέσιμο" ${f['Status']==='Διαθέσιμο'?'selected':''}>Διαθέσιμο</option>
-          <option value="Off Market" ${f['Status']==='Off Market'?'selected':''}>Off Market</option>
-          <option value="Πουλήθηκε" ${f['Status']==='Πουλήθηκε'?'selected':''}>Πουλήθηκε</option>
-          <option value="Αποσύρθηκε" ${f['Status']==='Αποσύρθηκε'?'selected':''}>Αποσύρθηκε</option>
+          <option value="Διαθέσιμο" ${(f['Status']||'')==='Διαθέσιμο'?'selected':''}>Διαθέσιμο</option>
+          <option value="Off Market" ${(f['Status']||'')==='Off Market'?'selected':''}>Off Market</option>
+          <option value="Πουλήθηκε" ${(f['Status']||'')==='Πουλήθηκε'?'selected':''}>Πουλήθηκε</option>
+          <option value="Αποσύρθηκε" ${(f['Status']||'')==='Αποσύρθηκε'?'selected':''}>Αποσύρθηκε</option>
         </select>
       </div>
       <div class="form-group">
+        <label>Agent (User)</label>
+        <select id="f_user">
+          <option value="">Επιλογή...</option>
+          ${userOptions}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ημερομηνία</label>
+        <input type="date" id="f_date" value="${f['Ημερομηνία']||today}">
+      </div>
+      <div class="form-group">
         <label>Τιμή (€)</label>
-        <input type="number" id="f_timi" value="${f['Τιμή']||''}" placeholder="π.χ. 150000">
+        <input type="number" id="f_timi" value="${timiVal}" placeholder="π.χ. 150000" oninput="calcTimiMetro()">
+      </div>
+      <div class="form-group">
+        <label>Εκτίμηση (€)</label>
+        <input type="number" id="f_ektimisi" value="${f['Εκτίμηση']||''}" placeholder="π.χ. 160000">
       </div>
       <div class="form-group">
         <label>Εμβαδό Μεικτό (τ.μ.)</label>
-        <input type="number" id="f_emvado" value="${f['Εμβ. Μεικτό']||''}" placeholder="π.χ. 85">
+        <input type="number" id="f_emvado" value="${emvadoVal}" placeholder="π.χ. 85" oninput="calcTimiMetro()">
       </div>
       <div class="form-group">
         <label>Εμβαδό Καθαρό (τ.μ.)</label>
         <input type="number" id="f_emvado_k" value="${f['Εμβαδό Καθαρό']||''}" placeholder="π.χ. 78">
       </div>
       <div class="form-group">
+        <label>Τιμή/τ.μ. (αυτόματο)</label>
+        <input type="text" id="f_timi_tm" value="${timiMetro ? timiMetro+'€' : ''}" placeholder="Υπολογίζεται αυτόματα" readonly style="background:#f5f5f5">
+      </div>
+      <div class="form-group">
         <label>Δωμάτια</label>
         <select id="f_domata">
           <option value="">Επιλογή...</option>
-          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${(f['Δωμάτια']||f['ΔΩΜΑΤΑ'])===d?'selected':''}>${d}</option>`).join('')}
+          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${((f['Δωμάτια']||f['ΔΩΜΑΤΑ'])||'')==d?'selected':''}>${d}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
@@ -1740,16 +1800,16 @@ async function openAkinitoForm(id = null) {
       </div>
       <div class="form-group">
         <label>Όροφος</label>
-        <input type="text" id="f_oros" value="${f['Όροφος']||''}" placeholder="π.χ. 2ος">
+        <select id="f_oros">
+          <option value="">Επιλογή...</option>
+          ${['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'].map(o=>`<option value="${o}" ${(f['Όροφος']||'')==o?'selected':''}>${o}</option>`).join('')}
+        </select>
       </div>
       <div class="form-group">
         <label>Θέση Στάθμευσης</label>
         <select id="f_stathmeusi">
-          <option value="Όχι" ${(f['Θέση Στάθμευσης']||'')==='Όχι'?'selected':''}>Όχι</option>
-          <option value="Ναί" ${(f['Θέση Στάθμευσης']||'')==='Ναί'?'selected':''}>Ναί</option>
-          <option value="Ανοιχτή" ${(f['Θέση Στάθμευσης']||'')==='Ανοιχτή'?'selected':''}>Ανοιχτή</option>
-          <option value="Κλειστή" ${(f['Θέση Στάθμευσης']||'')==='Κλειστή'?'selected':''}>Κλειστή</option>
-          <option value="Πυλωτή" ${(f['Θέση Στάθμευσης']||'')==='Πυλωτή'?'selected':''}>Πυλωτή</option>
+          <option value="">Επιλογή...</option>
+          ${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
@@ -1757,8 +1817,28 @@ async function openAkinitoForm(id = null) {
         <input type="text" id="f_diefthinsi" value="${f['Διεύθυνση']||''}" placeholder="Οδός αριθμός">
       </div>
       <div class="form-group">
-        <label>Τιμή ανά τ.μ.</label>
-        <input type="number" id="f_timi_tm" value="${f['Τιμή ανά Τετρ.μέτρο']||''}" placeholder="Αυτόματος υπολογισμός">
+        <label>Συνεργασίες</label>
+        <input type="text" id="f_sinergasies" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική">
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:16px;padding-top:20px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="f_asanser" ${f['Ανσέρ']||f['Ασανσέρ']?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
+          Ασανσέρ
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="f_apothiki" ${f['Αποθήκη']?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
+          Αποθήκη
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Φωτογραφίες</label>
+        <input type="file" id="f_photos" multiple accept="image/*" style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);width:100%">
+        ${f['Φωτογραφίες'] ? `<div style="margin-top:8px;font-size:12px;color:var(--success)">✅ Υπάρχουν ${(f['Φωτογραφίες']||[]).length} φωτογραφίες</div>` : ''}
+      </div>
+      <div class="form-group">
+        <label>Video</label>
+        <input type="file" id="f_video" accept="video/*" style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);width:100%">
+        ${f['Video'] ? `<div style="margin-top:8px;font-size:12px;color:var(--success)">✅ Υπάρχει video</div>` : ''}
       </div>
       <div class="form-group form-full">
         <label>Σημειώσεις</label>
@@ -1772,7 +1852,6 @@ async function openAkinitoForm(id = null) {
     </button>
   `);
 
-  // Handle new option
   document.getElementById('f_periochi').addEventListener('change', function() {
     if (this.value === '__new__') {
       const newVal = prompt('Νέα Περιοχή:');
@@ -1796,24 +1875,46 @@ async function openAkinitoForm(id = null) {
   });
 }
 
+function calcTimiMetro() {
+  const timi = parseFloat(document.getElementById('f_timi')?.value) || 0;
+  const emvado = parseFloat(document.getElementById('f_emvado')?.value) || 0;
+  const el = document.getElementById('f_timi_tm');
+  if (el && timi > 0 && emvado > 0) {
+    el.value = (timi/emvado).toLocaleString('el-GR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+  }
+}
+
 async function saveAkinito(id) {
+  const timi = parseFloat(document.getElementById('f_timi').value) || null;
+  const emvado = parseFloat(document.getElementById('f_emvado').value) || null;
+  const timiMetro = (timi && emvado) ? parseFloat((timi/emvado).toFixed(2)) : null;
+  const userId = document.getElementById('f_user').value;
+
   const fields = {
-    'Περιοχή': document.getElementById('f_periochi').value,
-    'Είδος ακινήτου': document.getElementById('f_eidos').value,
-    'Status': document.getElementById('f_status').value,
-    'Τιμή': parseFloat(document.getElementById('f_timi').value) || null,
-    'Εμβ. Μεικτό': parseFloat(document.getElementById('f_emvado').value) || null,
+    'Περιοχή': document.getElementById('f_periochi').value || null,
+    'Είδος ακινήτου': document.getElementById('f_eidos').value || null,
+    'Status': document.getElementById('f_status').value || null,
+    'Ημερομηνία': document.getElementById('f_date').value || null,
+    'Τιμή': timi,
+    'Εκτίμηση': parseFloat(document.getElementById('f_ektimisi').value) || null,
+    'Εμβ. Μεικτό': emvado,
     'Εμβαδό Καθαρό': parseFloat(document.getElementById('f_emvado_k').value) || null,
-    'Δωμάτια': document.getElementById('f_domata').value,
+    'Τιμή ανά Τετρ.μέτρο': timiMetro,
+    'Δωμάτια': document.getElementById('f_domata').value || null,
     'Έτος κατασκευής': parseInt(document.getElementById('f_etos').value) || null,
-    'Όροφος': document.getElementById('f_oros').value,
-    'Θέση Στάθμευσης': document.getElementById('f_stathmeusi').value,
-    'Διεύθυνση': document.getElementById('f_diefthinsi').value,
-    'Σημειώσεις': document.getElementById('f_simeioseis').value,
+    'Όροφος': document.getElementById('f_oros').value || null,
+    'Θέση Στάθμευσης': document.getElementById('f_stathmeusi').value || null,
+    'Διεύθυνση': document.getElementById('f_diefthinsi').value || null,
+    'Συνεργασίες': document.getElementById('f_sinergasies').value || null,
+    'Ανσέρ': document.getElementById('f_asanser').checked,
+    'Αποθήκη': document.getElementById('f_apothiki').checked,
+    'Σημειώσεις': document.getElementById('f_simeioseis').value || null,
   };
 
+  if (userId) fields['User'] = [userId];
+
   // Remove null values
-  Object.keys(fields).forEach(k => fields[k] === null && delete fields[k]);
+  Object.keys(fields).forEach(k => (fields[k] === null || fields[k] === '') && delete fields[k]);
 
   showLoading(true);
   try {
