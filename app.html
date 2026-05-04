@@ -1822,7 +1822,7 @@ async function openAkinitoForm(id = null) {
       </div>
       <div class="form-group" style="display:flex;align-items:center;gap:16px;padding-top:20px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input type="checkbox" id="f_asanser" ${f['Ανσέρ']||f['Ασανσέρ']?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
+          <input type="checkbox" id="f_asanser" ${f['Ασανσέρ']?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
           Ασανσέρ
         </label>
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
@@ -1906,12 +1906,15 @@ async function saveAkinito(id) {
     'Θέση Στάθμευσης': document.getElementById('f_stathmeusi').value || null,
     'Διεύθυνση': document.getElementById('f_diefthinsi').value || null,
     'Συνεργασίες': document.getElementById('f_sinergasies').value || null,
-    'Ανσέρ': document.getElementById('f_asanser').checked,
+    'Ασανσέρ': document.getElementById('f_asanser').checked,
     'Αποθήκη': document.getElementById('f_apothiki').checked,
     'Σημειώσεις': document.getElementById('f_simeioseis').value || null,
   };
 
   if (userId) fields['User'] = [userId];
+  // Remove false checkboxes to avoid overwriting
+  if (!fields['Ασανσέρ']) delete fields['Ασανσέρ'];
+  if (!fields['Αποθήκη']) delete fields['Αποθήκη'];
 
   // Remove null values
   Object.keys(fields).forEach(k => (fields[k] === null || fields[k] === '') && delete fields[k]);
