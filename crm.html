@@ -1,0 +1,2655 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Real Estate CRM</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+============================================================ */
+:root {
+  --bg: #ffffff;
+  --bg2: #f9f9f9;
+  --bg3: #f2f2f2;
+  --surface: #ffffff;
+  --border: #e8e8e8;
+  --border2: #d0d0d0;
+  --text: #111111;
+  --text2: #555555;
+  --text3: #999999;
+  --accent: #1a1a1a;
+  --gold: #c9a96e;
+  --gold2: #e8d5b0;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #2563eb;
+  --radius: 10px;
+  --radius2: 6px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow2: 0 2px 8px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.08);
+  --sidebar: 240px;
+  --topbar: 56px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --transition: 0.2s ease;
+}
+
+[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --bg2: #181818;
+  --bg3: #222222;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --border2: #3a3a3a;
+  --text: #f0f0f0;
+  --text2: #aaaaaa;
+  --text3: #666666;
+  --accent: #f0f0f0;
+  --shadow: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow2: 0 2px 8px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:14px; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; transition:background var(--transition), color var(--transition); }
+
+/* ============================================================
+   LOGIN
+============================================================ */
+#loginPage {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg2);
+  padding:20px;
+}
+
+.login-box {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:40px;
+  width:100%;
+  max-width:380px;
+  box-shadow:var(--shadow2);
+}
+
+.login-logo {
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.login-logo img {
+  max-height:60px;
+  max-width:200px;
+  object-fit:contain;
+}
+
+.login-logo-text {
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:-0.5px;
+  color:var(--text);
+}
+
+.login-logo-text span { color:var(--gold); }
+
+.login-sub {
+  font-size:11px;
+  color:var(--text3);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+.field { margin-bottom:16px; }
+
+.field label {
+  display:block;
+  font-size:11px;
+  font-weight:600;
+  color:var(--text2);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:6px;
+}
+
+.field input, .field select, .field textarea {
+  width:100%;
+  padding:10px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  font-family:var(--font);
+  font-size:14px;
+  color:var(--text);
+  background:var(--bg);
+  outline:none;
+  transition:border-color var(--transition);
+  -webkit-appearance:none;
+}
+
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--gold);
+}
+
+.btn-primary {
+  width:100%;
+  padding:12px;
+  background:var(--text);
+  color:var(--bg);
+  border:none;
+  border-radius:var(--radius2);
+  font-family:var(--font);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:opacity var(--transition);
+  margin-top:8px;
+}
+
+.btn-primary:hover { opacity:0.85; }
+
+.login-err {
+  color:var(--danger);
+  font-size:12px;
+  text-align:center;
+  margin-top:10px;
+  display:none;
+}
+
+/* ============================================================
+   APP LAYOUT
+============================================================ */
+#app { display:none; }
+
+.layout { display:flex; min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width:var(--sidebar);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  position:fixed;
+  top:0; left:0; bottom:0;
+  display:flex;
+  flex-direction:column;
+  z-index:200;
+  transition:transform var(--transition);
+  overflow-y:auto;
+}
+
+.sb-logo {
+  padding:20px 16px 16px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  text-align:center;
+  position:relative;
+}
+
+.sb-logo img {
+  max-height:48px;
+  max-width:180px;
+  object-fit:contain;
+}
+
+.sb-logo-text {
+  font-size:18px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-0.3px;
+}
+
+.sb-logo-text span { color:var(--gold); }
+
+.sb-logo-hint {
+  font-size:9px;
+  color:var(--text3);
+  margin-top:2px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.sb-user {
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.sb-avatar {
+  width:32px; height:32px;
+  background:var(--gold);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:13px;
+  color:#fff;
+  flex-shrink:0;
+}
+
+.sb-user-name { font-size:13px; font-weight:600; color:var(--text); }
+.sb-user-role { font-size:11px; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px; }
+
+.sb-nav { flex:1; padding:8px 0; }
+
+.sb-section {
+  padding:8px 16px 2px;
+  font-size:9px;
+  font-weight:700;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+}
+
+.sb-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 16px;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all var(--transition);
+  font-size:13px;
+  font-weight:500;
+  border-radius:0;
+  position:relative;
+  margin:1px 8px;
+  border-radius:var(--radius2);
+}
+
+.sb-item:hover { background:var(--bg2); color:var(--text); }
+
+.sb-item.active {
+  background:var(--bg2);
+  color:var(--text);
+  font-weight:600;
+}
+
+.sb-item.active::before {
+  content:'';
+  position:absolute;
+  left:-8px; top:50%;
+  transform:translateY(-50%);
+  width:3px; height:16px;
+  background:var(--gold);
+  border-radius:2px;
+}
+
+.sb-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+
+.sb-badge {
+  margin-left:auto;
+  background:var(--gold);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:20px;
+  min-width:18px;
+  text-align:center;
+}
+
+.sb-footer {
+  padding:12px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:8px;
+}
+
+.sb-btn {
+  flex:1;
+  padding:8px;
+  background:none;
+  border:1px solid var(--border);
+  border-radius:var(--radius2);
+  cursor:pointer;
+  font-size:12px;
+  color:var(--text2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  transition:all var(--transition);
+}
+
+.sb-btn:hover { background:var(--bg2); color:var(--text); }
+
+/* MAIN */
+.main { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+
+.topbar {
+  height:var(--topbar);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.topbar-left { display:flex; align-items:center; gap:12px; }
+.topbar-title { font-size:16px; font-weight:700; color:var(--text); }
+
+.topbar-right { display:flex; align-items:center; gap:8px; }
+
+.content { padding:24px; flex:1; }
+
+/* HAMBURGER */
+.hamburger {
+  display:none;
+  background:none;
+  border:none;
+  font-size:20px;
+  cursor:pointer;
+  color:var(--text);
+  padding:4px;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn {
+  padding:8px 16px;
+  border-radius:var(--radius2);
+  font-family:var(--font);
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  border:none;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:all var(--transition);
+  white-space:nowrap;
+}
+
+.btn-dark { background:var(--text); color:var(--bg); }
+.btn-dark:hover { opacity:0.8; }
+.btn-outline { background:none; border:1.5px solid var(--border); color:var(--text2); }
+.btn-outline:hover { border-color:var(--border2); color:var(--text); background:var(--bg2); }
+.btn-ghost { background:none; color:var(--text2); }
+.btn-ghost:hover { background:var(--bg2); color:var(--text); }
+.btn-danger { background:rgba(220,38,38,0.1); color:var(--danger); border:1px solid rgba(220,38,38,0.2); }
+.btn-danger:hover { background:rgba(220,38,38,0.2); }
+.btn-gold { background:var(--gold); color:#fff; }
+.btn-gold:hover { opacity:0.9; }
+.btn-sm { padding:5px 10px; font-size:12px; }
+.btn-icon { padding:6px; width:32px; height:32px; justify-content:center; }
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+
+.stat {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  cursor:default;
+}
+
+.stat-label { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.stat-value { font-size:32px; font-weight:700; line-height:1; color:var(--text); }
+.stat-sub { font-size:12px; color:var(--text3); margin-top:6px; }
+
+/* ============================================================
+   CHARTS
+============================================================ */
+.charts { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:24px; }
+
+.chart-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.chart-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:16px; }
+
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer; }
+.bar-row:hover .bar-fill { opacity:0.8; }
+.bar-label { font-size:12px; color:var(--text2); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bar-track { flex:1; height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+.bar-fill { height:100%; background:var(--gold); border-radius:3px; transition:width 0.8s ease; }
+.bar-count { font-size:12px; font-weight:600; color:var(--text2); width:20px; text-align:right; }
+
+.agents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+
+.agent-card {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  text-align:center;
+  cursor:pointer;
+  transition:all var(--transition);
+}
+
+.agent-card:hover { border-color:var(--gold); transform:translateY(-2px); box-shadow:var(--shadow); }
+.agent-count { font-size:28px; font-weight:700; color:var(--gold); }
+.agent-name { font-size:12px; color:var(--text2); margin-top:4px; }
+
+/* ============================================================
+   TABLE / LIST
+============================================================ */
+.list-container {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.list-header {
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.list-title { font-size:15px; font-weight:700; color:var(--text); }
+.list-count { font-size:13px; color:var(--text3); }
+
+.search-wrap { position:relative; }
+.search-wrap input { padding:7px 12px 7px 32px; border:1.5px solid var(--border); border-radius:var(--radius2); font-size:13px; background:var(--bg2); color:var(--text); outline:none; width:200px; }
+.search-wrap input:focus { border-color:var(--gold); }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:13px; pointer-events:none; }
+
+.filters {
+  padding:10px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  background:var(--bg2);
+}
+
+.filter-select {
+  padding:6px 10px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  font-size:12px;
+  background:var(--surface);
+  color:var(--text);
+  outline:none;
+  cursor:pointer;
+}
+
+.filter-select:focus { border-color:var(--gold); }
+
+table { width:100%; border-collapse:collapse; }
+
+th {
+  padding:10px 16px;
+  text-align:left;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+
+td {
+  padding:12px 16px;
+  font-size:13px;
+  border-bottom:1px solid var(--border);
+  vertical-align:middle;
+  color:var(--text);
+}
+
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--bg2); cursor:pointer; }
+
+.badge {
+  padding:3px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  display:inline-block;
+  white-space:nowrap;
+}
+
+.badge-green { background:rgba(22,163,74,0.1); color:#16a34a; }
+.badge-gold { background:rgba(201,169,110,0.15); color:#a07840; }
+.badge-gray { background:var(--bg3); color:var(--text3); }
+.badge-red { background:rgba(220,38,38,0.1); color:var(--danger); }
+.badge-blue { background:rgba(37,99,235,0.1); color:var(--info); }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);
+  z-index:1000;
+  display:none;
+  align-items:flex-start;
+  justify-content:center;
+  padding:20px;
+  overflow-y:auto;
+}
+
+.overlay.open { display:flex; }
+
+.modal {
+  background:var(--surface);
+  border-radius:16px;
+  width:100%;
+  max-width:680px;
+  box-shadow:var(--shadow2);
+  animation:slideUp 0.25s ease;
+  margin:auto;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.modal-head {
+  padding:20px 24px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  background:var(--surface);
+  border-radius:16px 16px 0 0;
+  z-index:1;
+}
+
+.modal-title { font-size:17px; font-weight:700; }
+
+.modal-close {
+  width:28px; height:28px;
+  border-radius:50%;
+  border:none;
+  background:var(--bg2);
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text2);
+}
+
+.modal-close:hover { background:var(--bg3); }
+
+.modal-body { padding:20px 24px; max-height:70vh; overflow-y:auto; }
+
+.modal-foot {
+  padding:16px 24px;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  position:sticky;
+  bottom:0;
+  background:var(--surface);
+  border-radius:0 0 16px 16px;
+}
+
+/* FORM GRID */
+.fgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.fspan { grid-column:1/-1; }
+
+.modal .field label { color:var(--text2); }
+.modal .field input, .modal .field select, .modal .field textarea {
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  color:var(--text);
+}
+
+.modal .field input:focus, .modal .field select:focus, .modal .field textarea:focus {
+  border-color:var(--gold);
+  background:var(--bg);
+}
+
+/* CHECKBOX FIELD */
+.check-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  cursor:pointer;
+}
+
+.check-row input[type="checkbox"] {
+  width:16px;
+  height:16px;
+  accent-color:var(--gold);
+  cursor:pointer;
+}
+
+/* MULTISELECT TAGS */
+.ms-container {
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  background:var(--bg2);
+  padding:8px;
+  min-height:42px;
+  cursor:pointer;
+}
+
+.ms-container:focus-within { border-color:var(--gold); }
+
+.ms-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px; }
+
+.ms-tag {
+  background:var(--gold2);
+  color:#7a5c30;
+  padding:2px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:500;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.ms-tag button {
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#7a5c30;
+  font-size:12px;
+  padding:0;
+  line-height:1;
+}
+
+.ms-options {
+  display:none;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  background:var(--surface);
+  box-shadow:var(--shadow2);
+  max-height:200px;
+  overflow-y:auto;
+  margin-top:4px;
+}
+
+.ms-options.open { display:block; }
+
+.ms-option {
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:background var(--transition);
+}
+
+.ms-option:hover { background:var(--bg2); }
+.ms-option input[type="checkbox"] { accent-color:var(--gold); }
+
+.ms-add {
+  padding:6px 12px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:6px;
+}
+
+.ms-add input {
+  flex:1;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  font-size:12px;
+  background:var(--bg);
+  color:var(--text);
+  outline:none;
+}
+
+.ms-add button {
+  padding:4px 8px;
+  background:var(--gold);
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:12px;
+}
+
+/* DETAIL VIEW */
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.detail-item {
+  padding:10px 14px;
+  background:var(--bg2);
+  border-radius:var(--radius2);
+}
+
+.detail-label {
+  font-size:10px;
+  font-weight:700;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:3px;
+}
+
+.detail-value { font-size:13px; font-weight:500; color:var(--text); }
+
+.detail-photos { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.detail-photo { width:80px; height:80px; object-fit:cover; border-radius:var(--radius2); cursor:pointer; border:1px solid var(--border); }
+
+/* SCORE CARDS */
+.score-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+
+.score-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:all var(--transition);
+}
+
+.score-card:hover { box-shadow:var(--shadow2); transform:translateY(-2px); border-color:var(--border2); }
+
+.score-card-head {
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+}
+
+.score-circle {
+  width:52px; height:52px;
+  border-radius:50%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:14px;
+  flex-shrink:0;
+  border:2px solid;
+}
+
+.score-100 { border-color:#16a34a; color:#16a34a; background:rgba(22,163,74,0.08); }
+.score-90 { border-color:#16a34a; color:#16a34a; background:rgba(22,163,74,0.06); }
+.score-80 { border-color:var(--info); color:var(--info); background:rgba(37,99,235,0.06); }
+.score-70 { border-color:var(--warning); color:var(--warning); background:rgba(217,119,6,0.06); }
+.score-60 { border-color:var(--danger); color:var(--danger); background:rgba(220,38,38,0.06); }
+
+.score-label { font-size:8px; text-transform:uppercase; letter-spacing:0.5px; }
+
+.score-info { flex:1; padding-right:12px; }
+.score-periochi { font-size:16px; font-weight:700; }
+.score-eidos { font-size:12px; color:var(--text2); margin-top:2px; }
+
+.score-card-body { padding:14px 16px; }
+
+.score-details { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.score-det-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.3px; }
+.score-det-val { font-size:13px; font-weight:600; }
+.score-timi { font-size:20px; font-weight:700; color:var(--gold); margin-bottom:12px; }
+
+.progress { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width 1s ease; }
+
+.score-card-foot {
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:6px;
+  background:var(--bg2);
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toasts {
+  position:fixed;
+  bottom:20px; right:20px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.toast {
+  padding:12px 16px;
+  border-radius:var(--radius);
+  font-size:13px;
+  font-weight:500;
+  box-shadow:var(--shadow2);
+  animation:toastIn 0.3s ease;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  max-width:300px;
+}
+
+.toast-s { background:#16a34a; color:#fff; }
+.toast-e { background:var(--danger); color:#fff; }
+.toast-i { background:var(--text); color:var(--bg); }
+
+@keyframes toastIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
+
+/* LOADING */
+.loader {
+  position:fixed; inset:0;
+  background:rgba(255,255,255,0.85);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:9998;
+}
+
+[data-theme="dark"] .loader { background:rgba(0,0,0,0.85); }
+
+.spin {
+  width:32px; height:32px;
+  border:2.5px solid var(--border);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* EMPTY STATE */
+.empty {
+  text-align:center;
+  padding:60px 20px;
+  color:var(--text3);
+}
+
+.empty-icon { font-size:40px; margin-bottom:12px; opacity:0.5; }
+.empty-text { font-size:14px; font-weight:500; margin-bottom:4px; }
+.empty-sub { font-size:12px; }
+
+/* ============================================================
+   MOBILE
+============================================================ */
+@media(max-width:768px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); box-shadow:var(--shadow2); }
+  .main { margin-left:0; }
+  .hamburger { display:flex; }
+  .content { padding:16px; }
+  .stats { grid-template-columns:1fr 1fr; gap:12px; }
+  .charts { grid-template-columns:1fr; }
+  .fgrid { grid-template-columns:1fr; }
+  .detail-grid { grid-template-columns:1fr; }
+  .score-grid { grid-template-columns:1fr; }
+  .topbar { padding:0 16px; }
+  .search-wrap input { width:160px; }
+  td, th { padding:10px 12px; }
+}
+
+@media(max-width:480px) {
+  .stats { grid-template-columns:1fr 1fr; }
+  .stat-value { font-size:24px; }
+  .login-box { padding:28px 20px; }
+}
+
+/* OVERLAY for mobile sidebar */
+.sb-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:199;
+}
+
+.sb-overlay.open { display:block; }
+
+/* SCORE BAR in detail */
+.score-bar-wrap { margin:16px 0; }
+.score-bar-label { display:flex; justify-content:space-between; font-size:12px; color:var(--text2); margin-bottom:6px; }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <p style="margin-top:12px;font-size:12px;color:var(--text3)">Φόρτωση...</p>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="mTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-foot" id="mFoot"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">
+      <div id="loginLogoWrap">
+        <div class="login-logo-text">Real<span>Estate</span></div>
+        <div class="login-sub">CRM Platform</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Airtable Token</label>
+      <input type="password" id="lToken" placeholder="patXXXX.YYYY" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="lEmail" placeholder="email@example.com">
+    </div>
+    <div class="field">
+      <label>Κωδικός</label>
+      <input type="password" id="lPass" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Σύνδεση →</button>
+    <div class="login-err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sb-logo" onclick="triggerLogoUpload()" title="Κλικ για αλλαγή logo">
+        <input type="file" id="logoFile" accept="image/jpeg,image/png,image/gif,image/svg+xml" style="display:none" onchange="handleLogoUpload(this)">
+        <div id="sbLogoContent">
+          <div class="sb-logo-text">Real<span>Estate</span></div>
+          <div class="sb-logo-hint">κλικ για logo</div>
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-avatar" id="sbAvatar">K</div>
+        <div>
+          <div class="sb-user-name" id="sbName">Χρήστης</div>
+          <div class="sb-user-role" id="sbRole">Agent</div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="sb-section">Κύριο</div>
+        <div class="sb-item active" data-page="home" onclick="goPage('home',this)">
+          <span class="sb-icon">⬜</span> Αρχική
+        </div>
+        <div class="sb-item" data-page="akinita" onclick="goPage('akinita',this)">
+          <span class="sb-icon">🏢</span> Ακίνητα
+        </div>
+        <div class="sb-item" data-page="zitiseis" onclick="goPage('zitiseis',this)">
+          <span class="sb-icon">🔍</span> Ζητήσεις
+        </div>
+        <div class="sb-item" data-page="matching" onclick="goPage('matching',this)">
+          <span class="sb-icon">⭐</span> Matching
+          <span class="sb-badge" id="mBadge">0</span>
+        </div>
+        <div class="sb-section" style="margin-top:8px">Διαχείριση</div>
+        <div class="sb-item" data-page="kataskevastes" onclick="goPage('kataskevastes',this)">
+          <span class="sb-icon">🔧</span> Κατασκευαστές
+        </div>
+        <div class="sb-item admin-only" data-page="users" onclick="goPage('users',this)">
+          <span class="sb-icon">👥</span> Χρήστες
+        </div>
+      </div>
+      <div class="sb-footer">
+        <button class="sb-btn" onclick="toggleTheme()" title="Dark/Light mode">🌙</button>
+        <button class="sb-btn" onclick="doRefresh()" title="Ανανέωση">↻</button>
+        <button class="sb-btn" onclick="doLogout()" title="Αποσύνδεση" style="color:var(--danger)">⬅</button>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger btn btn-ghost btn-icon" onclick="toggleSidebar()">☰</button>
+          <div class="topbar-title" id="pageTitle">Αρχική</div>
+        </div>
+        <div class="topbar-right" id="topActions"></div>
+      </div>
+      <div class="content" id="pageContent"></div>
+    </main>
+  </div>
+</div>
+
+<script charset="utf-8">
+// ============================================================
+// CONFIG
+// ============================================================
+const CFG = {
+  BASE: 'app3fUC1uIoQsX2DP',
+  TOKEN: '',
+  T: {
+    AK: 'ΑΚΙΝΗΤΑ',
+    ZI: 'Ζητήσεις',
+    MA: 'Matching Σκορ',
+    US: 'USERS',
+    KA: 'ΚΑΤΑΣΚΕΥΑΣΤΕΣ'
+  }
+};
+
+let ME = null;
+let DB = { ak:[], zi:[], ma:[], us:[], ka:[] };
+let PAGE = 'home';
+
+// ============================================================
+// API
+// ============================================================
+async function api(table, method='GET', body=null, id=null) {
+  const url = id
+    ? `https://api.airtable.com/v0/${CFG.BASE}/${encodeURIComponent(table)}/${id}`
+    : `https://api.airtable.com/v0/${CFG.BASE}/${encodeURIComponent(table)}`;
+  const opts = {
+    method,
+    headers: { 'Authorization': `Bearer ${CFG.TOKEN}`, 'Content-Type': 'application/json' }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  if (!r.ok) { const e = await r.json(); throw new Error(JSON.stringify(e)); }
+  return r.json();
+}
+
+async function getAll(table, filter='') {
+  let recs=[], offset=null;
+  do {
+    let url = `https://api.airtable.com/v0/${CFG.BASE}/${encodeURIComponent(table)}?pageSize=100`;
+    if (filter) url += `&filterByFormula=${encodeURIComponent(filter)}`;
+    if (offset) url += `&offset=${offset}`;
+    const r = await fetch(url, { headers:{ 'Authorization':`Bearer ${CFG.TOKEN}` } });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    recs = recs.concat(d.records||[]);
+    offset = d.offset;
+  } while(offset);
+  return recs;
+}
+
+async function createRec(table, fields) { return api(table,'POST',{fields}); }
+async function updateRec(table, id, fields) { return api(table,'PATCH',{fields},id); }
+async function deleteRec(table, id) { return api(table,'DELETE',null,id); }
+
+// Add new option to Airtable select field
+async function addSelectOption(table, fieldName, newOption) {
+  // We just save it locally - Airtable auto-creates options when you use new values
+  return newOption;
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+async function doLogin() {
+  const token = document.getElementById('lToken').value.trim();
+  const email = document.getElementById('lEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('lPass').value.trim();
+
+  if (!token || !email || !pass) { showErr('Συμπλήρωσε όλα τα πεδία'); return; }
+
+  CFG.TOKEN = token;
+  setLoading(true);
+
+  try {
+    const users = await getAll(CFG.T.US);
+    const user = users.find(u => (u.fields['Email']||'').toLowerCase().trim() === email);
+
+    if (!user) { showErr('Δεν βρέθηκε χρήστης'); setLoading(false); return; }
+    if (user.fields['Password'] !== pass) { showErr('Λανθασμένος κωδικός'); setLoading(false); return; }
+
+    ME = {
+      id: user.id,
+      name: user.fields['Name'] || email,
+      email,
+      role: (user.fields['Role']||'agent').toLowerCase()
+    };
+
+    localStorage.setItem('crm_user', JSON.stringify(ME));
+    localStorage.setItem('crm_token', token);
+
+    await initApp();
+  } catch(e) {
+    console.error(e);
+    showErr('Σφάλμα σύνδεσης. Έλεγξε το token.');
+  }
+  setLoading(false);
+}
+
+function showErr(msg) {
+  const el = document.getElementById('lErr');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  ME = null;
+  localStorage.removeItem('crm_user');
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function initApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  document.getElementById('sbName').textContent = ME.name;
+  document.getElementById('sbRole').textContent = ME.role.toUpperCase();
+  document.getElementById('sbAvatar').textContent = ME.name.charAt(0).toUpperCase();
+
+  if (ME.role !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display='none');
+  }
+
+  loadTheme();
+  loadLogo();
+  setLoading(true);
+  await loadAll();
+  setLoading(false);
+  goPage('home', document.querySelector('.sb-item[data-page="home"]'));
+}
+
+async function loadAll() {
+  try {
+    const [ak, zi, ma, us, ka] = await Promise.all([
+      getAll(CFG.T.AK),
+      getAll(CFG.T.ZI),
+      getAll(CFG.T.MA),
+      getAll(CFG.T.US),
+      getAll(CFG.T.KA)
+    ]);
+    DB.ak = ak; DB.zi = zi; DB.us = us; DB.ka = ka;
+    DB.ma = ME.role === 'admin' ? ma : ma.filter(r =>
+      (r.fields['User Ζήτησης']||'').toLowerCase() === ME.email.toLowerCase()
+    );
+    document.getElementById('mBadge').textContent = DB.ma.length;
+  } catch(e) { toast('Σφάλμα φόρτωσης','e'); console.error(e); }
+}
+
+async function doRefresh() {
+  setLoading(true);
+  await loadAll();
+  setLoading(false);
+  goPage(PAGE, document.querySelector(`.sb-item[data-page="${PAGE}"]`));
+  toast('Ανανεώθηκε!');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goPage(page, el) {
+  PAGE = page;
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = { home:'Αρχική', akinita:'Ακίνητα', zitiseis:'Ζητήσεις', matching:'Matching', kataskevastes:'Κατασκευαστές', users:'Χρήστες' };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  const c = document.getElementById('pageContent');
+  const a = document.getElementById('topActions');
+  const pages = { home:pgHome, akinita:pgAkinita, zitiseis:pgZitiseis, matching:pgMatching, kataskevastes:pgKataskevastes, users:pgUsers };
+  if (pages[page]) pages[page](c, a);
+  closeSidebar();
+}
+
+// ============================================================
+// HOME PAGE
+// ============================================================
+function pgHome(c, a) {
+  a.innerHTML = `<button class="btn btn-outline btn-sm" onclick="doRefresh()">↻ Ανανέωση</button>`;
+  const isAdmin = ME.role === 'admin';
+
+  const myAk = isAdmin ? DB.ak : DB.ak.filter(r => {
+    const u = r.fields['User'];
+    return Array.isArray(u) && u.includes(ME.id);
+  });
+
+  const diath = myAk.filter(r => r.fields['Status']==='Διαθέσιμο').length;
+  const offm = myAk.filter(r => r.fields['Status']==='Off Market').length;
+
+  const byEidos = {};
+  myAk.forEach(r => {
+    const e = r.fields['Είδος ακινήτου'] || 'Άλλο';
+    byEidos[e] = (byEidos[e]||0) + 1;
+  });
+
+  const byPeriochi = {};
+  myAk.forEach(r => {
+    const p = r.fields['Περιοχή'] || 'Άλλη';
+    byPeriochi[p] = (byPeriochi[p]||0) + 1;
+  });
+
+  const maxE = Math.max(...Object.values(byEidos), 1);
+  const maxP = Math.max(...Object.values(byPeriochi), 1);
+
+  const agentsHTML = isAdmin ? DB.us.map(u => {
+    const cnt = DB.ak.filter(r => Array.isArray(r.fields['User']) && r.fields['User'].includes(u.id)).length;
+    const name = u.fields['Name'] || u.fields['Email'] || '';
+    return `<div class="agent-card" onclick="filterByAgent('${u.id}','${name}')">
+      <div class="agent-count">${cnt}</div>
+      <div class="agent-name">${name}</div>
+    </div>`;
+  }).join('') : '';
+
+  c.innerHTML = `
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Συνολικά Ακίνητα</div>
+        <div class="stat-value">${myAk.length}</div>
+        <div class="stat-sub">Στο χαρτοφυλάκιό μου</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Διαθέσιμα</div>
+        <div class="stat-value" style="color:var(--success)">${diath}</div>
+        <div class="stat-sub">Ενεργές αγγελίες</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Off Market</div>
+        <div class="stat-value" style="color:var(--gold)">${offm}</div>
+        <div class="stat-sub">Αποκλειστικά</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Matching</div>
+        <div class="stat-value" style="color:var(--info)">${DB.ma.length}</div>
+        <div class="stat-sub">Αποτελέσματα</div>
+      </div>
+    </div>
+    <div class="charts">
+      <div class="chart-card">
+        <div class="chart-title">Ανά Είδος Ακινήτου</div>
+        ${Object.entries(byEidos).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`
+          <div class="bar-row">
+            <div class="bar-label">${k}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(v/maxE)*100}%"></div></div>
+            <div class="bar-count">${v}</div>
+          </div>`).join('')}
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Ανά Περιοχή</div>
+        ${Object.entries(byPeriochi).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`
+          <div class="bar-row">
+            <div class="bar-label">${k}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(v/maxP)*100}%"></div></div>
+            <div class="bar-count">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    ${isAdmin ? `
+    <div class="chart-card" style="margin-top:0">
+      <div class="chart-title">Ακίνητα ανά Agent <span style="font-size:11px;color:var(--text3);font-weight:400">(κλικ για φιλτράρισμα)</span></div>
+      <div class="agents-grid">${agentsHTML}</div>
+    </div>` : ''}
+  `;
+}
+
+function filterByAgent(userId, name) {
+  goPage('akinita', document.querySelector('.sb-item[data-page="akinita"]'));
+  setTimeout(() => {
+    const filtered = DB.ak.filter(r => Array.isArray(r.fields['User']) && r.fields['User'].includes(userId));
+    renderAkRows(filtered);
+    const title = document.querySelector('.list-title');
+    if (title) title.textContent = `Ακίνητα — ${name}`;
+  }, 100);
+}
+
+// ============================================================
+// ΑΚΙΝΗΤΑ PAGE
+// ============================================================
+function pgAkinita(c, a) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  a.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openAkForm()">+ Νέο Ακίνητο</button>` : '';
+
+  const statuses = [...new Set(DB.ak.map(r=>r.fields['Status']).filter(Boolean))];
+  const eidi = [...new Set(DB.ak.map(r=>r.fields['Είδος ακινήτου']).filter(Boolean))];
+  const perioches = [...new Set(DB.ak.map(r=>r.fields['Περιοχή']).filter(Boolean))];
+
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header">
+        <div>
+          <span class="list-title">Ακίνητα</span>
+          <span class="list-count" id="akCount"></span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input placeholder="Αναζήτηση..." id="akSearch" oninput="filterAk()">
+          </div>
+        </div>
+      </div>
+      <div class="filters">
+        <select class="filter-select" id="fStatus" onchange="filterAk()">
+          <option value="">Όλα Status</option>
+          ${statuses.map(s=>`<option value="${s}">${s}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="fEidos" onchange="filterAk()">
+          <option value="">Όλα Είδη</option>
+          ${eidi.map(e=>`<option value="${e}">${e}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="fPeriochi" onchange="filterAk()">
+          <option value="">Όλες Περιοχές</option>
+          ${perioches.map(p=>`<option value="${p}">${p}</option>`).join('')}
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Α/Α</th>
+            <th>Περιοχή</th>
+            <th>Είδος</th>
+            <th>Status</th>
+            <th>Εμβαδό</th>
+            <th>Τιμή</th>
+            <th>Agent</th>
+          </tr></thead>
+          <tbody id="akBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  renderAkRows(getMyAk());
+}
+
+function getMyAk() {
+  return ME.role === 'admin' ? DB.ak : DB.ak.filter(r =>
+    Array.isArray(r.fields['User']) && r.fields['User'].includes(ME.id)
+  );
+}
+
+function renderAkRows(recs) {
+  const tbody = document.getElementById('akBody');
+  if (!tbody) return;
+  const el = document.getElementById('akCount');
+  if (el) el.textContent = ` (${recs.length})`;
+
+  if (!recs.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏢</div><div class="empty-text">Δεν βρέθηκαν ακίνητα</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = recs.map(r => {
+    const f = r.fields;
+    const sc = {Διαθέσιμο:'badge-green','Off Market':'badge-gold',Πουλήθηκε:'badge-gray',Αποσύρθηκε:'badge-red'}[f['Status']]||'badge-gray';
+    const timi = f['Τιμή'] ? `€${Number(f['Τιμή']).toLocaleString('el-GR')}` : '—';
+    const emv = f['Εμβ. Μεικτό'] ? `${f['Εμβ. Μεικτό']} τ.μ.` : '—';
+    // Get agent name from linked User field
+    const userId = Array.isArray(f['User']) ? f['User'][0] : null;
+    const agentRec = userId ? DB.us.find(u => u.id === userId) : null;
+    const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
+
+    return `<tr onclick="viewAk('${r.id}')">
+      <td><strong>${f['Α/A']||'—'}</strong></td>
+      <td>${f['Περιοχή']||'—'}</td>
+      <td>${f['Είδος ακινήτου']||'—'}</td>
+      <td><span class="badge ${sc}">${f['Status']||'—'}</span></td>
+      <td>${emv}</td>
+      <td><strong>${timi}</strong></td>
+      <td style="color:var(--text2)">${agentName}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterAk() {
+  const s = (document.getElementById('akSearch')?.value||'').toLowerCase();
+  const st = document.getElementById('fStatus')?.value||'';
+  const ei = document.getElementById('fEidos')?.value||'';
+  const pe = document.getElementById('fPeriochi')?.value||'';
+  let r = getMyAk();
+  if (s) r = r.filter(x => JSON.stringify(x.fields).toLowerCase().includes(s));
+  if (st) r = r.filter(x => x.fields['Status']===st);
+  if (ei) r = r.filter(x => x.fields['Είδος ακινήτου']===ei);
+  if (pe) r = r.filter(x => x.fields['Περιοχή']===pe);
+  renderAkRows(r);
+}
+
+function viewAk(id) {
+  const rec = DB.ak.find(r => r.id === id);
+  if (!rec) return;
+  const f = rec.fields;
+
+  const isOwner = ME.role === 'admin' || (Array.isArray(f['User']) && f['User'].includes(ME.id));
+
+  const userId = Array.isArray(f['User']) ? f['User'][0] : null;
+  const agentRec = userId ? DB.us.find(u => u.id === userId) : null;
+  const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
+
+  const timi = f['Τιμή'] ? `€${Number(f['Τιμή']).toLocaleString('el-GR')}` : '—';
+  const ektimisi = f['Εκτίμηση'] ? `€${Number(f['Εκτίμηση']).toLocaleString('el-GR')}` : '—';
+  const timiMetro = f['Τιμή ανά Τετρ.μέτρο'] ? `€${Number(f['Τιμή ανά Τετρ.μέτρο']).toLocaleString('el-GR')}/τ.μ.` : '—';
+  const sc = {Διαθέσιμο:'badge-green','Off Market':'badge-gold',Πουλήθηκε:'badge-gray',Αποσύρθηκε:'badge-red'}[f['Status']]||'badge-gray';
+
+  const photosHTML = Array.isArray(f['Φωτογραφίες']) && f['Φωτογραφίες'].length ?
+    `<div class="detail-photos">${f['Φωτογραφίες'].map(p=>`<img class="detail-photo" src="${p.url}" onclick="window.open('${p.url}','_blank')">`).join('')}</div>` : '';
+
+  openModal(`🏢 Ακίνητο #${f['Α/A']||''}`, `
+    ${photosHTML}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:20px;font-weight:700">${f['Περιοχή']||'—'}</div>
+        <div style="color:var(--text2)">${f['Είδος ακινήτου']||'—'} ${f['Δωμάτια']?'· '+f['Δωμάτια']+' δωμ.':''}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:var(--gold)">${timi}</div>
+        <span class="badge ${sc}">${f['Status']||''}</span>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Εμβαδό Μεικτό</div><div class="detail-value">${f['Εμβ. Μεικτό']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Εμβαδό Καθαρό</div><div class="detail-value">${f['Εμβαδό Καθαρό']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Τιμή/τ.μ.</div><div class="detail-value">${timiMetro}</div></div>
+      <div class="detail-item"><div class="detail-label">Εκτίμηση</div><div class="detail-value">${ektimisi}</div></div>
+      <div class="detail-item"><div class="detail-label">Έτος Κατ/σης</div><div class="detail-value">${f['Έτος κατασκευής']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Όροφος</div><div class="detail-value">${f['Όροφος']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Δωμάτια</div><div class="detail-value">${f['Δωμάτια']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Θέση Στάθμευσης</div><div class="detail-value">${f['Θέση Στάθμευσης']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Ασανσέρ</div><div class="detail-value">${f['Ασανσέρ']?'✅ Ναί':'❌ Όχι'}</div></div>
+      <div class="detail-item"><div class="detail-label">Αποθήκη</div><div class="detail-value">${f['Αποθήκη']?'✅ Ναί':'❌ Όχι'}</div></div>
+      <div class="detail-item"><div class="detail-label">Διεύθυνση</div><div class="detail-value">${f['Διεύθυνση']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Συνεργασίες</div><div class="detail-value">${f['Συνεργασίες']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Agent</div><div class="detail-value">${agentName}</div></div>
+      <div class="detail-item"><div class="detail-label">Ημερομηνία</div><div class="detail-value">${f['Ημερομηνία']?new Date(f['Ημερομηνία']).toLocaleDateString('el-GR'):'—'}</div></div>
+    </div>
+    ${f['Σημειώσεις'] ? `<div style="margin-top:12px;padding:12px;background:var(--bg2);border-radius:var(--radius2)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Σημειώσεις</div><div style="font-size:13px">${f['Σημειώσεις']}</div></div>` : ''}
+  `, `
+    <button class="btn btn-outline btn-sm" onclick="printAk('${id}')">📄 PDF</button>
+    <button class="btn btn-outline btn-sm" onclick="viberAk('${id}')">💬 Viber</button>
+    ${isOwner ? `
+    <button class="btn btn-danger btn-sm" onclick="delAk('${id}')">🗑️ Διαγραφή</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal();openAkForm('${id}')">✏️ Επεξεργασία</button>
+    ` : ''}
+  `);
+}
+
+function getUserOptions(selectedId='') {
+  return DB.us.map(u => {
+    const name = u.fields['Name'] || u.fields['Email'] || '';
+    return `<option value="${u.id}" ${u.id===selectedId?'selected':''}>${name}</option>`;
+  }).join('');
+}
+
+function getUniqueOptions(field, dataset='ak') {
+  return [...new Set(DB[dataset].map(r => {
+    const v = r.fields[field];
+    if (Array.isArray(v)) return v;
+    return v ? [v] : [];
+  }).flat().filter(Boolean))];
+}
+
+async function openAkForm(id=null) {
+  const rec = id ? DB.ak.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
+  const isEdit = !!id;
+
+  const userId = Array.isArray(f['User']) ? f['User'][0] : '';
+  const today = new Date().toISOString().split('T')[0];
+  const timiVal = f['Τιμή'] || '';
+  const emvVal = f['Εμβ. Μεικτό'] || '';
+  const timiMetro = timiVal && emvVal ? (timiVal/emvVal).toFixed(2) : '';
+
+  const perioches = getUniqueOptions('Περιοχή');
+  const eidi = getUniqueOptions('Είδος ακινήτου');
+
+  openModal(isEdit ? '✏️ Επεξεργασία Ακινήτου' : '+ Νέο Ακίνητο', `
+    <div class="fgrid">
+      <div class="field">
+        <label>Ημερομηνία</label>
+        <input type="date" id="ak_date" value="${f['Ημερομηνία']||today}">
+      </div>
+      <div class="field">
+        <label>Agent</label>
+        <select id="ak_user">
+          <option value="">Επιλογή...</option>
+          ${getUserOptions(userId)}
+        </select>
+      </div>
+      <div class="field">
+        <label>Περιοχή *</label>
+        <select id="ak_periochi" onchange="handleNewOpt(this,'ak_periochi_new')">
+          <option value="">Επιλογή...</option>
+          ${perioches.map(p=>`<option value="${p}" ${(f['Περιοχή']||'')==p?'selected':''}>${p}</option>`).join('')}
+          <option value="__new__">+ Νέα Περιοχή</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Είδος Ακινήτου *</label>
+        <select id="ak_eidos" onchange="handleNewOpt(this,'ak_eidos_new')">
+          <option value="">Επιλογή...</option>
+          ${eidi.map(e=>`<option value="${e}" ${((f['Είδος ακινήτου']||'')==e)?'selected':''}>${e}</option>`).join('')}
+          <option value="__new__">+ Νέο Είδος</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="ak_status">
+          ${['Διαθέσιμο','Off Market','Πουλήθηκε','Αποσύρθηκε'].map(s=>`<option value="${s}" ${(f['Status']||'')==s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Όροφος</label>
+        <select id="ak_oros">
+          <option value="">Επιλογή...</option>
+          ${['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'].map(o=>`<option value="${o}" ${(f['Όροφος']||'')==o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Δωμάτια</label>
+        <select id="ak_domata">
+          <option value="">Επιλογή...</option>
+          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${((f['Δωμάτια']||'')==d)?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Θέση Στάθμευσης</label>
+        <select id="ak_stath">
+          <option value="">Επιλογή...</option>
+          ${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Τιμή (€)</label>
+        <input type="number" id="ak_timi" value="${timiVal}" placeholder="π.χ. 150000" oninput="calcTM()">
+      </div>
+      <div class="field">
+        <label>Εκτίμηση (€)</label>
+        <input type="number" id="ak_ektimisi" value="${f['Εκτίμηση']||''}" placeholder="π.χ. 160000">
+      </div>
+      <div class="field">
+        <label>Εμβαδό Μεικτό (τ.μ.)</label>
+        <input type="number" id="ak_emv" value="${emvVal}" placeholder="π.χ. 85" oninput="calcTM()">
+      </div>
+      <div class="field">
+        <label>Εμβαδό Καθαρό (τ.μ.)</label>
+        <input type="number" id="ak_emvk" value="${f['Εμβαδό Καθαρό']||''}" placeholder="π.χ. 78">
+      </div>
+      <div class="field">
+        <label>Τιμή/τ.μ. (αυτόματο)</label>
+        <input type="text" id="ak_tm" value="${timiMetro?timiMetro+' €/τ.μ.':''}" readonly style="background:var(--bg3);color:var(--text3)">
+      </div>
+      <div class="field">
+        <label>Έτος Κατασκευής</label>
+        <input type="number" id="ak_etos" value="${f['Έτος κατασκευής']||''}" placeholder="π.χ. 2010">
+      </div>
+      <div class="field">
+        <label>Διεύθυνση</label>
+        <input type="text" id="ak_dieft" value="${f['Διεύθυνση']||''}" placeholder="Οδός αριθμός">
+      </div>
+      <div class="field">
+        <label>Συνεργασίες</label>
+        <input type="text" id="ak_sinerg" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική">
+      </div>
+      <div class="field" style="display:flex;gap:16px;align-items:center;padding-top:18px">
+        <label class="check-row" style="flex:1;margin-bottom:0">
+          <input type="checkbox" id="ak_asanser" ${f['Ασανσέρ']?'checked':''}> Ασανσέρ
+        </label>
+        <label class="check-row" style="flex:1;margin-bottom:0">
+          <input type="checkbox" id="ak_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
+        </label>
+      </div>
+      <div class="field fspan">
+        <label>Σημειώσεις</label>
+        <textarea id="ak_notes" rows="3" placeholder="Περιγραφή...">${f['Σημειώσεις']||''}</textarea>
+      </div>
+    </div>
+  `, `
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveAk('${id||''}')">
+      ${isEdit ? '💾 Αποθήκευση' : '+ Δημιουργία'}
+    </button>
+  `);
+}
+
+function handleNewOpt(sel, inputId) {
+  if (sel.value === '__new__') {
+    const val = prompt('Νέο στοιχείο:');
+    if (val && val.trim()) {
+      const opt = new Option(val.trim(), val.trim(), true, true);
+      sel.insertBefore(opt, sel.lastElementChild);
+      sel.value = val.trim();
+    } else {
+      sel.value = '';
+    }
+  }
+}
+
+function calcTM() {
+  const t = parseFloat(document.getElementById('ak_timi')?.value)||0;
+  const e = parseFloat(document.getElementById('ak_emv')?.value)||0;
+  const el = document.getElementById('ak_tm');
+  if (el && t>0 && e>0) {
+    el.value = (t/e).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €/τ.μ.';
+  }
+}
+
+async function saveAk(id) {
+  const timi = parseFloat(document.getElementById('ak_timi').value)||null;
+  const emv = parseFloat(document.getElementById('ak_emv').value)||null;
+  const userId = document.getElementById('ak_user').value;
+
+  const fields = {
+    'Ημερομηνία': document.getElementById('ak_date').value || null,
+    'Περιοχή': document.getElementById('ak_periochi').value || null,
+    'Είδος ακινήτου': document.getElementById('ak_eidos').value || null,
+    'Status': document.getElementById('ak_status').value || null,
+    'Όροφος': document.getElementById('ak_oros').value || null,
+    'Δωμάτια': document.getElementById('ak_domata').value || null,
+    'Θέση Στάθμευσης': document.getElementById('ak_stath').value || null,
+    'Τιμή': timi,
+    'Εκτίμηση': parseFloat(document.getElementById('ak_ektimisi').value)||null,
+    'Εμβ. Μεικτό': emv,
+    'Εμβαδό Καθαρό': parseFloat(document.getElementById('ak_emvk').value)||null,
+    'Τιμή ανά Τετρ.μέτρο': (timi&&emv) ? parseFloat((timi/emv).toFixed(2)) : null,
+    'Έτος κατασκευής': parseInt(document.getElementById('ak_etos').value)||null,
+    'Διεύθυνση': document.getElementById('ak_dieft').value || null,
+    'Συνεργασίες': document.getElementById('ak_sinerg').value || null,
+    'Σημειώσεις': document.getElementById('ak_notes').value || null,
+  };
+
+  if (document.getElementById('ak_asanser').checked) fields['Ασανσέρ'] = true;
+  if (document.getElementById('ak_apothiki').checked) fields['Αποθήκη'] = true;
+  if (userId) fields['User'] = [userId];
+
+  Object.keys(fields).forEach(k => (fields[k]===null||fields[k]==='') && delete fields[k]);
+
+  setLoading(true);
+  try {
+    if (id) { await updateRec(CFG.T.AK, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.AK, fields); toast('Δημιουργήθηκε!','s'); }
+    closeModal();
+    await loadAll();
+    pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { console.error(e); toast('Σφάλμα αποθήκευσης','e'); }
+  setLoading(false);
+}
+
+async function delAk(id) {
+  if (!confirm('Διαγραφή ακινήτου;')) return;
+  setLoading(true);
+  try {
+    await deleteRec(CFG.T.AK, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα διαγραφής','e'); }
+  setLoading(false);
+}
+
+function printAk(id) {
+  const rec = DB.ak.find(r=>r.id===id);
+  if (!rec) return;
+  printFields(rec.fields, 'Ακίνητο');
+}
+
+function viberAk(id) {
+  const rec = DB.ak.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const t = `Ακίνητο\n${f['Περιοχή']||''} - ${f['Είδος ακινήτου']||''}\n${f['Εμβ. Μεικτό']||''} τ.μ.\n€${Number(f['Τιμή']||0).toLocaleString('el-GR')}\n${f['Status']||''}`;
+  window.open(`viber://forward?text=${encodeURIComponent(t)}`);
+}
+
+// ============================================================
+// ΖΗΤΗΣΕΙΣ PAGE
+// ============================================================
+function pgZitiseis(c, a) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  a.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openZiForm()">+ Νέα Ζήτηση</button>` : '';
+
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header">
+        <div>
+          <span class="list-title">Ζητήσεις</span>
+          <span class="list-count" id="ziCount"></span>
+        </div>
+        <div style="margin-left:auto">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input placeholder="Αναζήτηση..." id="ziSearch" oninput="filterZi()">
+          </div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Α/Α</th>
+            <th>Agent</th>
+            <th>Περιοχή</th>
+            <th>Είδος</th>
+            <th>Τιμή</th>
+            <th>Δωμάτια</th>
+            <th>Ημερομηνία</th>
+          </tr></thead>
+          <tbody id="ziBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  renderZiRows(getMyZi());
+}
+
+function getMyZi() {
+  return ME.role === 'admin' ? DB.zi : DB.zi.filter(r => {
+    const u = r.fields['USER'] || r.fields['User'];
+    return Array.isArray(u) && u.includes(ME.id);
+  });
+}
+
+function renderZiRows(recs) {
+  const tbody = document.getElementById('ziBody');
+  if (!tbody) return;
+  const el = document.getElementById('ziCount');
+  if (el) el.textContent = ` (${recs.length})`;
+
+  if (!recs.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Δεν βρέθηκαν ζητήσεις</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = recs.map(r => {
+    const f = r.fields;
+    const periochi = Array.isArray(f['Περιοχή']) ? f['Περιοχή'].join(', ') : (f['Περιοχή']||'—');
+    const eidos = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'].join(', ') : (f['Είδος ακινήτου']||'—');
+    const tMin = f['Τιμή Min'] ? `€${Number(f['Τιμή Min']).toLocaleString('el-GR')}` : '';
+    const tMax = f['Τιμή Max'] ? `€${Number(f['Τιμή Max']).toLocaleString('el-GR')}` : '';
+    const timi = tMin && tMax ? `${tMin}–${tMax}` : tMin || tMax || '—';
+    const date = f['Ημερομηνία'] ? new Date(f['Ημερομηνία']).toLocaleDateString('el-GR') : '—';
+    const userId = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : null;
+    const agentRec = userId ? DB.us.find(u=>u.id===userId) : null;
+    const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
+
+    return `<tr onclick="viewZi('${r.id}')">
+      <td><strong>${f['Α/A Ζήτησης']||f['Α/A']||'—'}</strong></td>
+      <td style="color:var(--text2)">${agentName}</td>
+      <td>${periochi}</td>
+      <td>${eidos}</td>
+      <td style="font-size:12px">${timi}</td>
+      <td>${f['Δωμάτια']||'—'}</td>
+      <td style="color:var(--text3);font-size:12px">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterZi() {
+  const s = (document.getElementById('ziSearch')?.value||'').toLowerCase();
+  let r = getMyZi();
+  if (s) r = r.filter(x => JSON.stringify(x.fields).toLowerCase().includes(s));
+  renderZiRows(r);
+}
+
+function viewZi(id) {
+  const rec = DB.zi.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const isOwner = ME.role==='admin' || (() => {
+    const u = f['USER']||f['User'];
+    return Array.isArray(u) && u.includes(ME.id);
+  })();
+
+  const userId = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : null;
+  const agentRec = userId ? DB.us.find(u=>u.id===userId) : null;
+  const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
+
+  const val = (v) => {
+    if (!v) return '—';
+    if (Array.isArray(v)) return v.map(x=>typeof x==='object'?x.name||x:x).join(', ');
+    return v;
+  };
+
+  openModal('🔍 Ζήτηση', `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Ημερομηνία</div><div class="detail-value">${f['Ημερομηνία']?new Date(f['Ημερομηνία']).toLocaleDateString('el-GR'):'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Agent</div><div class="detail-value">${agentName}</div></div>
+      <div class="detail-item"><div class="detail-label">Περιοχή</div><div class="detail-value">${val(f['Περιοχή'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Είδος</div><div class="detail-value">${val(f['Είδος ακινήτου'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Από Έτος</div><div class="detail-value">${f['Από Έτος']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Έως Έτος</div><div class="detail-value">${f['Έως Έτος']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Δωμάτια</div><div class="detail-value">${f['Δωμάτια']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Όροφος</div><div class="detail-value">${val(f['Όροφος'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Εμβαδό Min</div><div class="detail-value">${f['Εμβαδό Min']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Εμβαδό Max</div><div class="detail-value">${f['Εμβαδό Max']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Θέση Στάθμευσης</div><div class="detail-value">${f['Θέση Στάθμευσης']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Αποθήκη</div><div class="detail-value">${f['Αποθήκη']?'✅ Ναί':'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Τιμή Min</div><div class="detail-value">${f['Τιμή Min']?'€'+Number(f['Τιμή Min']).toLocaleString('el-GR'):'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Τιμή Max</div><div class="detail-value">${f['Τιμή Max']?'€'+Number(f['Τιμή Max']).toLocaleString('el-GR'):'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Τρόπος Πληρωμής</div><div class="detail-value">${val(f['Τρόπος Πληρωμής'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Hot</div><div class="detail-value">${f['Hot']?'🔥 Ναί':'—'}</div></div>
+    </div>
+    ${f['Ειδικά Χαρακτηριστικά']?.length ? `<div style="margin-top:12px;padding:12px;background:var(--bg2);border-radius:var(--radius2)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px">Ειδικά Χαρακτηριστικά</div><div style="display:flex;flex-wrap:wrap;gap:6px">${(Array.isArray(f['Ειδικά Χαρακτηριστικά'])?f['Ειδικά Χαρακτηριστικά']:[f['Ειδικά Χαρακτηριστικά']]).map(x=>`<span class="badge badge-blue">${typeof x==='object'?x.name||x:x}</span>`).join('')}</div></div>` : ''}
+  `, `
+    <button class="btn btn-outline btn-sm" onclick="printZi('${id}')">📄 PDF</button>
+    <button class="btn btn-outline btn-sm" onclick="viberZi('${id}')">💬 Viber</button>
+    ${isOwner ? `
+    <button class="btn btn-danger btn-sm" onclick="delZi('${id}')">🗑️</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal();openZiForm('${id}')">✏️ Επεξεργασία</button>
+    ` : ''}
+  `);
+}
+
+async function openZiForm(id=null) {
+  const rec = id ? DB.zi.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
+  const isEdit = !!id;
+  const today = new Date().toISOString().split('T')[0];
+
+  const userId = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : '';
+  const perioches = getUniqueOptions('Περιοχή');
+  const eidi = getUniqueOptions('Είδος ακινήτου');
+  const orofoi = ['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'];
+  const xar = getUniqueOptions('Ειδικά Χαρακτηριστικά', 'ak');
+  const selPerioches = Array.isArray(f['Περιοχή']) ? f['Περιοχή'] : (f['Περιοχή'] ? [f['Περιοχή']] : []);
+  const selEidi = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'] : (f['Είδος ακινήτου'] ? [f['Είδος ακινήτου']] : []);
+  const selOrofoi = Array.isArray(f['Όροφος']) ? f['Όροφος'] : (f['Όροφος'] ? [f['Όροφος']] : []);
+  const selXar = Array.isArray(f['Ειδικά Χαρακτηριστικά']) ? f['Ειδικά Χαρακτηριστικά'].map(x=>typeof x==='object'?x.name||x:x) : [];
+  const selTropo = Array.isArray(f['Τρόπος Πληρωμής']) ? f['Τρόπος Πληρωμής'].map(x=>typeof x==='object'?x.name||x:x) : (f['Τρόπος Πληρωμής']?[f['Τρόπος Πληρωμής']]:[]);
+  const tropoOpts = ['Μετρητά','Δάνειο Στεγαστικό','Home 2','Άλλο'];
+
+  openModal(isEdit ? '✏️ Επεξεργασία Ζήτησης' : '+ Νέα Ζήτηση', `
+    <div class="fgrid">
+      <div class="field">
+        <label>Ημερομηνία</label>
+        <input type="date" id="zi_date" value="${f['Ημερομηνία']||today}">
+      </div>
+      <div class="field">
+        <label>Agent</label>
+        <select id="zi_user">
+          <option value="">Επιλογή...</option>
+          ${getUserOptions(userId)}
+        </select>
+      </div>
+      <div class="field fspan">
+        <label>Περιοχή (πολλαπλή — κλικ για επιλογή)</label>
+        ${buildMultiSelect('zi_periochi', perioches, selPerioches, true)}
+      </div>
+      <div class="field fspan">
+        <label>Είδος Ακινήτου (πολλαπλή επιλογή)</label>
+        ${buildMultiSelect('zi_eidos', eidi, selEidi, true)}
+      </div>
+      <div class="field">
+        <label>Από Έτος</label>
+        <input type="number" id="zi_etos_apo" value="${f['Από Έτος']||''}" placeholder="π.χ. 2000">
+      </div>
+      <div class="field">
+        <label>Έως Έτος</label>
+        <input type="number" id="zi_etos_eos" value="${f['Έως Έτος']||''}" placeholder="π.χ. 2010">
+      </div>
+      <div class="field">
+        <label>Δωμάτια</label>
+        <select id="zi_domata">
+          <option value="">Επιλογή...</option>
+          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${(f['Δωμάτια']||'')==d?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Όροφος (πολλαπλή)</label>
+        ${buildMultiSelect('zi_oros', orofoi, selOrofoi, false)}
+      </div>
+      <div class="field">
+        <label>Εμβαδό Min (τ.μ.)</label>
+        <input type="number" id="zi_emv_min" value="${f['Εμβαδό Min']||''}" placeholder="π.χ. 70">
+      </div>
+      <div class="field">
+        <label>Εμβαδό Max (τ.μ.)</label>
+        <input type="number" id="zi_emv_max" value="${f['Εμβαδό Max']||''}" placeholder="π.χ. 120">
+      </div>
+      <div class="field">
+        <label>Θέση Στάθμευσης</label>
+        <select id="zi_stath">
+          <option value="">Δεν έχει σημασία</option>
+          ${['Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field" style="padding-top:18px">
+        <label class="check-row">
+          <input type="checkbox" id="zi_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
+        </label>
+      </div>
+      <div class="field">
+        <label>Τιμή Min (€)</label>
+        <input type="number" id="zi_timi_min" value="${f['Τιμή Min']||''}" placeholder="π.χ. 100000">
+      </div>
+      <div class="field">
+        <label>Τιμή Max (€)</label>
+        <input type="number" id="zi_timi_max" value="${f['Τιμή Max']||''}" placeholder="π.χ. 200000">
+      </div>
+      <div class="field fspan">
+        <label>Τρόπος Πληρωμής</label>
+        ${buildMultiSelect('zi_tropo', tropoOpts, selTropo, true)}
+      </div>
+      <div class="field fspan">
+        <label>Ειδικά Χαρακτηριστικά</label>
+        ${buildMultiSelect('zi_xar', xar, selXar, true)}
+      </div>
+      <div class="field fspan" style="padding-top:8px">
+        <label class="check-row">
+          <input type="checkbox" id="zi_hot" ${f['Hot']?'checked':''}> 🔥 Hot Ζήτηση
+        </label>
+      </div>
+    </div>
+  `, `
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveZi('${id||''}')">
+      ${isEdit ? '💾 Αποθήκευση' : '+ Δημιουργία'}
+    </button>
+  `);
+}
+
+// MultiSelect builder
+function buildMultiSelect(id, options, selected=[], allowNew=false) {
+  const selArr = selected.map(x => typeof x==='object' ? x.name||x : x);
+  return `
+    <div class="ms-container" onclick="toggleMS('${id}')">
+      <div class="ms-tags" id="${id}_tags">
+        ${selArr.map(v=>`<span class="ms-tag">${v}<button type="button" onclick="event.stopPropagation();removeTag('${id}','${v}')">&times;</button></span>`).join('')}
+        <span style="font-size:12px;color:var(--text3);padding:2px 4px">Κλικ για επιλογή...</span>
+      </div>
+    </div>
+    <div class="ms-options" id="${id}_opts">
+      ${options.map(o=>`
+        <div class="ms-option" onclick="toggleTag('${id}','${o}')">
+          <input type="checkbox" ${selArr.includes(o)?'checked':''} onclick="event.stopPropagation();toggleTag('${id}','${o}')"> ${o}
+        </div>`).join('')}
+      ${allowNew ? `
+      <div class="ms-add">
+        <input type="text" id="${id}_new" placeholder="Νέα επιλογή..." onclick="event.stopPropagation()">
+        <button type="button" onclick="event.stopPropagation();addMSOption('${id}')">+</button>
+      </div>` : ''}
+    </div>
+    <input type="hidden" id="${id}_val" value="${selArr.join(',')}">
+  `;
+}
+
+function toggleMS(id) {
+  const opts = document.getElementById(id+'_opts');
+  if (opts) opts.classList.toggle('open');
+}
+
+function toggleTag(id, val) {
+  const hiddenInput = document.getElementById(id+'_val');
+  const tagsEl = document.getElementById(id+'_tags');
+  const opts = document.getElementById(id+'_opts');
+  if (!hiddenInput) return;
+
+  let vals = hiddenInput.value ? hiddenInput.value.split(',').filter(Boolean) : [];
+  const idx = vals.indexOf(val);
+  if (idx >= 0) vals.splice(idx, 1);
+  else vals.push(val);
+
+  hiddenInput.value = vals.join(',');
+
+  // Update tags display
+  tagsEl.innerHTML = vals.map(v=>`<span class="ms-tag">${v}<button type="button" onclick="event.stopPropagation();removeTag('${id}','${v}')">&times;</button></span>`).join('') +
+    `<span style="font-size:12px;color:var(--text3);padding:2px 4px">Κλικ για επιλογή...</span>`;
+
+  // Update checkboxes
+  if (opts) {
+    opts.querySelectorAll('.ms-option').forEach(opt => {
+      const cb = opt.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = vals.includes(opt.textContent.trim());
+    });
+  }
+}
+
+function removeTag(id, val) {
+  toggleTag(id, val);
+}
+
+function addMSOption(id) {
+  const input = document.getElementById(id+'_new');
+  if (!input || !input.value.trim()) return;
+  const newVal = input.value.trim();
+  const opts = document.getElementById(id+'_opts');
+
+  // Add to options list
+  const addDiv = opts.querySelector('.ms-add');
+  const newOpt = document.createElement('div');
+  newOpt.className = 'ms-option';
+  newOpt.innerHTML = `<input type="checkbox"> ${newVal}`;
+  newOpt.onclick = () => toggleTag(id, newVal);
+  opts.insertBefore(newOpt, addDiv);
+
+  // Select it
+  toggleTag(id, newVal);
+  input.value = '';
+}
+
+function getMSValues(id) {
+  const el = document.getElementById(id+'_val');
+  if (!el || !el.value) return [];
+  return el.value.split(',').filter(Boolean);
+}
+
+async function saveZi(id) {
+  const userId = document.getElementById('zi_user').value;
+  const fields = {
+    'Ημερομηνία': document.getElementById('zi_date').value || null,
+    'Περιοχή': getMSValues('zi_periochi'),
+    'Είδος ακινήτου': getMSValues('zi_eidos'),
+    'Από Έτος': parseInt(document.getElementById('zi_etos_apo').value)||null,
+    'Έως Έτος': parseInt(document.getElementById('zi_etos_eos').value)||null,
+    'Δωμάτια': document.getElementById('zi_domata').value || null,
+    'Όροφος': getMSValues('zi_oros'),
+    'Εμβαδό Min': parseFloat(document.getElementById('zi_emv_min').value)||null,
+    'Εμβαδό Max': parseFloat(document.getElementById('zi_emv_max').value)||null,
+    'Θέση Στάθμευσης': document.getElementById('zi_stath').value || null,
+    'Τιμή Min': parseFloat(document.getElementById('zi_timi_min').value)||null,
+    'Τιμή Max': parseFloat(document.getElementById('zi_timi_max').value)||null,
+    'Τρόπος Πληρωμής': getMSValues('zi_tropo'),
+    'Ειδικά Χαρακτηριστικά': getMSValues('zi_xar'),
+    'Hot': document.getElementById('zi_hot').checked || null,
+  };
+
+  if (document.getElementById('zi_apothiki').checked) fields['Αποθήκη'] = true;
+  if (userId) fields['USER'] = [userId];
+
+  Object.keys(fields).forEach(k => {
+    const v = fields[k];
+    if (v===null||v===''||(Array.isArray(v)&&v.length===0)||v===false) delete fields[k];
+  });
+
+  setLoading(true);
+  try {
+    if (id) { await updateRec(CFG.T.ZI, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.ZI, fields); toast('Δημιουργήθηκε!','s'); }
+    closeModal();
+    await loadAll();
+    pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { console.error(e); toast('Σφάλμα αποθήκευσης','e'); }
+  setLoading(false);
+}
+
+async function delZi(id) {
+  if (!confirm('Διαγραφή ζήτησης;')) return;
+  setLoading(true);
+  try {
+    await deleteRec(CFG.T.ZI, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
+}
+
+function printZi(id) {
+  const rec = DB.zi.find(r=>r.id===id);
+  if (rec) printFields(rec.fields, 'Ζήτηση');
+}
+
+function viberZi(id) {
+  const rec = DB.zi.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const p = Array.isArray(f['Περιοχή'])?f['Περιοχή'].join(', '):(f['Περιοχή']||'');
+  const t = `Ζήτηση Ακινήτου\n${p}\n€${Number(f['Τιμή Min']||0).toLocaleString('el-GR')} - €${Number(f['Τιμή Max']||0).toLocaleString('el-GR')}`;
+  window.open(`viber://forward?text=${encodeURIComponent(t)}`);
+}
+
+// ============================================================
+// MATCHING PAGE
+// ============================================================
+function pgMatching(c, a) {
+  a.innerHTML = `<button class="btn btn-outline btn-sm" onclick="doRefresh()">↻</button>`;
+
+  c.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input placeholder="Αναζήτηση..." id="maSearch" oninput="filterMa()">
+      </div>
+      <select class="filter-select" id="maScore" onchange="filterMa()">
+        <option value="0">Όλα τα σκορ</option>
+        <option value="90">90%+</option>
+        <option value="80">80%+</option>
+        <option value="70">70%+</option>
+      </select>
+    </div>
+    <div class="score-grid" id="maGrid"></div>
+  `;
+
+  renderMaCards(DB.ma.sort((a,b)=>(b.fields['Σκορ %']||0)-(a.fields['Σκορ %']||0)));
+}
+
+function renderMaCards(recs) {
+  const g = document.getElementById('maGrid');
+  if (!g) return;
+  if (!recs.length) {
+    g.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⭐</div><div class="empty-text">Δεν βρέθηκαν αποτελέσματα</div></div>`;
+    return;
+  }
+
+  g.innerHTML = recs.map(r => {
+    const f = r.fields;
+    const sc = f['Σκορ %']||0;
+    const scClass = sc>=90?'score-90':sc>=80?'score-80':sc>=70?'score-70':'score-60';
+    const timi = f['Τιμή']?`€${Number(f['Τιμή']).toLocaleString('el-GR')}`:'—';
+    const date = f['Ημερομηνία Matching']?new Date(f['Ημερομηνία Matching']).toLocaleDateString('el-GR'):'—';
+
+    return `
+      <div class="score-card" onclick="viewMa('${r.id}')">
+        <div class="score-card-head">
+          <div class="score-info">
+            <div class="score-periochi">${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||'—'}</div>
+            <div class="score-eidos">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||'—'}</div>
+          </div>
+          <div class="score-circle ${scClass}">
+            <span>${sc}%</span>
+            <span class="score-label">match</span>
+          </div>
+        </div>
+        <div class="score-card-body">
+          <div class="score-timi">${timi}</div>
+          <div class="score-details">
+            <div><div class="score-det-label">Εμβαδό</div><div class="score-det-val">${f['Εμβαδό']||f['Εμβ. Μεικτό']||'—'} τ.μ.</div></div>
+            <div><div class="score-det-label">Δωμάτια</div><div class="score-det-val">${f['ΔΩΜΑΤΙΑ']||f['Δωμάτια']||'—'}</div></div>
+            <div><div class="score-det-label">Έτος</div><div class="score-det-val">${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||f['Έτος κατασκευής']||'—'}</div></div>
+            <div><div class="score-det-label">Στάθμευση</div><div class="score-det-val">${f['Θέση Στάθμευσης']||'—'}</div></div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-label"><span>Matching Score</span><span>${sc}%</span></div>
+            <div class="progress"><div class="progress-fill" style="width:${sc}%"></div></div>
+          </div>
+          <div style="font-size:11px;color:var(--text3)">📅 ${date}</div>
+        </div>
+        <div class="score-card-foot">
+          <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();viewMa('${r.id}')">🏢 Λεπτομέρειες</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();printMa('${r.id}')">📄</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();viberMa('${r.id}')">💬</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterMa() {
+  const s = (document.getElementById('maSearch')?.value||'').toLowerCase();
+  const minSc = parseInt(document.getElementById('maScore')?.value||'0')||0;
+  let r = DB.ma.filter(x => (x.fields['Σκορ %']||0) >= minSc);
+  if (s) r = r.filter(x => JSON.stringify(x.fields).toLowerCase().includes(s));
+  r.sort((a,b)=>(b.fields['Σκορ %']||0)-(a.fields['Σκορ %']||0));
+  renderMaCards(r);
+}
+
+function viewMa(id) {
+  const ma = DB.ma.find(r=>r.id===id);
+  if (!ma) return;
+  const f = ma.fields;
+  const sc = f['Σκορ %']||0;
+  const akId = Array.isArray(f['Ακίνητο ID']) ? f['Ακίνητο ID'][0] : f['Ακίνητο ID'];
+  const ak = DB.ak.find(r=>r.id===akId);
+  const sf = ak ? ak.fields : {};
+
+  const timi = (sf['Τιμή']||f['Τιμή']) ? `€${Number(sf['Τιμή']||f['Τιμή']).toLocaleString('el-GR')}` : '—';
+
+  // Lookup fields
+  const getLU = key => {
+    const v = f[key];
+    if (!v) return '—';
+    if (Array.isArray(v)) return v[0] || '—';
+    return v;
+  };
+
+  const allFields = ak ? sf : f;
+  const displayItems = [
+    ['Περιοχή', allFields['Περιοχή']||f['ΠΕΡΙΟΧΗ']],
+    ['Είδος', allFields['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']],
+    ['Status', getLU('Status (from Ακίνητο ID)')||allFields['Status']],
+    ['Εμβαδό Μεικτό', (getLU('Εμβ. Μεικτό (from Ακίνητο ID)')||allFields['Εμβ. Μεικτό']||f['Εμβαδό'])+(allFields['Εμβ. Μεικτό']?' τ.μ.':'')],
+    ['Δωμάτια', getLU('Δωμάτια (from Ακίνητο ID)')||allFields['Δωμάτια']||f['ΔΩΜΑΤΙΑ']],
+    ['Έτος Κατ/σης', getLU('Έτος κατασκευής (from Ακίνητο ID)')||allFields['Έτος κατασκευής']||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']],
+    ['Όροφος', getLU('Όροφος (from Ακίνητο ID)')||allFields['Όροφος']],
+    ['Θέση Στάθμευσης', getLU('Θέση Στάθμευσης (from Ακίνητο ID)')||allFields['Θέση Στάθμευσης']||f['Θέση Στάθμευσης']],
+    ['Ασανσέρ', (getLU('Ασανσέρ (from Ακίνητο ID)')||allFields['Ασανσέρ']) ? '✅' : '❌'],
+    ['Αποθήκη', (getLU('Αποθήκη (from Ακίνητο ID)')||allFields['Αποθήκη']) ? '✅' : '❌'],
+    ['Διεύθυνση', getLU('Διεύθυνση (from Ακίνητο ID)')||allFields['Διεύθυνση']],
+    ['Σημειώσεις', getLU('Σημειώσεις (from Ακίνητο ID)')||allFields['Σημειώσεις']],
+  ].filter(([,v]) => v && v !== '—' && v !== 'undefined');
+
+  openModal('🏢 Στοιχεία Matching', `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:20px;font-weight:700">${allFields['Περιοχή']||f['ΠΕΡΙΟΧΗ']||'—'}</div>
+        <div style="color:var(--text2)">${allFields['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'—'}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:var(--gold)">${timi}</div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      ${displayItems.map(([k,v])=>`<div class="detail-item"><div class="detail-label">${k}</div><div class="detail-value">${v||'—'}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:16px;padding:14px;background:var(--bg2);border-radius:var(--radius2)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text2)">Matching Score</span>
+        <strong style="color:var(--gold)">${sc}%</strong>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:${sc}%"></div></div>
+    </div>
+  `, `
+    <button class="btn btn-outline btn-sm" onclick="printMa('${id}')">📄 PDF</button>
+    <button class="btn btn-outline btn-sm" onclick="viberMa('${id}')">💬 Viber</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal()">Κλείσιμο</button>
+  `);
+}
+
+function printMa(id) {
+  const ma = DB.ma.find(r=>r.id===id);
+  if (ma) printFields(ma.fields, 'Matching');
+}
+
+function viberMa(id) {
+  const ma = DB.ma.find(r=>r.id===id);
+  if (!ma) return;
+  const f = ma.fields;
+  const t = `Matching Ακίνητο\n${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||''} - ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||''}\n€${Number(f['Τιμή']||0).toLocaleString('el-GR')}\nScore: ${f['Σκορ %']}%`;
+  window.open(`viber://forward?text=${encodeURIComponent(t)}`);
+}
+
+// ============================================================
+// ΚΑΤΑΣΚΕΥΑΣΤΕΣ
+// ============================================================
+function pgKataskevastes(c, a) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  a.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openKaForm()">+ Νέος</button>` : '';
+
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header">
+        <span class="list-title">Κατασκευαστές</span>
+        <span class="list-count" id="kaCount"> (${DB.ka.length})</span>
+        <div style="margin-left:auto">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input placeholder="Αναζήτηση..." id="kaSearch" oninput="filterKa()">
+          </div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Όνομα</th><th>Τηλέφωνο</th><th>Email</th><th>Περιοχή</th><th>Ειδικότητα</th></tr></thead>
+          <tbody id="kaBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  renderKaRows(DB.ka);
+}
+
+function renderKaRows(recs) {
+  const tbody = document.getElementById('kaBody');
+  if (!tbody) return;
+  if (!recs.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🔧</div><div class="empty-text">Δεν βρέθηκαν κατασκευαστές</div></div></td></tr>`;
+    return;
+  }
+  const canEdit = ['admin','agent'].includes(ME.role);
+  tbody.innerHTML = recs.map(r => {
+    const f = r.fields;
+    return `<tr onclick="viewKa('${r.id}')">
+      <td><strong>${f['Name']||f['Όνομα']||'—'}</strong></td>
+      <td>${f['Phone']||f['Τηλέφωνο']||'—'}</td>
+      <td>${f['Email']||'—'}</td>
+      <td>${f['Περιοχή']||'—'}</td>
+      <td>${f['Ειδικότητα']||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterKa() {
+  const s = (document.getElementById('kaSearch')?.value||'').toLowerCase();
+  renderKaRows(s ? DB.ka.filter(x=>JSON.stringify(x.fields).toLowerCase().includes(s)) : DB.ka);
+}
+
+function viewKa(id) {
+  const rec = DB.ka.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const canEdit = ['admin','agent'].includes(ME.role);
+  openModal('🔧 Κατασκευαστής', `
+    <div class="detail-grid">
+      ${Object.entries(f).filter(([k,v])=>v&&k!=='id').map(([k,v])=>`<div class="detail-item"><div class="detail-label">${k}</div><div class="detail-value">${v}</div></div>`).join('')}
+    </div>
+  `, `
+    ${canEdit ? `
+    <button class="btn btn-danger btn-sm" onclick="delKa('${id}')">🗑️</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal();openKaForm('${id}')">✏️ Επεξεργασία</button>
+    ` : ''}
+    <button class="btn btn-outline btn-sm" onclick="closeModal()">Κλείσιμο</button>
+  `);
+}
+
+async function openKaForm(id=null) {
+  const rec = id ? DB.ka.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
+  openModal(id?'✏️ Επεξεργασία':'+ Νέος Κατασκευαστής', `
+    <div class="fgrid">
+      <div class="field fspan"><label>Όνομα / Εταιρεία</label><input type="text" id="ka_name" value="${f['Name']||f['Όνομα']||''}"></div>
+      <div class="field"><label>Τηλέφωνο</label><input type="tel" id="ka_phone" value="${f['Phone']||f['Τηλέφωνο']||''}"></div>
+      <div class="field"><label>Email</label><input type="email" id="ka_email" value="${f['Email']||''}"></div>
+      <div class="field"><label>Περιοχή</label><input type="text" id="ka_per" value="${f['Περιοχή']||''}"></div>
+      <div class="field"><label>Ειδικότητα</label><input type="text" id="ka_eid" value="${f['Ειδικότητα']||''}"></div>
+      <div class="field fspan"><label>Σημειώσεις</label><textarea id="ka_notes" rows="3">${f['Σημειώσεις']||''}</textarea></div>
+    </div>
+  `, `
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveKa('${id||''}')">💾 Αποθήκευση</button>
+  `);
+}
+
+async function saveKa(id) {
+  const fields = {
+    'Name': document.getElementById('ka_name').value,
+    'Phone': document.getElementById('ka_phone').value,
+    'Email': document.getElementById('ka_email').value,
+    'Περιοχή': document.getElementById('ka_per').value,
+    'Ειδικότητα': document.getElementById('ka_eid').value,
+    'Σημειώσεις': document.getElementById('ka_notes').value,
+  };
+  Object.keys(fields).forEach(k => !fields[k] && delete fields[k]);
+  setLoading(true);
+  try {
+    if (id) { await updateRec(CFG.T.KA, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.KA, fields); toast('Δημιουργήθηκε!','s'); }
+    closeModal();
+    await loadAll();
+    pgKataskevastes(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
+}
+
+async function delKa(id) {
+  if (!confirm('Διαγραφή;')) return;
+  setLoading(true);
+  try {
+    await deleteRec(CFG.T.KA, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgKataskevastes(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
+}
+
+// ============================================================
+// USERS
+// ============================================================
+function pgUsers(c, a) {
+  if (ME.role !== 'admin') { c.innerHTML = '<div class="empty"><div class="empty-icon">🔒</div><div class="empty-text">Δεν έχεις πρόσβαση</div></div>'; return; }
+  a.innerHTML = `<button class="btn btn-dark" onclick="openUsForm()">+ Νέος Χρήστης</button>`;
+
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header"><span class="list-title">Χρήστες</span><span class="list-count"> (${DB.us.length})</span></div>
+      <table>
+        <thead><tr><th>Όνομα</th><th>Email</th><th>Κινητό</th><th>Ρόλος</th></tr></thead>
+        <tbody>
+          ${DB.us.map(r=>{
+            const f=r.fields;
+            const role=(f['Role']||'agent').toLowerCase();
+            const rc={admin:'badge-red',agent:'badge-blue',viewer:'badge-gray'}[role]||'badge-gray';
+            return `<tr onclick="openUsForm('${r.id}')">
+              <td><strong>${f['Name']||'—'}</strong></td>
+              <td>${f['Email']||'—'}</td>
+              <td>${f['Phone']||f['Κινητό']||'—'}</td>
+              <td><span class="badge ${rc}">${role}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function openUsForm(id=null) {
+  const rec = id ? DB.us.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
+  openModal(id?'✏️ Επεξεργασία Χρήστη':'+ Νέος Χρήστης', `
+    <div class="fgrid">
+      <div class="field fspan"><label>Ονοματεπώνυμο</label><input type="text" id="us_name" value="${f['Name']||''}"></div>
+      <div class="field"><label>Email</label><input type="email" id="us_email" value="${f['Email']||''}"></div>
+      <div class="field"><label>Κωδικός ${id?'(κενό = χωρίς αλλαγή)':''}</label><input type="password" id="us_pass"></div>
+      <div class="field"><label>Κινητό</label><input type="tel" id="us_phone" value="${f['Phone']||f['Κινητό']||''}"></div>
+      <div class="field"><label>Ρόλος</label>
+        <select id="us_role">
+          ${['admin','agent','viewer'].map(r=>`<option value="${r}" ${(f['Role']||'').toLowerCase()===r?'selected':''}>${r}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+  `, `
+    ${id ? `<button class="btn btn-danger btn-sm" onclick="delUs('${id}')">🗑️</button>` : ''}
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveUs('${id||''}')">💾 Αποθήκευση</button>
+  `);
+}
+
+async function saveUs(id) {
+  const pass = document.getElementById('us_pass').value;
+  const fields = {
+    'Name': document.getElementById('us_name').value,
+    'Email': document.getElementById('us_email').value,
+    'Phone': document.getElementById('us_phone').value,
+    'Role': document.getElementById('us_role').value,
+  };
+  if (pass) fields['Password'] = pass;
+  Object.keys(fields).forEach(k => !fields[k] && delete fields[k]);
+  setLoading(true);
+  try {
+    if (id) { await updateRec(CFG.T.US, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.US, fields); toast('Δημιουργήθηκε!','s'); }
+    closeModal();
+    await loadAll();
+    pgUsers(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
+}
+
+async function delUs(id) {
+  if (!confirm('Διαγραφή χρήστη;')) return;
+  setLoading(true);
+  try {
+    await deleteRec(CFG.T.US, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgUsers(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
+}
+
+// ============================================================
+// PRINT / VIBER
+// ============================================================
+function printFields(fields, title) {
+  const w = window.open('', '_blank');
+  const rows = Object.entries(fields).filter(([k,v])=>v&&k!=='User'&&k!=='USER').map(([k,v])=>`
+    <tr>
+      <td style="font-weight:600;padding:8px 12px;border-bottom:1px solid #eee;color:#666;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:35%">${k}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:13px">${Array.isArray(v)?v.map(x=>typeof x==='object'?x.name||x:x).join(', '):v}</td>
+    </tr>`).join('');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
+  <style>body{font-family:-apple-system,sans-serif;max-width:700px;margin:40px auto;color:#111}h1{font-size:22px;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #c9a96e}table{width:100%;border-collapse:collapse}@media print{.noprint{display:none}}</style>
+  </head><body>
+  <h1>${title}</h1><table>${rows}</table>
+  <p style="margin-top:20px;font-size:11px;color:#999">Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</p>
+  <button class="noprint" onclick="window.print()" style="margin-top:16px;padding:10px 24px;background:#c9a96e;border:none;color:#fff;cursor:pointer;border-radius:6px">🖨️ Εκτύπωση / PDF</button>
+  </body></html>`);
+  w.document.close();
+}
+
+// ============================================================
+// LOGO
+// ============================================================
+function triggerLogoUpload() {
+  document.getElementById('logoFile').click();
+}
+
+async function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64 = e.target.result;
+    // Save to Airtable as a config record
+    try {
+      await saveLogoToAirtable(base64);
+      applyLogo(base64);
+      toast('Logo ανανεώθηκε!','s');
+    } catch(err) {
+      // Fallback to localStorage
+      localStorage.setItem('crm_logo', base64);
+      applyLogo(base64);
+      toast('Logo αποθηκεύτηκε τοπικά','i');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveLogoToAirtable(base64) {
+  // Store as base64 in a special USERS record or use a config approach
+  // For now store in localStorage as fallback
+  localStorage.setItem('crm_logo', base64);
+}
+
+function applyLogo(src) {
+  const el = document.getElementById('sbLogoContent');
+  if (el) el.innerHTML = `<img src="${src}" style="max-height:48px;max-width:180px;object-fit:contain">`;
+  const loginLogo = document.getElementById('loginLogoWrap');
+  if (loginLogo) loginLogo.innerHTML = `<img src="${src}" style="max-height:60px;max-width:200px;object-fit:contain">`;
+}
+
+function loadLogo() {
+  const saved = localStorage.getItem('crm_logo');
+  if (saved) applyLogo(saved);
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('crm_theme', newTheme);
+  document.querySelector('.sb-footer .sb-btn:first-child').textContent = isDark ? '🌙' : '☀️';
+}
+
+function loadTheme() {
+  const t = localStorage.getItem('crm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  const btn = document.querySelector('.sb-footer .sb-btn:first-child');
+  if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(title, body, foot='') {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = body;
+  document.getElementById('mFoot').innerHTML = foot;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close MS dropdowns on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ms-container') && !e.target.closest('.ms-options')) {
+    document.querySelectorAll('.ms-options.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type='i') {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<span>${type==='s'?'✓':type==='e'?'✕':'ℹ'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ============================================================
+// LOADING
+// ============================================================
+function setLoading(show) {
+  document.getElementById('loader').style.display = show ? 'flex' : 'none';
+}
+
+// ============================================================
+// SIDEBAR MOBILE
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('open');
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
+});
+
+// ============================================================
+// AUTO LOGIN
+// ============================================================
+window.addEventListener('load', async () => {
+  const savedUser = localStorage.getItem('crm_user');
+  const savedToken = localStorage.getItem('crm_token');
+  if (savedUser && savedToken) {
+    try {
+      ME = JSON.parse(savedUser);
+      CFG.TOKEN = savedToken;
+      await initApp();
+    } catch(e) {
+      localStorage.removeItem('crm_user');
+      localStorage.removeItem('crm_token');
+    }
+  }
+  setLoading(false);
+});
+</script>
+</body>
+</html>
