@@ -1855,7 +1855,7 @@ function viewZi(id) {
       <div class="detail-item"><div class="detail-label">Τιμή Min</div><div class="detail-value">${f['Τιμή Min']?'€'+Number(f['Τιμή Min']).toLocaleString('el-GR'):'—'}</div></div>
       <div class="detail-item"><div class="detail-label">Τιμή Max</div><div class="detail-value">${f['Τιμή Max']?'€'+Number(f['Τιμή Max']).toLocaleString('el-GR'):'—'}</div></div>
       <div class="detail-item"><div class="detail-label">Τρόπος Πληρωμής</div><div class="detail-value">${val(f['Τρόπος Πληρωμής'])}</div></div>
-      <div class="detail-item"><div class="detail-label">Hot</div><div class="detail-value">${f['Hot']?'🔥 Ναί':'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Hot</div><div class="detail-value">${f['HOT 🔥']?'🔥 Ναί':'—'}</div></div>
     </div>
     ${f['Ειδικά Χαρακτηριστικά']?.length ? `<div style="margin-top:12px;padding:12px;background:var(--bg2);border-radius:var(--radius2)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px">Ειδικά Χαρακτηριστικά</div><div style="display:flex;flex-wrap:wrap;gap:6px">${(Array.isArray(f['Ειδικά Χαρακτηριστικά'])?f['Ειδικά Χαρακτηριστικά']:[f['Ειδικά Χαρακτηριστικά']]).map(x=>`<span class="badge badge-blue">${typeof x==='object'?x.name||x:x}</span>`).join('')}</div></div>` : ''}
   `, `
@@ -1964,7 +1964,7 @@ async function openZiForm(id=null) {
       </div>
       <div class="field fspan" style="padding-top:8px">
         <label class="check-row">
-          <input type="checkbox" id="zi_hot" ${f['Hot']?'checked':''}> 🔥 Hot Ζήτηση
+          <input type="checkbox" id="zi_hot" ${f['HOT 🔥']?'checked':''}> 🔥 Hot Ζήτηση
         </label>
       </div>
     </div>
@@ -2078,7 +2078,7 @@ async function saveZi(id) {
     'Τιμή Max': parseFloat(document.getElementById('zi_timi_max').value)||null,
     'Τρόπος Πληρωμής': getMSValues('zi_tropo').map(v => v.trim()).filter(Boolean),
     'Ειδικά Χαρακτηριστικά': getMSValues('zi_xar').map(v => v.trim()).filter(Boolean),
-    'Hot': document.getElementById('zi_hot').checked || null,
+    'HOT 🔥': document.getElementById('zi_hot').checked,
   };
 
   fields['Αποθήκη'] = document.getElementById('zi_apothiki').checked;
