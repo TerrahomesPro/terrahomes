@@ -1670,7 +1670,7 @@ async function saveAk(id) {
     'Status': document.getElementById('ak_status').value || null,
     'Όροφος': document.getElementById('ak_oros').value || null,
     'Δωμάτια': document.getElementById('ak_domata').value || null,
-    'Θέση Στάθμευσης': document.getElementById('ak_stath').value || null,
+    'Θέση Στάθμευσης': document.getElementById('ak_stath').value.replace(/["']/g,'').trim() || null,
     'Τιμή': timi,
     'Εκτίμηση': parseFloat(document.getElementById('ak_ektimisi').value)||null,
     'Εμβ. Μεικτό': emv,
@@ -1691,6 +1691,7 @@ async function saveAk(id) {
     else if (Array.isArray(fields[k]) && fields[k].length===0) delete fields[k];
   });
 
+  console.log('FIELDS:', JSON.stringify(fields));
   setLoading(true);
   try {
     if (id) { await updateRec(CFG.T.AK, id, fields); toast('Αποθηκεύτηκε!','s'); }
