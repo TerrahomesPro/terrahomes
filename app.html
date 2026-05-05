@@ -2,2601 +2,2423 @@
 <html lang="el">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TerraHomes CRM</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Real Estate CRM</title>
 <style>
 /* ============================================================
-   CSS VARIABLES — ΑΛΛΑΞΕ ΕΔΩ ΤΑ ΧΡΩΜΑΤΑ & FONTS
-   ============================================================ */
+   DESIGN TOKENS
+============================================================ */
 :root {
-  --primary: #1a1a2e;
-  --secondary: #16213e;
-  --accent: #c9a96e;
-  --accent-light: #e8d5b0;
-  --bg: #f8f7f4;
-  --bg-card: #ffffff;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --border: #e5e0d8;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  --font-display: 'Cormorant Garamond', serif;
-  --font-body: 'DM Sans', sans-serif;
-  --radius: 12px;
-  --shadow: 0 4px 24px rgba(26,26,46,0.08);
-  --shadow-lg: 0 8px 40px rgba(26,26,46,0.15);
-  --sidebar-width: 260px;
+  --bg: #ffffff;
+  --bg2: #f9f9f9;
+  --bg3: #f2f2f2;
+  --surface: #ffffff;
+  --border: #e8e8e8;
+  --border2: #d0d0d0;
+  --text: #111111;
+  --text2: #555555;
+  --text3: #999999;
+  --accent: #1a1a1a;
+  --gold: #c9a96e;
+  --gold2: #e8d5b0;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #2563eb;
+  --radius: 10px;
+  --radius2: 6px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow2: 0 2px 8px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.08);
+  --sidebar: 240px;
+  --topbar: 56px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --transition: 0.2s ease;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
+[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --bg2: #181818;
+  --bg3: #222222;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --border2: #3a3a3a;
+  --text: #f0f0f0;
+  --text2: #aaaaaa;
+  --text3: #666666;
+  --accent: #f0f0f0;
+  --shadow: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow2: 0 2px 8px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.3);
 }
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:14px; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; transition:background var(--transition), color var(--transition); }
 
 /* ============================================================
-   LOGIN PAGE
-   ============================================================ */
+   LOGIN
+============================================================ */
 #loginPage {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, #0f3460 100%);
-  position: relative;
-  overflow: hidden;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg2);
+  padding:20px;
 }
 
-#loginPage::before {
-  content: '';
-  position: absolute;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(201,169,110,0.15) 0%, transparent 70%);
-  top: -200px; right: -200px;
-  border-radius: 50%;
-}
-
-#loginPage::after {
-  content: '';
-  position: absolute;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(201,169,110,0.1) 0%, transparent 70%);
-  bottom: -100px; left: -100px;
-  border-radius: 50%;
-}
-
-.login-card {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(201,169,110,0.3);
-  border-radius: 24px;
-  padding: 48px 40px;
-  width: 100%;
-  max-width: 420px;
-  position: relative;
-  z-index: 1;
+.login-box {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:40px;
+  width:100%;
+  max-width:380px;
+  box-shadow:var(--shadow2);
 }
 
 .login-logo {
-  text-align: center;
-  margin-bottom: 36px;
+  text-align:center;
+  margin-bottom:32px;
 }
 
-.login-logo h1 {
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 300;
-  color: #fff;
-  letter-spacing: 2px;
+.login-logo img {
+  max-height:60px;
+  max-width:200px;
+  object-fit:contain;
 }
 
-.login-logo span {
-  color: var(--accent);
-  font-weight: 600;
+.login-logo-text {
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:-0.5px;
+  color:var(--text);
 }
 
-.login-logo p {
-  color: rgba(255,255,255,0.5);
-  font-size: 13px;
-  margin-top: 4px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
+.login-logo-text span { color:var(--gold); }
+
+.login-sub {
+  font-size:11px;
+  color:var(--text3);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-top:4px;
 }
 
-.form-group {
-  margin-bottom: 20px;
+.field { margin-bottom:16px; }
+
+.field label {
+  display:block;
+  font-size:11px;
+  font-weight:600;
+  color:var(--text2);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:6px;
 }
 
-.form-group label {
-  display: block;
-  color: rgba(255,255,255,0.7);
-  font-size: 12px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
+.field input, .field select, .field textarea {
+  width:100%;
+  padding:10px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  font-family:var(--font);
+  font-size:14px;
+  color:var(--text);
+  background:var(--bg);
+  outline:none;
+  transition:border-color var(--transition);
+  -webkit-appearance:none;
 }
 
-.form-group input, .form-group select, .form-group textarea {
-  width: 100%;
-  padding: 14px 16px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--radius);
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s;
-}
-
-.form-group input:focus {
-  border-color: var(--accent);
-  background: rgba(255,255,255,0.12);
-  box-shadow: 0 0 0 3px rgba(201,169,110,0.15);
-}
-
-.form-group input::placeholder { color: rgba(255,255,255,0.3); }
-
-.btn-login {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, var(--accent), #b8935a);
-  border: none;
-  border-radius: var(--radius);
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.3s;
-  margin-top: 8px;
-}
-
-.btn-login:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(201,169,110,0.4);
-}
-
-.login-error {
-  color: #ff6b6b;
-  font-size: 13px;
-  text-align: center;
-  margin-top: 12px;
-  display: none;
-}
-
-/* ============================================================
-   MAIN APP LAYOUT
-   ============================================================ */
-#mainApp { display: none; }
-
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* SIDEBAR */
-.sidebar {
-  width: var(--sidebar-width);
-  background: var(--primary);
-  min-height: 100vh;
-  position: fixed;
-  left: 0; top: 0;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s;
-}
-
-.sidebar-logo {
-  padding: 28px 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.sidebar-logo h2 {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 400;
-  color: #fff;
-  letter-spacing: 1px;
-}
-
-.sidebar-logo span { color: var(--accent); }
-
-.sidebar-logo small {
-  display: block;
-  color: rgba(255,255,255,0.4);
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-.sidebar-user {
-  padding: 16px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.user-avatar {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--accent), #b8935a);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  color: #fff;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.user-info { flex: 1; overflow: hidden; }
-
-.user-name {
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.user-role {
-  font-size: 11px;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 16px 0;
-  overflow-y: auto;
-}
-
-.nav-section-label {
-  padding: 8px 24px 4px;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  color: rgba(255,255,255,0.6);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  border-left: 3px solid transparent;
-  position: relative;
-}
-
-.nav-item:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.05);
-}
-
-.nav-item.active {
-  color: #fff;
-  background: rgba(201,169,110,0.15);
-  border-left-color: var(--accent);
-}
-
-.nav-item .nav-icon { font-size: 18px; width: 20px; text-align: center; }
-
-.nav-badge {
-  margin-left: auto;
-  background: var(--accent);
-  color: #fff;
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.sidebar-footer {
-  padding: 16px 24px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.btn-logout {
-  width: 100%;
-  padding: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius);
-  color: rgba(255,255,255,0.6);
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-size: 13px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-logout:hover {
-  background: rgba(239,68,68,0.2);
-  color: #ff6b6b;
-  border-color: rgba(239,68,68,0.3);
-}
-
-/* MAIN CONTENT */
-.main-content {
-  margin-left: var(--sidebar-width);
-  flex: 1;
-  min-height: 100vh;
-}
-
-.top-bar {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.page-title {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.top-bar-actions { display: flex; align-items: center; gap: 12px; }
-
-.page-content { padding: 32px; }
-
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-.btn {
-  padding: 10px 20px;
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--gold);
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
+  width:100%;
+  padding:12px;
+  background:var(--text);
+  color:var(--bg);
+  border:none;
+  border-radius:var(--radius2);
+  font-family:var(--font);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:opacity var(--transition);
+  margin-top:8px;
 }
 
-.btn-primary:hover {
-  background: #b8935a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(201,169,110,0.3);
-}
+.btn-primary:hover { opacity:0.85; }
 
-.btn-secondary {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.btn-secondary:hover { background: var(--border); }
-
-.btn-danger {
-  background: rgba(239,68,68,0.1);
-  color: var(--danger);
-  border: 1px solid rgba(239,68,68,0.2);
-}
-
-.btn-danger:hover { background: rgba(239,68,68,0.2); }
-
-.btn-success {
-  background: rgba(16,185,129,0.1);
-  color: var(--success);
-  border: 1px solid rgba(16,185,129,0.2);
-}
-
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-
-/* ============================================================
-   CARDS & STATS
-   ============================================================ */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
-}
-
-.stat-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 24px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  transition: transform 0.2s;
-}
-
-.stat-card:hover { transform: translateY(-2px); }
-
-.stat-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.stat-value {
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1;
-}
-
-.stat-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
-.stat-icon {
-  float: right;
-  font-size: 28px;
-  opacity: 0.2;
+.login-err {
+  color:var(--danger);
+  font-size:12px;
+  text-align:center;
+  margin-top:10px;
+  display:none;
 }
 
 /* ============================================================
-   TABLE
-   ============================================================ */
-.table-container {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  overflow: hidden;
+   APP LAYOUT
+============================================================ */
+#app { display:none; }
+
+.layout { display:flex; min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width:var(--sidebar);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  position:fixed;
+  top:0; left:0; bottom:0;
+  display:flex;
+  flex-direction:column;
+  z-index:200;
+  transition:transform var(--transition);
+  overflow-y:auto;
 }
 
-.table-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+.sb-logo {
+  padding:20px 16px 16px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  text-align:center;
+  position:relative;
 }
 
-.table-title {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 500;
+.sb-logo img {
+  max-height:48px;
+  max-width:180px;
+  object-fit:contain;
 }
 
-.search-box {
-  padding: 8px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 13px;
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-  width: 240px;
-  transition: all 0.2s;
+.sb-logo-text {
+  font-size:18px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-0.3px;
 }
 
-.search-box:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+.sb-logo-text span { color:var(--gold); }
+
+.sb-logo-hint {
+  font-size:9px;
+  color:var(--text3);
+  margin-top:2px;
+  letter-spacing:1px;
+  text-transform:uppercase;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.sb-user {
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-th {
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
+.sb-avatar {
+  width:32px; height:32px;
+  background:var(--gold);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:13px;
+  color:#fff;
+  flex-shrink:0;
 }
 
-th:hover { color: var(--text); }
+.sb-user-name { font-size:13px; font-weight:600; color:var(--text); }
+.sb-user-role { font-size:11px; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px; }
 
-td {
-  padding: 14px 16px;
-  font-size: 13px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
+.sb-nav { flex:1; padding:8px 0; }
+
+.sb-section {
+  padding:8px 16px 2px;
+  font-size:9px;
+  font-weight:700;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
 }
 
-tr:last-child td { border-bottom: none; }
-
-tr:hover td { background: rgba(201,169,110,0.03); }
-
-.badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 500;
-  display: inline-block;
+.sb-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 16px;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all var(--transition);
+  font-size:13px;
+  font-weight:500;
+  border-radius:0;
+  position:relative;
+  margin:1px 8px;
+  border-radius:var(--radius2);
 }
 
-.badge-green { background: rgba(16,185,129,0.1); color: var(--success); }
-.badge-yellow { background: rgba(245,158,11,0.1); color: var(--warning); }
-.badge-blue { background: rgba(59,130,246,0.1); color: var(--info); }
-.badge-red { background: rgba(239,68,68,0.1); color: var(--danger); }
-.badge-gray { background: rgba(107,114,128,0.1); color: var(--text-muted); }
-.badge-gold { background: rgba(201,169,110,0.15); color: var(--accent); }
+.sb-item:hover { background:var(--bg2); color:var(--text); }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+.sb-item.active {
+  background:var(--bg2);
+  color:var(--text);
+  font-weight:600;
 }
 
-.modal-overlay.open { display: flex; }
-
-.modal {
-  background: var(--bg-card);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-lg);
-  animation: modalIn 0.3s ease;
+.sb-item.active::before {
+  content:'';
+  position:absolute;
+  left:-8px; top:50%;
+  transform:translateY(-50%);
+  width:3px; height:16px;
+  background:var(--gold);
+  border-radius:2px;
 }
 
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(0.95) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+.sb-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+
+.sb-badge {
+  margin-left:auto;
+  background:var(--gold);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:20px;
+  min-width:18px;
+  text-align:center;
 }
 
-.modal-header {
-  padding: 24px 28px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  background: var(--bg-card);
-  z-index: 1;
+.sb-footer {
+  padding:12px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:8px;
 }
 
-.modal-title {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 500;
+.sb-btn {
+  flex:1;
+  padding:8px;
+  background:none;
+  border:1px solid var(--border);
+  border-radius:var(--radius2);
+  cursor:pointer;
+  font-size:12px;
+  color:var(--text2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  transition:all var(--transition);
 }
 
-.modal-close {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: var(--bg);
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+.sb-btn:hover { background:var(--bg2); color:var(--text); }
+
+/* MAIN */
+.main { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+
+.topbar {
+  height:var(--topbar);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
 }
 
-.modal-close:hover { background: var(--border); }
+.topbar-left { display:flex; align-items:center; gap:12px; }
+.topbar-title { font-size:16px; font-weight:700; color:var(--text); }
 
-.modal-body { padding: 24px 28px; }
+.topbar-right { display:flex; align-items:center; gap:8px; }
 
-.modal-footer {
-  padding: 20px 28px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  position: sticky;
-  bottom: 0;
-  background: var(--bg-card);
-}
+.content { padding:24px; flex:1; }
 
-/* FORM INSIDE MODAL */
-.modal .form-group label {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.modal .form-group input,
-.modal .form-group select,
-.modal .form-group textarea {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  outline: none;
-  transition: all 0.2s;
-}
-
-.modal .form-group input:focus,
-.modal .form-group select:focus,
-.modal .form-group textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.form-full { grid-column: 1 / -1; }
-
-/* ============================================================
-   MATCHING SCORE PAGE
-   ============================================================ */
-.matching-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-}
-
-.match-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  transition: all 0.3s;
-}
-
-.match-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.match-card-header {
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.match-score-circle {
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.score-100 { background: rgba(16,185,129,0.15); color: var(--success); border: 2px solid var(--success); }
-.score-90 { background: rgba(16,185,129,0.1); color: #059669; border: 2px solid #059669; }
-.score-80 { background: rgba(59,130,246,0.1); color: var(--info); border: 2px solid var(--info); }
-.score-70 { background: rgba(245,158,11,0.1); color: var(--warning); border: 2px solid var(--warning); }
-.score-60 { background: rgba(239,68,68,0.1); color: var(--danger); border: 2px solid var(--danger); }
-
-.match-score-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
-
-.match-info { flex: 1; padding-right: 12px; }
-
-.match-periochi {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.match-eidos { font-size: 13px; color: var(--text-muted); }
-
-.match-card-body { padding: 16px 20px; }
-
-.match-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.match-detail-item { }
-
-.match-detail-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
-
-.match-detail-value {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.match-timi {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--accent);
-  margin-bottom: 16px;
-}
-
-.match-card-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border);
-  background: var(--bg);
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+/* HAMBURGER */
+.hamburger {
+  display:none;
+  background:none;
+  border:none;
+  font-size:20px;
+  cursor:pointer;
+  color:var(--text);
+  padding:4px;
 }
 
 /* ============================================================
-   SCORE BAR
-   ============================================================ */
-.score-bar-container { margin-bottom: 16px; }
-.score-bar-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
+   BUTTONS
+============================================================ */
+.btn {
+  padding:8px 16px;
+  border-radius:var(--radius2);
+  font-family:var(--font);
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  border:none;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:all var(--transition);
+  white-space:nowrap;
 }
-.score-bar {
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
+
+.btn-dark { background:var(--text); color:var(--bg); }
+.btn-dark:hover { opacity:0.8; }
+.btn-outline { background:none; border:1.5px solid var(--border); color:var(--text2); }
+.btn-outline:hover { border-color:var(--border2); color:var(--text); background:var(--bg2); }
+.btn-ghost { background:none; color:var(--text2); }
+.btn-ghost:hover { background:var(--bg2); color:var(--text); }
+.btn-danger { background:rgba(220,38,38,0.1); color:var(--danger); border:1px solid rgba(220,38,38,0.2); }
+.btn-danger:hover { background:rgba(220,38,38,0.2); }
+.btn-gold { background:var(--gold); color:#fff; }
+.btn-gold:hover { opacity:0.9; }
+.btn-sm { padding:5px 10px; font-size:12px; }
+.btn-icon { padding:6px; width:32px; height:32px; justify-content:center; }
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+
+.stat {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  cursor:default;
 }
-.score-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  background: linear-gradient(90deg, var(--accent), #10b981);
-  transition: width 1s ease;
-}
+
+.stat-label { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.stat-value { font-size:32px; font-weight:700; line-height:1; color:var(--text); }
+.stat-sub { font-size:12px; color:var(--text3); margin-top:6px; }
 
 /* ============================================================
    CHARTS
-   ============================================================ */
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
-}
+============================================================ */
+.charts { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:24px; }
 
 .chart-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  padding: 24px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
 }
 
-.chart-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 20px;
-  color: var(--text);
+.chart-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:16px; }
+
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer; }
+.bar-row:hover .bar-fill { opacity:0.8; }
+.bar-label { font-size:12px; color:var(--text2); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bar-track { flex:1; height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+.bar-fill { height:100%; background:var(--gold); border-radius:3px; transition:width 0.8s ease; }
+.bar-count { font-size:12px; font-weight:600; color:var(--text2); width:20px; text-align:right; }
+
+.agents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+
+.agent-card {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  text-align:center;
+  cursor:pointer;
+  transition:all var(--transition);
 }
 
-.chart-bar-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.chart-bar-label { font-size: 12px; color: var(--text-muted); width: 120px; flex-shrink: 0; }
-.chart-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-.chart-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: width 1s; }
-.chart-bar-count { font-size: 12px; font-weight: 600; color: var(--text); width: 24px; text-align: right; }
+.agent-card:hover { border-color:var(--gold); transform:translateY(-2px); box-shadow:var(--shadow); }
+.agent-count { font-size:28px; font-weight:700; color:var(--gold); }
+.agent-name { font-size:12px; color:var(--text2); margin-top:4px; }
 
 /* ============================================================
-   LOADING & EMPTY STATES
-   ============================================================ */
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(248,247,244,0.9);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+   TABLE / LIST
+============================================================ */
+.list-container {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
 }
 
-.spinner {
-  width: 40px; height: 40px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.list-header {
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+.list-title { font-size:15px; font-weight:700; color:var(--text); }
+.list-count { font-size:13px; color:var(--text3); }
 
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-}
+.search-wrap { position:relative; }
+.search-wrap input { padding:7px 12px 7px 32px; border:1.5px solid var(--border); border-radius:var(--radius2); font-size:13px; background:var(--bg2); color:var(--text); outline:none; width:200px; }
+.search-wrap input:focus { border-color:var(--gold); }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:13px; pointer-events:none; }
 
-.empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
-.empty-state-text { font-size: 16px; margin-bottom: 8px; }
-.empty-state-sub { font-size: 13px; }
-
-/* ============================================================
-   TOAST NOTIFICATIONS
-   ============================================================ */
-.toast-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.toast {
-  padding: 14px 20px;
-  border-radius: var(--radius);
-  background: var(--primary);
-  color: #fff;
-  font-size: 13px;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: toastIn 0.3s ease;
-  max-width: 320px;
-}
-
-.toast-success { background: var(--success); }
-.toast-error { background: var(--danger); }
-.toast-warning { background: var(--warning); }
-
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(100%); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* ============================================================
-   PROPERTY DETAIL VIEW
-   ============================================================ */
-.property-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.property-detail-item {
-  padding: 12px 16px;
-  background: var(--bg);
-  border-radius: 8px;
-}
-
-.property-detail-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.property-detail-value {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-/* ============================================================
-   MOBILE RESPONSIVE
-   ============================================================ */
-.hamburger {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--text);
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-  .sidebar.mobile-open {
-    transform: translateX(0);
-  }
-  .main-content {
-    margin-left: 0;
-  }
-  .hamburger { display: block; }
-  .page-content { padding: 16px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .matching-grid { grid-template-columns: 1fr; }
-  .top-bar { padding: 0 16px; }
-}
-
-/* ============================================================
-   PAGINATION
-   ============================================================ */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 20px;
-  border-top: 1px solid var(--border);
-}
-
-.page-btn {
-  width: 36px; height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  cursor: pointer;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  color: var(--text);
-}
-
-.page-btn:hover, .page-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-
-/* FILTERS ROW */
-.filters-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+.filters {
+  padding:10px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  background:var(--bg2);
 }
 
 .filter-select {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 12px;
-  background: var(--bg-card);
-  color: var(--text);
-  outline: none;
-  cursor: pointer;
+  padding:6px 10px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  font-size:12px;
+  background:var(--surface);
+  color:var(--text);
+  outline:none;
+  cursor:pointer;
 }
 
-.filter-select:focus { border-color: var(--accent); }
+.filter-select:focus { border-color:var(--gold); }
+
+table { width:100%; border-collapse:collapse; }
+
+th {
+  padding:10px 16px;
+  text-align:left;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+
+td {
+  padding:12px 16px;
+  font-size:13px;
+  border-bottom:1px solid var(--border);
+  vertical-align:middle;
+  color:var(--text);
+}
+
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--bg2); cursor:pointer; }
+
+.badge {
+  padding:3px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  display:inline-block;
+  white-space:nowrap;
+}
+
+.badge-green { background:rgba(22,163,74,0.1); color:#16a34a; }
+.badge-gold { background:rgba(201,169,110,0.15); color:#a07840; }
+.badge-gray { background:var(--bg3); color:var(--text3); }
+.badge-red { background:rgba(220,38,38,0.1); color:var(--danger); }
+.badge-blue { background:rgba(37,99,235,0.1); color:var(--info); }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);
+  z-index:1000;
+  display:none;
+  align-items:flex-start;
+  justify-content:center;
+  padding:20px;
+  overflow-y:auto;
+}
+
+.overlay.open { display:flex; }
+
+.modal {
+  background:var(--surface);
+  border-radius:16px;
+  width:100%;
+  max-width:680px;
+  box-shadow:var(--shadow2);
+  animation:slideUp 0.25s ease;
+  margin:auto;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.modal-head {
+  padding:20px 24px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  background:var(--surface);
+  border-radius:16px 16px 0 0;
+  z-index:1;
+}
+
+.modal-title { font-size:17px; font-weight:700; }
+
+.modal-close {
+  width:28px; height:28px;
+  border-radius:50%;
+  border:none;
+  background:var(--bg2);
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text2);
+}
+
+.modal-close:hover { background:var(--bg3); }
+
+.modal-body { padding:20px 24px; max-height:70vh; overflow-y:auto; }
+
+.modal-foot {
+  padding:16px 24px;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  position:sticky;
+  bottom:0;
+  background:var(--surface);
+  border-radius:0 0 16px 16px;
+}
+
+/* FORM GRID */
+.fgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.fspan { grid-column:1/-1; }
+
+.modal .field label { color:var(--text2); }
+.modal .field input, .modal .field select, .modal .field textarea {
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  color:var(--text);
+}
+
+.modal .field input:focus, .modal .field select:focus, .modal .field textarea:focus {
+  border-color:var(--gold);
+  background:var(--bg);
+}
+
+/* CHECKBOX FIELD */
+.check-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  cursor:pointer;
+}
+
+.check-row input[type="checkbox"] {
+  width:16px;
+  height:16px;
+  accent-color:var(--gold);
+  cursor:pointer;
+}
+
+/* MULTISELECT TAGS */
+.ms-container {
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  background:var(--bg2);
+  padding:8px;
+  min-height:42px;
+  cursor:pointer;
+}
+
+.ms-container:focus-within { border-color:var(--gold); }
+
+.ms-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px; }
+
+.ms-tag {
+  background:var(--gold2);
+  color:#7a5c30;
+  padding:2px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:500;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.ms-tag button {
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#7a5c30;
+  font-size:12px;
+  padding:0;
+  line-height:1;
+}
+
+.ms-options {
+  display:none;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius2);
+  background:var(--surface);
+  box-shadow:var(--shadow2);
+  max-height:200px;
+  overflow-y:auto;
+  margin-top:4px;
+}
+
+.ms-options.open { display:block; }
+
+.ms-option {
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:background var(--transition);
+}
+
+.ms-option:hover { background:var(--bg2); }
+.ms-option input[type="checkbox"] { accent-color:var(--gold); }
+
+.ms-add {
+  padding:6px 12px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:6px;
+}
+
+.ms-add input {
+  flex:1;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  font-size:12px;
+  background:var(--bg);
+  color:var(--text);
+  outline:none;
+}
+
+.ms-add button {
+  padding:4px 8px;
+  background:var(--gold);
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:12px;
+}
+
+/* DETAIL VIEW */
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.detail-item {
+  padding:10px 14px;
+  background:var(--bg2);
+  border-radius:var(--radius2);
+}
+
+.detail-label {
+  font-size:10px;
+  font-weight:700;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:3px;
+}
+
+.detail-value { font-size:13px; font-weight:500; color:var(--text); }
+
+.detail-photos { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.detail-photo { width:80px; height:80px; object-fit:cover; border-radius:var(--radius2); cursor:pointer; border:1px solid var(--border); }
+
+/* SCORE CARDS */
+.score-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+
+.score-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:all var(--transition);
+}
+
+.score-card:hover { box-shadow:var(--shadow2); transform:translateY(-2px); border-color:var(--border2); }
+
+.score-card-head {
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+}
+
+.score-circle {
+  width:52px; height:52px;
+  border-radius:50%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:14px;
+  flex-shrink:0;
+  border:2px solid;
+}
+
+.score-100 { border-color:#16a34a; color:#16a34a; background:rgba(22,163,74,0.08); }
+.score-90 { border-color:#16a34a; color:#16a34a; background:rgba(22,163,74,0.06); }
+.score-80 { border-color:var(--info); color:var(--info); background:rgba(37,99,235,0.06); }
+.score-70 { border-color:var(--warning); color:var(--warning); background:rgba(217,119,6,0.06); }
+.score-60 { border-color:var(--danger); color:var(--danger); background:rgba(220,38,38,0.06); }
+
+.score-label { font-size:8px; text-transform:uppercase; letter-spacing:0.5px; }
+
+.score-info { flex:1; padding-right:12px; }
+.score-periochi { font-size:16px; font-weight:700; }
+.score-eidos { font-size:12px; color:var(--text2); margin-top:2px; }
+
+.score-card-body { padding:14px 16px; }
+
+.score-details { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.score-det-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.3px; }
+.score-det-val { font-size:13px; font-weight:600; }
+.score-timi { font-size:20px; font-weight:700; color:var(--gold); margin-bottom:12px; }
+
+.progress { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width 1s ease; }
+
+.score-card-foot {
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  display:flex;
+  gap:6px;
+  background:var(--bg2);
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toasts {
+  position:fixed;
+  bottom:20px; right:20px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.toast {
+  padding:12px 16px;
+  border-radius:var(--radius);
+  font-size:13px;
+  font-weight:500;
+  box-shadow:var(--shadow2);
+  animation:toastIn 0.3s ease;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  max-width:300px;
+}
+
+.toast-s { background:#16a34a; color:#fff; }
+.toast-e { background:var(--danger); color:#fff; }
+.toast-i { background:var(--text); color:var(--bg); }
+
+@keyframes toastIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
+
+/* LOADING */
+.loader {
+  position:fixed; inset:0;
+  background:rgba(255,255,255,0.85);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:9998;
+}
+
+[data-theme="dark"] .loader { background:rgba(0,0,0,0.85); }
+
+.spin {
+  width:32px; height:32px;
+  border:2.5px solid var(--border);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* EMPTY STATE */
+.empty {
+  text-align:center;
+  padding:60px 20px;
+  color:var(--text3);
+}
+
+.empty-icon { font-size:40px; margin-bottom:12px; opacity:0.5; }
+.empty-text { font-size:14px; font-weight:500; margin-bottom:4px; }
+.empty-sub { font-size:12px; }
+
+/* ============================================================
+   MOBILE
+============================================================ */
+@media(max-width:768px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); box-shadow:var(--shadow2); }
+  .main { margin-left:0; }
+  .hamburger { display:flex; }
+  .content { padding:16px; }
+  .stats { grid-template-columns:1fr 1fr; gap:12px; }
+  .charts { grid-template-columns:1fr; }
+  .fgrid { grid-template-columns:1fr; }
+  .detail-grid { grid-template-columns:1fr; }
+  .score-grid { grid-template-columns:1fr; }
+  .topbar { padding:0 16px; }
+  .search-wrap input { width:160px; }
+  td, th { padding:10px 12px; }
+}
+
+@media(max-width:480px) {
+  .stats { grid-template-columns:1fr 1fr; }
+  .stat-value { font-size:24px; }
+  .login-box { padding:28px 20px; }
+}
+
+/* OVERLAY for mobile sidebar */
+.sb-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:199;
+}
+
+.sb-overlay.open { display:block; }
+
+/* SCORE BAR in detail */
+.score-bar-wrap { margin:16px 0; }
+.score-bar-label { display:flex; justify-content:space-between; font-size:12px; color:var(--text2); margin-bottom:6px; }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <p style="margin-top:16px;color:var(--text-muted);font-size:13px;">Φόρτωση...</p>
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <p style="margin-top:12px;font-size:12px;color:var(--text3)">Φόρτωση...</p>
 </div>
 
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toastContainer"></div>
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
 
-<!-- ============================================================
-     LOGIN PAGE
-     ============================================================ -->
-<div id="loginPage">
-  <div class="login-card">
-    <div class="login-logo">
-      <h1>Terra<span>Homes</span></h1>
-      <p>Real Estate CRM</p>
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="mTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="email@example.com">
-    </div>
-    <div class="form-group">
-      <label>Κωδικός</label>
-      <input type="password" id="loginPassword" placeholder="••••••••">
-    </div>
-    <div class="form-group">
-      <label>Airtable Token</label>
-      <input type="password" id="loginToken" placeholder="patXXXXXX.YYYYYY">
-    </div>
-    <button class="btn-login" onclick="handleLogin()">Σύνδεση →</button>
-    <div class="login-error" id="loginError">Email ή κωδικός λανθασμένος</div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-foot" id="mFoot"></div>
   </div>
 </div>
 
-<!-- ============================================================
-     MAIN APP
-     ============================================================ -->
-<div id="mainApp">
-  <div class="app-layout">
+<!-- SIDEBAR OVERLAY -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
 
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">
+      <div id="loginLogoWrap">
+        <div class="login-logo-text">Real<span>Estate</span></div>
+        <div class="login-sub">CRM Platform</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Airtable Token</label>
+      <input type="password" id="lToken" placeholder="patXXXX.YYYY" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="lEmail" placeholder="email@example.com">
+    </div>
+    <div class="field">
+      <label>Κωδικός</label>
+      <input type="password" id="lPass" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Σύνδεση →</button>
+    <div class="login-err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="layout">
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
-      <div class="sidebar-logo" style="padding:16px 24px;cursor:pointer" onclick="document.getElementById('logoUpload').click()" title="Κλικ για αλλαγή λογότυπου">
-        <input type="file" id="logoUpload" accept="image/jpeg,image/png" style="display:none" onchange="uploadLogo(this)">
-        <div id="logoContainer" style="width:100%;height:60px;display:flex;align-items:center;justify-content:center">
-          <img id="logoImg" src="" alt="" style="max-width:100%;max-height:60px;object-fit:contain;display:none;border-radius:6px">
-          <div id="logoPlaceholder" style="text-align:center">
-            <h2 style="font-family:var(--font-display);font-size:22px;font-weight:400;color:#fff;letter-spacing:1px">Terra<span style="color:var(--accent)">Homes</span></h2>
-            <small style="display:block;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-top:2px">Real Estate CRM</small>
-          </div>
-        </div>
-        <div style="text-align:center;margin-top:4px;font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:1px">ΚΛΙΚ ΓΙΑ ΑΛΛΑΓΗ LOGO</div>
-      </div>
-      <div class="sidebar-user">
-        <div class="user-avatar" id="userAvatar">K</div>
-        <div class="user-info">
-          <div class="user-name" id="userName">Χρήστης</div>
-          <div class="user-role" id="userRole">Agent</div>
+      <div class="sb-logo" onclick="triggerLogoUpload()" title="Κλικ για αλλαγή logo">
+        <input type="file" id="logoFile" accept="image/jpeg,image/png,image/gif,image/svg+xml" style="display:none" onchange="handleLogoUpload(this)">
+        <div id="sbLogoContent">
+          <div class="sb-logo-text">Real<span>Estate</span></div>
+          <div class="sb-logo-hint">κλικ για logo</div>
         </div>
       </div>
-      <nav class="sidebar-nav">
-        <div class="nav-section-label">Κύριο Μενού</div>
-        <div class="nav-item active" onclick="showPage('home')">
-          <span class="nav-icon">🏠</span> Αρχική
+      <div class="sb-user">
+        <div class="sb-avatar" id="sbAvatar">K</div>
+        <div>
+          <div class="sb-user-name" id="sbName">Χρήστης</div>
+          <div class="sb-user-role" id="sbRole">Agent</div>
         </div>
-        <div class="nav-item" onclick="showPage('akinita')">
-          <span class="nav-icon">🏢</span> Ακίνητα
+      </div>
+      <div class="sb-nav">
+        <div class="sb-section">Κύριο</div>
+        <div class="sb-item active" data-page="home" onclick="goPage('home',this)">
+          <span class="sb-icon">⬜</span> Αρχική
         </div>
-        <div class="nav-item" onclick="showPage('zitiseis')">
-          <span class="nav-icon">🔍</span> Ζητήσεις
+        <div class="sb-item" data-page="akinita" onclick="goPage('akinita',this)">
+          <span class="sb-icon">🏢</span> Ακίνητα
         </div>
-        <div class="nav-item" onclick="showPage('matching')">
-          <span class="nav-icon">⭐</span> Matching Σκορ
-          <span class="nav-badge" id="matchingBadge">0</span>
+        <div class="sb-item" data-page="zitiseis" onclick="goPage('zitiseis',this)">
+          <span class="sb-icon">🔍</span> Ζητήσεις
         </div>
-        <div class="nav-section-label" style="margin-top:8px">Διαχείριση</div>
-        <div class="nav-item" onclick="showPage('kataskevastes')">
-          <span class="nav-icon">👷</span> Κατασκευαστές
+        <div class="sb-item" data-page="matching" onclick="goPage('matching',this)">
+          <span class="sb-icon">⭐</span> Matching
+          <span class="sb-badge" id="mBadge">0</span>
         </div>
-        <div class="nav-item admin-only" onclick="showPage('users')">
-          <span class="nav-icon">👥</span> Χρήστες
+        <div class="sb-section" style="margin-top:8px">Διαχείριση</div>
+        <div class="sb-item" data-page="kataskevastes" onclick="goPage('kataskevastes',this)">
+          <span class="sb-icon">🔧</span> Κατασκευαστές
         </div>
-      </nav>
-      <div class="sidebar-footer">
-        <button class="btn-logout" onclick="handleLogout()">
-          <span>⬅️</span> Αποσύνδεση
-        </button>
+        <div class="sb-item admin-only" data-page="users" onclick="goPage('users',this)">
+          <span class="sb-icon">👥</span> Χρήστες
+        </div>
+      </div>
+      <div class="sb-footer">
+        <button class="sb-btn" onclick="toggleTheme()" title="Dark/Light mode">🌙</button>
+        <button class="sb-btn" onclick="doRefresh()" title="Ανανέωση">↻</button>
+        <button class="sb-btn" onclick="doLogout()" title="Αποσύνδεση" style="color:var(--danger)">⬅</button>
       </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <div class="top-bar">
-        <div style="display:flex;align-items:center;gap:16px">
-          <button class="hamburger" onclick="toggleSidebar()">☰</button>
-          <h1 class="page-title" id="pageTitle">Αρχική</h1>
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger btn btn-ghost btn-icon" onclick="toggleSidebar()">☰</button>
+          <div class="topbar-title" id="pageTitle">Αρχική</div>
         </div>
-        <div class="top-bar-actions" id="topBarActions"></div>
+        <div class="topbar-right" id="topActions"></div>
       </div>
-
-      <div class="page-content" id="pageContent">
-        <!-- Content loads here -->
-      </div>
+      <div class="content" id="pageContent"></div>
     </main>
-
-  </div>
-</div>
-
-<!-- ============================================================
-     MODAL
-     ============================================================ -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modal">
-    <div class="modal-header">
-      <h2 class="modal-title" id="modalTitle">Modal</h2>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-footer" id="modalFooter"></div>
   </div>
 </div>
 
 <script charset="utf-8">
 // ============================================================
-// CONFIGURATION — ΑΛΛΑΞΕ ΕΔΩ ΤΑ ΣΤΟΙΧΕΙΑ ΣΟΥ
+// CONFIG
 // ============================================================
-const CONFIG = {
-  AIRTABLE_TOKEN: '',
-  BASE_ID: 'app3fUC1uIoQsX2DP',
-  TABLES: {
-    AKINITA: 'ΑΚΙΝΗΤΑ',
-    ZITISEIS: 'Ζητήσεις',
-    MATCHING: 'Matching Σκορ',
-    USERS: 'USERS',
-    KATASKEVASTES: 'ΚΑΤΑΣΚΕΥΑΣΤΕΣ'
+const CFG = {
+  BASE: 'app3fUC1uIoQsX2DP',
+  TOKEN: '',
+  T: {
+    AK: 'ΑΚΙΝΗΤΑ',
+    ZI: 'Ζητήσεις',
+    MA: 'Matching Σκορ',
+    US: 'USERS',
+    KA: 'ΚΑΤΑΣΚΕΥΑΣΤΕΣ'
   }
 };
 
-// ============================================================
-// APP STATE
-// ============================================================
-let currentUser = null;
-let currentPage = 'home';
-let allData = {
-  akinita: [],
-  zitiseis: [],
-  matching: [],
-  users: [],
-  kataskevastes: []
-};
+let ME = null;
+let DB = { ak:[], zi:[], ma:[], us:[], ka:[] };
+let PAGE = 'home';
 
 // ============================================================
-// AIRTABLE API
+// API
 // ============================================================
-async function airtableRequest(table, method = 'GET', body = null, recordId = null) {
-  const url = recordId
-    ? `https://api.airtable.com/v0/${CONFIG.BASE_ID}/${encodeURIComponent(table)}/${recordId}`
-    : `https://api.airtable.com/v0/${CONFIG.BASE_ID}/${encodeURIComponent(table)}`;
-
-  const options = {
+async function api(table, method='GET', body=null, id=null) {
+  const url = id
+    ? `https://api.airtable.com/v0/${CFG.BASE}/${encodeURIComponent(table)}/${id}`
+    : `https://api.airtable.com/v0/${CFG.BASE}/${encodeURIComponent(table)}`;
+  const opts = {
     method,
-    headers: {
-      'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`,
-      'Content-Type': 'application/json'
-    }
+    headers: { 'Authorization': `Bearer ${CFG.TOKEN}`, 'Content-Type': 'application/json' }
   };
-
-  if (body) options.body = JSON.stringify(body);
-
-  const res = await fetch(url, options);
-  if (!res.ok) throw new Error(`Airtable error: ${res.status}`);
-  return res.json();
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  if (!r.ok) { const e = await r.json(); throw new Error(JSON.stringify(e)); }
+  return r.json();
 }
 
-async function getAllRecords(table, filterFormula = '') {
-  let records = [];
-  let offset = null;
-
+async function getAll(table, filter='') {
+  let recs=[], offset=null;
   do {
-    let url = `https://api.airtable.com/v0/${CONFIG.BASE_ID}/${encodeURIComponent(table)}?pageSize=100`;
-    if (filterFormula) url += `&filterByFormula=${encodeURIComponent(filterFormula)}`;
+    let url = `https://api.airtable.com/v0/${CFG.BASE}/${encodeURIComponent(table)}?pageSize=100`;
+    if (filter) url += `&filterByFormula=${encodeURIComponent(filter)}`;
     if (offset) url += `&offset=${offset}`;
-
-    const res = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}` }
-    });
-    const data = await res.json();
-    records = records.concat(data.records || []);
-    offset = data.offset;
-  } while (offset);
-
-  return records;
+    const r = await fetch(url, { headers:{ 'Authorization':`Bearer ${CFG.TOKEN}` } });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    recs = recs.concat(d.records||[]);
+    offset = d.offset;
+  } while(offset);
+  return recs;
 }
 
-async function createRecord(table, fields) {
-  return airtableRequest(table, 'POST', { fields });
-}
+async function createRec(table, fields) { return api(table,'POST',{fields}); }
+async function updateRec(table, id, fields) { return api(table,'PATCH',{fields},id); }
+async function deleteRec(table, id) { return api(table,'DELETE',null,id); }
 
-async function updateRecord(table, recordId, fields) {
-  return airtableRequest(table, 'PATCH', { fields }, recordId);
-}
-
-async function deleteRecord(table, recordId) {
-  return airtableRequest(table, 'DELETE', null, recordId);
+// Add new option to Airtable select field
+async function addSelectOption(table, fieldName, newOption) {
+  // We just save it locally - Airtable auto-creates options when you use new values
+  return newOption;
 }
 
 // ============================================================
-// AUTH — LOGIN/LOGOUT
+// AUTH
 // ============================================================
-async function handleLogin() {
-  const token = document.getElementById('loginToken').value.trim();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value.trim();
+async function doLogin() {
+  const token = document.getElementById('lToken').value.trim();
+  const email = document.getElementById('lEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('lPass').value.trim();
 
-  if (!token || !email || !password) {
-    showLoginError('Συμπληρωσε ολα τα πεδια');
-    return;
-  }
+  if (!token || !email || !pass) { showErr('Συμπλήρωσε όλα τα πεδία'); return; }
 
-  CONFIG.AIRTABLE_TOKEN = token;
-  localStorage.setItem('at', token);
+  CFG.TOKEN = token;
+  setLoading(true);
 
-  showLoading(true);
   try {
-    // Fetch all users and find by email client-side
-    const allUsers = await getAllRecords(CONFIG.TABLES.USERS);
-    const records = allUsers.filter(r => 
-      (r.fields['Email'] || '').toLowerCase().trim() === email.toLowerCase().trim()
-    );
+    const users = await getAll(CFG.T.US);
+    const user = users.find(u => (u.fields['Email']||'').toLowerCase().trim() === email);
 
-    if (records.length === 0) {
-      showLoginError('Δεν βρέθηκε χρήστης με αυτό το email');
-      showLoading(false);
-      return;
-    }
+    if (!user) { showErr('Δεν βρέθηκε χρήστης'); setLoading(false); return; }
+    if (user.fields['Password'] !== pass) { showErr('Λανθασμένος κωδικός'); setLoading(false); return; }
 
-    const user = records[0];
-    const fields = user.fields;
-
-    // Check password (stored in "Password" field in USERS table)
-    // ΠΡΟΣΟΧΗ: Αλλαξε το field name αν είναι διαφορετικό
-    if (fields['Password'] !== password) {
-      showLoginError('Λανθασμένος κωδικός');
-      showLoading(false);
-      return;
-    }
-
-    // Set current user
-    currentUser = {
+    ME = {
       id: user.id,
-      name: fields['Name'] || fields['Ονοματεπώνυμο'] || email,
-      email: email,
-      role: (fields['Role'] || fields['Ρόλος'] || 'agent').toLowerCase(),
-      phone: fields['Phone'] || fields['Κινητό'] || ''
+      name: user.fields['Name'] || email,
+      email,
+      role: (user.fields['Role']||'agent').toLowerCase()
     };
 
-    localStorage.setItem('terraUser', JSON.stringify(currentUser));
+    localStorage.setItem('crm_user', JSON.stringify(ME));
+    localStorage.setItem('crm_token', token);
+
     await initApp();
-
-  } catch (err) {
-    showLoginError('Σφάλμα σύνδεσης. Δοκίμασε ξανά.');
-    console.error(err);
+  } catch(e) {
+    console.error(e);
+    showErr('Σφάλμα σύνδεσης. Έλεγξε το token.');
   }
-  showLoading(false);
+  setLoading(false);
 }
 
-function uploadLogo(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = document.getElementById('logoImg');
-    const placeholder = document.getElementById('logoPlaceholder');
-    img.src = e.target.result;
-    img.style.display = 'block';
-    placeholder.style.display = 'none';
-    localStorage.setItem('companyLogo', e.target.result);
-  };
-  reader.readAsDataURL(file);
-}
-
-function loadSavedLogo() {
-  const saved = localStorage.getItem('companyLogo');
-  if (saved) {
-    const img = document.getElementById('logoImg');
-    const placeholder = document.getElementById('logoPlaceholder');
-    if (img && placeholder) {
-      img.src = saved;
-      img.style.display = 'block';
-      placeholder.style.display = 'none';
-    }
-  }
-}
-
-function handleLogout() {
-  currentUser = null;
-  localStorage.removeItem('terraUser');
-  document.getElementById('loginPage').style.display = 'flex';
-  document.getElementById('mainApp').style.display = 'none';
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPassword').value = '';
-}
-
-function showLoginError(msg) {
-  const el = document.getElementById('loginError');
+function showErr(msg) {
+  const el = document.getElementById('lErr');
   el.textContent = msg;
   el.style.display = 'block';
 }
 
+function doLogout() {
+  ME = null;
+  localStorage.removeItem('crm_user');
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
 // ============================================================
-// APP INIT
+// INIT
 // ============================================================
 async function initApp() {
   document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('app').style.display = 'block';
 
-  // Set user info in sidebar
-  document.getElementById('userName').textContent = currentUser.name;
-  loadSavedLogo();
-  document.getElementById('userRole').textContent = currentUser.role.toUpperCase();
-  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('sbName').textContent = ME.name;
+  document.getElementById('sbRole').textContent = ME.role.toUpperCase();
+  document.getElementById('sbAvatar').textContent = ME.name.charAt(0).toUpperCase();
 
-  // Hide admin-only items for non-admins
-  if (currentUser.role !== 'admin') {
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  if (ME.role !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display='none');
   }
 
-  // Load all data
-  showLoading(true);
-  await loadAllData();
-  showLoading(false);
-
-  showPage('home');
+  loadTheme();
+  loadLogo();
+  setLoading(true);
+  await loadAll();
+  setLoading(false);
+  goPage('home', document.querySelector('.sb-item[data-page="home"]'));
 }
 
-async function loadAllData() {
+async function loadAll() {
   try {
-    // Filter data based on role
-    const isAdmin = currentUser.role === 'admin';
-
-    const [akinita, zitiseis, matching, users, kataskevastes] = await Promise.all([
-      getAllRecords(CONFIG.TABLES.AKINITA),
-      getAllRecords(CONFIG.TABLES.ZITISEIS),
-      getAllRecords(CONFIG.TABLES.MATCHING),
-      getAllRecords(CONFIG.TABLES.USERS),
-      getAllRecords(CONFIG.TABLES.KATASKEVASTES)
+    const [ak, zi, ma, us, ka] = await Promise.all([
+      getAll(CFG.T.AK),
+      getAll(CFG.T.ZI),
+      getAll(CFG.T.MA),
+      getAll(CFG.T.US),
+      getAll(CFG.T.KA)
     ]);
+    DB.ak = ak; DB.zi = zi; DB.us = us; DB.ka = ka;
+    DB.ma = ME.role === 'admin' ? ma : ma.filter(r =>
+      (r.fields['User Ζήτησης']||'').toLowerCase() === ME.email.toLowerCase()
+    );
+    document.getElementById('mBadge').textContent = DB.ma.length;
+  } catch(e) { toast('Σφάλμα φόρτωσης','e'); console.error(e); }
+}
 
-    allData.akinita = akinita;
-    allData.zitiseis = zitiseis;
-    allData.matching = matching;
-    allData.users = users;
-    allData.kataskevastes = kataskevastes;
-
-    // Filter matching for current user (agents see only their own)
-    if (!isAdmin) {
-      allData.matching = matching.filter(r =>
-        (r.fields['User Ζήτησης'] || '').toLowerCase() === currentUser.email.toLowerCase()
-      );
-    }
-
-    // Update matching badge
-    document.getElementById('matchingBadge').textContent = allData.matching.length;
-
-  } catch (err) {
-    showToast('Σφάλμα φόρτωσης δεδομένων', 'error');
-    console.error(err);
-  }
+async function doRefresh() {
+  setLoading(true);
+  await loadAll();
+  setLoading(false);
+  goPage(PAGE, document.querySelector(`.sb-item[data-page="${PAGE}"]`));
+  toast('Ανανεώθηκε!');
 }
 
 // ============================================================
 // NAVIGATION
 // ============================================================
-function showPage(page) {
-  currentPage = page;
-
-  // Update nav active state
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  event && event.currentTarget && event.currentTarget.classList.add('active');
-
-  // Update page title
-  const titles = {
-    home: 'Αρχική',
-    akinita: 'Ακίνητα',
-    zitiseis: 'Ζητήσεις',
-    matching: 'Matching Σκορ',
-    kataskevastes: 'Κατασκευαστές',
-    users: 'Χρήστες'
-  };
+function goPage(page, el) {
+  PAGE = page;
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = { home:'Αρχική', akinita:'Ακίνητα', zitiseis:'Ζητήσεις', matching:'Matching', kataskevastes:'Κατασκευαστές', users:'Χρήστες' };
   document.getElementById('pageTitle').textContent = titles[page] || page;
-
-  // Render page
-  const content = document.getElementById('pageContent');
-  const actions = document.getElementById('topBarActions');
-
-  switch(page) {
-    case 'home': renderHome(content, actions); break;
-    case 'akinita': renderAkinita(content, actions); break;
-    case 'zitiseis': renderZitiseis(content, actions); break;
-    case 'matching': renderMatching(content, actions); break;
-    case 'kataskevastes': renderKataskevastes(content, actions); break;
-    case 'users': renderUsers(content, actions); break;
-  }
-
-  // Close mobile sidebar
-  document.getElementById('sidebar').classList.remove('mobile-open');
+  const c = document.getElementById('pageContent');
+  const a = document.getElementById('topActions');
+  const pages = { home:pgHome, akinita:pgAkinita, zitiseis:pgZitiseis, matching:pgMatching, kataskevastes:pgKataskevastes, users:pgUsers };
+  if (pages[page]) pages[page](c, a);
+  closeSidebar();
 }
 
 // ============================================================
 // HOME PAGE
 // ============================================================
-function renderHome(content, actions) {
-  actions.innerHTML = `
-    <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Ανανέωση</button>
-  `;
+function pgHome(c, a) {
+  a.innerHTML = `<button class="btn btn-outline btn-sm" onclick="doRefresh()">↻ Ανανέωση</button>`;
+  const isAdmin = ME.role === 'admin';
 
-  const isAdmin = currentUser.role === 'admin';
-  const myAkinita = isAdmin ? allData.akinita : allData.akinita.filter(r =>
-    JSON.stringify(r.fields['User'] || []).includes(currentUser.id)
-  );
+  const myAk = isAdmin ? DB.ak : DB.ak.filter(r => {
+    const u = r.fields['User'];
+    return Array.isArray(u) && u.includes(ME.id);
+  });
 
-  // Stats
-  const totalAkinita = myAkinita.length;
-  const diathesima = myAkinita.filter(r => r.fields['Status'] === 'Διαθέσιμο').length;
-  const offmarket = myAkinita.filter(r => r.fields['Status'] === 'Off Market').length;
-  const totalMatching = allData.matching.length;
+  const diath = myAk.filter(r => r.fields['Status']==='Διαθέσιμο').length;
+  const offm = myAk.filter(r => r.fields['Status']==='Off Market').length;
 
-  // Count by type
   const byEidos = {};
-  myAkinita.forEach(r => {
-    const eidos = r.fields['Είδος ακινήτου'] || r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'] || 'Άλλο';
-    byEidos[eidos] = (byEidos[eidos] || 0) + 1;
+  myAk.forEach(r => {
+    const e = r.fields['Είδος ακινήτου'] || 'Άλλο';
+    byEidos[e] = (byEidos[e]||0) + 1;
   });
 
-  // Count by periochi
   const byPeriochi = {};
-  myAkinita.forEach(r => {
-    const p = r.fields['Περιοχή'] || r.fields['ΠΕΡΙΟΧΗ'] || 'Άλλη';
-    byPeriochi[p] = (byPeriochi[p] || 0) + 1;
+  myAk.forEach(r => {
+    const p = r.fields['Περιοχή'] || 'Άλλη';
+    byPeriochi[p] = (byPeriochi[p]||0) + 1;
   });
 
-  const maxEidos = Math.max(...Object.values(byEidos), 1);
-  const maxPeriochi = Math.max(...Object.values(byPeriochi), 1);
+  const maxE = Math.max(...Object.values(byEidos), 1);
+  const maxP = Math.max(...Object.values(byPeriochi), 1);
 
-  content.innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-icon">🏢</span>
+  const agentsHTML = isAdmin ? DB.us.map(u => {
+    const cnt = DB.ak.filter(r => Array.isArray(r.fields['User']) && r.fields['User'].includes(u.id)).length;
+    const name = u.fields['Name'] || u.fields['Email'] || '';
+    return `<div class="agent-card" onclick="filterByAgent('${u.id}','${name}')">
+      <div class="agent-count">${cnt}</div>
+      <div class="agent-name">${name}</div>
+    </div>`;
+  }).join('') : '';
+
+  c.innerHTML = `
+    <div class="stats">
+      <div class="stat">
         <div class="stat-label">Συνολικά Ακίνητα</div>
-        <div class="stat-value">${totalAkinita}</div>
+        <div class="stat-value">${myAk.length}</div>
         <div class="stat-sub">Στο χαρτοφυλάκιό μου</div>
       </div>
-      <div class="stat-card">
-        <span class="stat-icon">✅</span>
+      <div class="stat">
         <div class="stat-label">Διαθέσιμα</div>
-        <div class="stat-value" style="color:var(--success)">${diathesima}</div>
+        <div class="stat-value" style="color:var(--success)">${diath}</div>
         <div class="stat-sub">Ενεργές αγγελίες</div>
       </div>
-      <div class="stat-card">
-        <span class="stat-icon">🔒</span>
+      <div class="stat">
         <div class="stat-label">Off Market</div>
-        <div class="stat-value" style="color:var(--accent)">${offmarket}</div>
+        <div class="stat-value" style="color:var(--gold)">${offm}</div>
         <div class="stat-sub">Αποκλειστικά</div>
       </div>
-      <div class="stat-card">
-        <span class="stat-icon">⭐</span>
+      <div class="stat">
         <div class="stat-label">Matching</div>
-        <div class="stat-value" style="color:var(--info)">${totalMatching}</div>
+        <div class="stat-value" style="color:var(--info)">${DB.ma.length}</div>
         <div class="stat-sub">Αποτελέσματα</div>
       </div>
     </div>
-
-    <div class="charts-grid">
+    <div class="charts">
       <div class="chart-card">
-        <div class="chart-title">📊 Ανά Είδος Ακινήτου</div>
-        ${Object.entries(byEidos).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`
-          <div class="chart-bar-item">
-            <div class="chart-bar-label">${k}</div>
-            <div class="chart-bar-track">
-              <div class="chart-bar-fill" style="width:${(v/maxEidos)*100}%"></div>
-            </div>
-            <div class="chart-bar-count">${v}</div>
-          </div>
-        `).join('')}
+        <div class="chart-title">Ανά Είδος Ακινήτου</div>
+        ${Object.entries(byEidos).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`
+          <div class="bar-row">
+            <div class="bar-label">${k}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(v/maxE)*100}%"></div></div>
+            <div class="bar-count">${v}</div>
+          </div>`).join('')}
       </div>
       <div class="chart-card">
-        <div class="chart-title">📍 Ανά Περιοχή</div>
-        ${Object.entries(byPeriochi).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`
-          <div class="chart-bar-item">
-            <div class="chart-bar-label">${k}</div>
-            <div class="chart-bar-track">
-              <div class="chart-bar-fill" style="width:${(v/maxPeriochi)*100}%"></div>
-            </div>
-            <div class="chart-bar-count">${v}</div>
-          </div>
-        `).join('')}
+        <div class="chart-title">Ανά Περιοχή</div>
+        ${Object.entries(byPeriochi).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`
+          <div class="bar-row">
+            <div class="bar-label">${k}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(v/maxP)*100}%"></div></div>
+            <div class="bar-count">${v}</div>
+          </div>`).join('')}
       </div>
     </div>
-
     ${isAdmin ? `
-    <div class="chart-card">
-      <div class="chart-title">👥 Ακίνητα ανά Agent</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:8px">
-        ${allData.users.filter(u=>u.fields['Role']==='agent'||u.fields['Ρόλος']==='agent').map(u=>`
-          <div style="background:var(--bg);padding:16px;border-radius:var(--radius);text-align:center">
-            <div style="font-size:28px;font-family:var(--font-display);font-weight:500;color:var(--accent)">
-              ${allData.akinita.filter(r=>JSON.stringify(r.fields['User']||[]).includes(u.id)).length}
-            </div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:4px">${u.fields['Name']||u.fields['Ονοματεπώνυμο']||'Agent'}</div>
-          </div>
-        `).join('')}
-      </div>
+    <div class="chart-card" style="margin-top:0">
+      <div class="chart-title">Ακίνητα ανά Agent <span style="font-size:11px;color:var(--text3);font-weight:400">(κλικ για φιλτράρισμα)</span></div>
+      <div class="agents-grid">${agentsHTML}</div>
     </div>` : ''}
   `;
+}
+
+function filterByAgent(userId, name) {
+  goPage('akinita', document.querySelector('.sb-item[data-page="akinita"]'));
+  setTimeout(() => {
+    const filtered = DB.ak.filter(r => Array.isArray(r.fields['User']) && r.fields['User'].includes(userId));
+    renderAkRows(filtered);
+    const title = document.querySelector('.list-title');
+    if (title) title.textContent = `Ακίνητα — ${name}`;
+  }, 100);
 }
 
 // ============================================================
 // ΑΚΙΝΗΤΑ PAGE
 // ============================================================
-function renderAkinita(content, actions) {
-  const canEdit = ['admin', 'agent'].includes(currentUser.role);
-  const isAdmin = currentUser.role === 'admin';
+function pgAkinita(c, a) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  a.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openAkForm()">+ Νέο Ακίνητο</button>` : '';
 
-  actions.innerHTML = canEdit ? `
-    <button class="btn btn-primary" onclick="openAkinitoForm()">+ Νέο Ακίνητο</button>
-  ` : '';
+  const statuses = [...new Set(DB.ak.map(r=>r.fields['Status']).filter(Boolean))];
+  const eidi = [...new Set(DB.ak.map(r=>r.fields['Είδος ακινήτου']).filter(Boolean))];
+  const perioches = [...new Set(DB.ak.map(r=>r.fields['Περιοχή']).filter(Boolean))];
 
-  let filtered = isAdmin ? allData.akinita : allData.akinita.filter(r =>
-    JSON.stringify(r.fields['User'] || []).includes(currentUser.id)
-  );
-
-  // Get unique values for filters
-  const statuses = [...new Set(allData.akinita.map(r => r.fields['Status']).filter(Boolean))];
-  const eidi = [...new Set(allData.akinita.map(r => r.fields['Είδος ακινήτου'] || r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']).filter(Boolean))];
-  const perioches = [...new Set(allData.akinita.map(r => r.fields['Περιοχή'] || r.fields['ΠΕΡΙΟΧΗ']).filter(Boolean))];
-
-  content.innerHTML = `
-    <div class="table-container">
-      <div class="table-header">
-        <div class="table-title">Ακίνητα <span style="color:var(--text-muted);font-size:16px">(${filtered.length})</span></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input class="search-box" type="text" placeholder="🔍 Αναζήτηση..." id="akinitoSearch" oninput="filterAkinita()">
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header">
+        <div>
+          <span class="list-title">Ακίνητα</span>
+          <span class="list-count" id="akCount"></span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input placeholder="Αναζήτηση..." id="akSearch" oninput="filterAk()">
+          </div>
         </div>
       </div>
-      <div class="filters-row">
-        <select class="filter-select" id="filterStatus" onchange="filterAkinita()">
-          <option value="">Όλα τα Status</option>
+      <div class="filters">
+        <select class="filter-select" id="fStatus" onchange="filterAk()">
+          <option value="">Όλα Status</option>
           ${statuses.map(s=>`<option value="${s}">${s}</option>`).join('')}
         </select>
-        <select class="filter-select" id="filterEidos" onchange="filterAkinita()">
-          <option value="">Όλα τα Είδη</option>
+        <select class="filter-select" id="fEidos" onchange="filterAk()">
+          <option value="">Όλα Είδη</option>
           ${eidi.map(e=>`<option value="${e}">${e}</option>`).join('')}
         </select>
-        <select class="filter-select" id="filterPeriochi" onchange="filterAkinita()">
-          <option value="">Όλες οι Περιοχές</option>
+        <select class="filter-select" id="fPeriochi" onchange="filterAk()">
+          <option value="">Όλες Περιοχές</option>
           ${perioches.map(p=>`<option value="${p}">${p}</option>`).join('')}
         </select>
       </div>
       <div style="overflow-x:auto">
-        <table id="akinitoTable">
-          <thead>
-            <tr>
-              <th>Α/Α</th>
-              <th>Περιοχή</th>
-              <th>Είδος</th>
-              <th>Status</th>
-              <th>Εμβαδό</th>
-              <th>Τιμή</th>
-              <th>Agent</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="akinitoTableBody">
-          </tbody>
+        <table>
+          <thead><tr>
+            <th>Α/Α</th>
+            <th>Περιοχή</th>
+            <th>Είδος</th>
+            <th>Status</th>
+            <th>Εμβαδό</th>
+            <th>Τιμή</th>
+            <th>Agent</th>
+          </tr></thead>
+          <tbody id="akBody"></tbody>
         </table>
       </div>
-      <div class="pagination" id="akinitaPagination"></div>
     </div>
   `;
 
-  renderAkinitoRows(filtered);
+  renderAkRows(getMyAk());
 }
 
-function renderAkinitoRows(records) {
-  const tbody = document.getElementById('akinitoTableBody');
-  if (!tbody) return;
+function getMyAk() {
+  return ME.role === 'admin' ? DB.ak : DB.ak.filter(r =>
+    Array.isArray(r.fields['User']) && r.fields['User'].includes(ME.id)
+  );
+}
 
-  if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8">
-      <div class="empty-state">
-        <div class="empty-state-icon">🏢</div>
-        <div class="empty-state-text">Δεν βρέθηκαν ακίνητα</div>
-      </div>
-    </td></tr>`;
+function renderAkRows(recs) {
+  const tbody = document.getElementById('akBody');
+  if (!tbody) return;
+  const el = document.getElementById('akCount');
+  if (el) el.textContent = ` (${recs.length})`;
+
+  if (!recs.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏢</div><div class="empty-text">Δεν βρέθηκαν ακίνητα</div></div></td></tr>`;
     return;
   }
 
-  tbody.innerHTML = records.map(r => {
+  tbody.innerHTML = recs.map(r => {
     const f = r.fields;
-    const status = f['Status'] || '';
-    const statusClass = {
-      'Διαθέσιμο': 'badge-green',
-      'Off Market': 'badge-gold',
-      'Πουλήθηκε': 'badge-gray',
-      'Αποσύρθηκε': 'badge-red'
-    }[status] || 'badge-gray';
+    const sc = {Διαθέσιμο:'badge-green','Off Market':'badge-gold',Πουλήθηκε:'badge-gray',Αποσύρθηκε:'badge-red'}[f['Status']]||'badge-gray';
+    const timi = f['Τιμή'] ? `€${Number(f['Τιμή']).toLocaleString('el-GR')}` : '—';
+    const emv = f['Εμβ. Μεικτό'] ? `${f['Εμβ. Μεικτό']} τ.μ.` : '—';
+    // Get agent name from linked User field
+    const userId = Array.isArray(f['User']) ? f['User'][0] : null;
+    const agentRec = userId ? DB.us.find(u => u.id === userId) : null;
+    const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
 
-    const timi = f['Τιμή'] ? `€${Number(f['Τιμή']).toLocaleString('el-GR')}` : '-';
-    const emvado = f['Εμβ. Μεικτό'] || f['ΕΜΒΑΔΟ'] || '-';
-    const periochi = f['Περιοχή'] || f['ΠΕΡΙΟΧΗ'] || '-';
-    const eidos = f['Είδος ακινήτου'] || f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'] || '-';
-    const aa = f['Α/A'] || f['Α/Α'] || '-';
-    const canEdit = ['admin', 'agent'].includes(currentUser.role);
-
-    return `<tr>
-      <td><strong>${aa}</strong></td>
-      <td>${periochi}</td>
-      <td>${eidos}</td>
-      <td><span class="badge ${statusClass}">${status}</span></td>
-      <td>${emvado} τ.μ.</td>
-      <td><strong style="color:var(--accent)">${timi}</strong></td>
-      <td style="font-size:12px;color:var(--text-muted)">Agent</td>
-      <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="viewAkinito('${r.id}')">👁️</button>
-          ${canEdit ? `
-            <button class="btn btn-secondary btn-sm" onclick="openAkinitoForm('${r.id}')">✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteAkinito('${r.id}')">🗑️</button>
-          ` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="printRecord('${r.id}','akinita')" title="PDF">📄</button>
-          <button class="btn btn-secondary btn-sm" onclick="shareViber('${r.id}','akinita')" title="Viber">💬</button>
-        </div>
-      </td>
+    return `<tr onclick="viewAk('${r.id}')">
+      <td><strong>${f['Α/A']||'—'}</strong></td>
+      <td>${f['Περιοχή']||'—'}</td>
+      <td>${f['Είδος ακινήτου']||'—'}</td>
+      <td><span class="badge ${sc}">${f['Status']||'—'}</span></td>
+      <td>${emv}</td>
+      <td><strong>${timi}</strong></td>
+      <td style="color:var(--text2)">${agentName}</td>
     </tr>`;
   }).join('');
 }
 
-function filterAkinita() {
-  const search = (document.getElementById('akinitoSearch')?.value || '').toLowerCase();
-  const status = document.getElementById('filterStatus')?.value || '';
-  const eidos = document.getElementById('filterEidos')?.value || '';
-  const periochi = document.getElementById('filterPeriochi')?.value || '';
-  const isAdmin = currentUser.role === 'admin';
-
-  let filtered = isAdmin ? allData.akinita : allData.akinita.filter(r =>
-    JSON.stringify(r.fields['User'] || []).includes(currentUser.id)
-  );
-
-  if (search) {
-    filtered = filtered.filter(r => {
-      const f = r.fields;
-      return JSON.stringify(f).toLowerCase().includes(search);
-    });
-  }
-  if (status) filtered = filtered.filter(r => r.fields['Status'] === status);
-  if (eidos) filtered = filtered.filter(r => (r.fields['Είδος ακινήτου'] || r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']) === eidos);
-  if (periochi) filtered = filtered.filter(r => (r.fields['Περιοχή'] || r.fields['ΠΕΡΙΟΧΗ']) === periochi);
-
-  renderAkinitoRows(filtered);
+function filterAk() {
+  const s = (document.getElementById('akSearch')?.value||'').toLowerCase();
+  const st = document.getElementById('fStatus')?.value||'';
+  const ei = document.getElementById('fEidos')?.value||'';
+  const pe = document.getElementById('fPeriochi')?.value||'';
+  let r = getMyAk();
+  if (s) r = r.filter(x => JSON.stringify(x.fields).toLowerCase().includes(s));
+  if (st) r = r.filter(x => x.fields['Status']===st);
+  if (ei) r = r.filter(x => x.fields['Είδος ακινήτου']===ei);
+  if (pe) r = r.filter(x => x.fields['Περιοχή']===pe);
+  renderAkRows(r);
 }
 
-function viewAkinito(id) {
-  const record = allData.akinita.find(r => r.id === id);
-  if (!record) return;
-  const f = record.fields;
+function viewAk(id) {
+  const rec = DB.ak.find(r => r.id === id);
+  if (!rec) return;
+  const f = rec.fields;
 
-  const fields = Object.entries(f).filter(([k,v]) => v && k !== 'User' && !Array.isArray(v) || typeof v === 'string' || typeof v === 'number');
+  const isOwner = ME.role === 'admin' || (Array.isArray(f['User']) && f['User'].includes(ME.id));
 
-  openModal(`🏢 Ακίνητο #${f['Α/A'] || ''}`, `
-    <div class="property-detail-grid">
-      ${fields.map(([k,v])=>`
-        <div class="property-detail-item">
-          <div class="property-detail-label">${k}</div>
-          <div class="property-detail-value">${Array.isArray(v) ? v.join(', ') : v}</div>
-        </div>
-      `).join('')}
+  const userId = Array.isArray(f['User']) ? f['User'][0] : null;
+  const agentRec = userId ? DB.us.find(u => u.id === userId) : null;
+  const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
+
+  const timi = f['Τιμή'] ? `€${Number(f['Τιμή']).toLocaleString('el-GR')}` : '—';
+  const ektimisi = f['Εκτίμηση'] ? `€${Number(f['Εκτίμηση']).toLocaleString('el-GR')}` : '—';
+  const timiMetro = f['Τιμή ανά Τετρ.μέτρο'] ? `€${Number(f['Τιμή ανά Τετρ.μέτρο']).toLocaleString('el-GR')}/τ.μ.` : '—';
+  const sc = {Διαθέσιμο:'badge-green','Off Market':'badge-gold',Πουλήθηκε:'badge-gray',Αποσύρθηκε:'badge-red'}[f['Status']]||'badge-gray';
+
+  const photosHTML = Array.isArray(f['Φωτογραφίες']) && f['Φωτογραφίες'].length ?
+    `<div class="detail-photos">${f['Φωτογραφίες'].map(p=>`<img class="detail-photo" src="${p.url}" onclick="window.open('${p.url}','_blank')">`).join('')}</div>` : '';
+
+  openModal(`🏢 Ακίνητο #${f['Α/A']||''}`, `
+    ${photosHTML}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:20px;font-weight:700">${f['Περιοχή']||'—'}</div>
+        <div style="color:var(--text2)">${f['Είδος ακινήτου']||'—'} ${f['Δωμάτια']?'· '+f['Δωμάτια']+' δωμ.':''}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:var(--gold)">${timi}</div>
+        <span class="badge ${sc}">${f['Status']||''}</span>
+      </div>
     </div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Εμβαδό Μεικτό</div><div class="detail-value">${f['Εμβ. Μεικτό']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Εμβαδό Καθαρό</div><div class="detail-value">${f['Εμβαδό Καθαρό']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Τιμή/τ.μ.</div><div class="detail-value">${timiMetro}</div></div>
+      <div class="detail-item"><div class="detail-label">Εκτίμηση</div><div class="detail-value">${ektimisi}</div></div>
+      <div class="detail-item"><div class="detail-label">Έτος Κατ/σης</div><div class="detail-value">${f['Έτος κατασκευής']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Όροφος</div><div class="detail-value">${f['Όροφος']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Δωμάτια</div><div class="detail-value">${f['Δωμάτια']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Θέση Στάθμευσης</div><div class="detail-value">${f['Θέση Στάθμευσης']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Ασανσέρ</div><div class="detail-value">${f['Ασανσέρ']?'✅ Ναί':'❌ Όχι'}</div></div>
+      <div class="detail-item"><div class="detail-label">Αποθήκη</div><div class="detail-value">${f['Αποθήκη']?'✅ Ναί':'❌ Όχι'}</div></div>
+      <div class="detail-item"><div class="detail-label">Διεύθυνση</div><div class="detail-value">${f['Διεύθυνση']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Συνεργασίες</div><div class="detail-value">${f['Συνεργασίες']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Agent</div><div class="detail-value">${agentName}</div></div>
+      <div class="detail-item"><div class="detail-label">Ημερομηνία</div><div class="detail-value">${f['Ημερομηνία']?new Date(f['Ημερομηνία']).toLocaleDateString('el-GR'):'—'}</div></div>
+    </div>
+    ${f['Σημειώσεις'] ? `<div style="margin-top:12px;padding:12px;background:var(--bg2);border-radius:var(--radius2)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Σημειώσεις</div><div style="font-size:13px">${f['Σημειώσεις']}</div></div>` : ''}
   `, `
-    <button class="btn btn-secondary" onclick="printRecord('${id}','akinita')">📄 PDF</button>
-    <button class="btn btn-secondary" onclick="shareViber('${id}','akinita')">💬 Viber</button>
-    <button class="btn btn-primary" onclick="closeModal()">Κλείσιμο</button>
+    <button class="btn btn-outline btn-sm" onclick="printAk('${id}')">📄 PDF</button>
+    <button class="btn btn-outline btn-sm" onclick="viberAk('${id}')">💬 Viber</button>
+    ${isOwner ? `
+    <button class="btn btn-danger btn-sm" onclick="delAk('${id}')">🗑️ Διαγραφή</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal();openAkForm('${id}')">✏️ Επεξεργασία</button>
+    ` : ''}
   `);
 }
 
-async function openAkinitoForm(id = null) {
-  const record = id ? allData.akinita.find(r => r.id === id) : null;
-  const f = record?.fields || {};
+function getUserOptions(selectedId='') {
+  return DB.us.map(u => {
+    const name = u.fields['Name'] || u.fields['Email'] || '';
+    return `<option value="${u.id}" ${u.id===selectedId?'selected':''}>${name}</option>`;
+  }).join('');
+}
+
+function getUniqueOptions(field, dataset='ak') {
+  return [...new Set(DB[dataset].map(r => {
+    const v = r.fields[field];
+    if (Array.isArray(v)) return v;
+    return v ? [v] : [];
+  }).flat().filter(Boolean))];
+}
+
+async function openAkForm(id=null) {
+  const rec = id ? DB.ak.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
   const isEdit = !!id;
 
-  const perioches = [...new Set(allData.akinita.map(r => r.fields['Περιοχή'] || r.fields['ΠΕΡΙΟΧΗ']).filter(Boolean))];
-  const eidi = [...new Set(allData.akinita.map(r => r.fields['Είδος ακινήτου'] || r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']).filter(Boolean))];
-  const userOptions = allData.users.map(u => `<option value="${u.id}" ${JSON.stringify(f['User']||[]).includes(u.id)?'selected':''}>${u.fields['Name']||u.fields['Ονοματεπώνυμο']||''}</option>`).join('');
-  
+  const userId = Array.isArray(f['User']) ? f['User'][0] : '';
   const today = new Date().toISOString().split('T')[0];
   const timiVal = f['Τιμή'] || '';
-  const emvadoVal = f['Εμβ. Μεικτό'] || '';
-  const timiMetro = timiVal && emvadoVal ? (timiVal/emvadoVal).toFixed(2) : '';
+  const emvVal = f['Εμβ. Μεικτό'] || '';
+  const timiMetro = timiVal && emvVal ? (timiVal/emvVal).toFixed(2) : '';
+
+  const perioches = getUniqueOptions('Περιοχή');
+  const eidi = getUniqueOptions('Είδος ακινήτου');
 
   openModal(isEdit ? '✏️ Επεξεργασία Ακινήτου' : '+ Νέο Ακίνητο', `
-    <div class="form-grid">
-      <div class="form-group">
+    <div class="fgrid">
+      <div class="field">
+        <label>Ημερομηνία</label>
+        <input type="date" id="ak_date" value="${f['Ημερομηνία']||today}">
+      </div>
+      <div class="field">
+        <label>Agent</label>
+        <select id="ak_user">
+          <option value="">Επιλογή...</option>
+          ${getUserOptions(userId)}
+        </select>
+      </div>
+      <div class="field">
         <label>Περιοχή *</label>
-        <select id="f_periochi">
+        <select id="ak_periochi" onchange="handleNewOpt(this,'ak_periochi_new')">
           <option value="">Επιλογή...</option>
           ${perioches.map(p=>`<option value="${p}" ${(f['Περιοχή']||'')==p?'selected':''}>${p}</option>`).join('')}
           <option value="__new__">+ Νέα Περιοχή</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="field">
         <label>Είδος Ακινήτου *</label>
-        <select id="f_eidos">
+        <select id="ak_eidos" onchange="handleNewOpt(this,'ak_eidos_new')">
           <option value="">Επιλογή...</option>
-          ${eidi.map(e=>`<option value="${e}" ${((f['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'])||'')==e?'selected':''}>${e}</option>`).join('')}
+          ${eidi.map(e=>`<option value="${e}" ${((f['Είδος ακινήτου']||'')==e)?'selected':''}>${e}</option>`).join('')}
           <option value="__new__">+ Νέο Είδος</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="field">
         <label>Status</label>
-        <select id="f_status">
-          <option value="Διαθέσιμο" ${(f['Status']||'')==='Διαθέσιμο'?'selected':''}>Διαθέσιμο</option>
-          <option value="Off Market" ${(f['Status']||'')==='Off Market'?'selected':''}>Off Market</option>
-          <option value="Πουλήθηκε" ${(f['Status']||'')==='Πουλήθηκε'?'selected':''}>Πουλήθηκε</option>
-          <option value="Αποσύρθηκε" ${(f['Status']||'')==='Αποσύρθηκε'?'selected':''}>Αποσύρθηκε</option>
+        <select id="ak_status">
+          ${['Διαθέσιμο','Off Market','Πουλήθηκε','Αποσύρθηκε'].map(s=>`<option value="${s}" ${(f['Status']||'')==s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
-      <div class="form-group">
-        <label>Agent (User)</label>
-        <select id="f_user">
-          <option value="">Επιλογή...</option>
-          ${userOptions}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Ημερομηνία</label>
-        <input type="date" id="f_date" value="${f['Ημερομηνία']||today}">
-      </div>
-      <div class="form-group">
-        <label>Τιμή (€)</label>
-        <input type="number" id="f_timi" value="${timiVal}" placeholder="π.χ. 150000" oninput="calcTimiMetro()">
-      </div>
-      <div class="form-group">
-        <label>Εκτίμηση (€)</label>
-        <input type="number" id="f_ektimisi" value="${f['Εκτίμηση']||''}" placeholder="π.χ. 160000">
-      </div>
-      <div class="form-group">
-        <label>Εμβαδό Μεικτό (τ.μ.)</label>
-        <input type="number" id="f_emvado" value="${emvadoVal}" placeholder="π.χ. 85" oninput="calcTimiMetro()">
-      </div>
-      <div class="form-group">
-        <label>Εμβαδό Καθαρό (τ.μ.)</label>
-        <input type="number" id="f_emvado_k" value="${f['Εμβαδό Καθαρό']||''}" placeholder="π.χ. 78">
-      </div>
-      <div class="form-group">
-        <label>Τιμή/τ.μ. (αυτόματο)</label>
-        <input type="text" id="f_timi_tm" value="${timiMetro ? timiMetro+'€' : ''}" placeholder="Υπολογίζεται αυτόματα" readonly style="background:#f5f5f5">
-      </div>
-      <div class="form-group">
-        <label>Δωμάτια</label>
-        <select id="f_domata">
-          <option value="">Επιλογή...</option>
-          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${((f['Δωμάτια']||f['ΔΩΜΑΤΑ'])||'')==d?'selected':''}>${d}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Έτος Κατασκευής</label>
-        <input type="number" id="f_etos" value="${f['Έτος κατασκευής']||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||''}" placeholder="π.χ. 2010">
-      </div>
-      <div class="form-group">
+      <div class="field">
         <label>Όροφος</label>
-        <select id="f_oros">
+        <select id="ak_oros">
           <option value="">Επιλογή...</option>
           ${['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'].map(o=>`<option value="${o}" ${(f['Όροφος']||'')==o?'selected':''}>${o}</option>`).join('')}
         </select>
       </div>
-      <div class="form-group">
+      <div class="field">
+        <label>Δωμάτια</label>
+        <select id="ak_domata">
+          <option value="">Επιλογή...</option>
+          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${((f['Δωμάτια']||'')==d)?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
         <label>Θέση Στάθμευσης</label>
-        <select id="f_stathmeusi">
+        <select id="ak_stath">
           <option value="">Επιλογή...</option>
           ${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
-      <div class="form-group">
+      <div class="field">
+        <label>Τιμή (€)</label>
+        <input type="number" id="ak_timi" value="${timiVal}" placeholder="π.χ. 150000" oninput="calcTM()">
+      </div>
+      <div class="field">
+        <label>Εκτίμηση (€)</label>
+        <input type="number" id="ak_ektimisi" value="${f['Εκτίμηση']||''}" placeholder="π.χ. 160000">
+      </div>
+      <div class="field">
+        <label>Εμβαδό Μεικτό (τ.μ.)</label>
+        <input type="number" id="ak_emv" value="${emvVal}" placeholder="π.χ. 85" oninput="calcTM()">
+      </div>
+      <div class="field">
+        <label>Εμβαδό Καθαρό (τ.μ.)</label>
+        <input type="number" id="ak_emvk" value="${f['Εμβαδό Καθαρό']||''}" placeholder="π.χ. 78">
+      </div>
+      <div class="field">
+        <label>Τιμή/τ.μ. (αυτόματο)</label>
+        <input type="text" id="ak_tm" value="${timiMetro?timiMetro+' €/τ.μ.':''}" readonly style="background:var(--bg3);color:var(--text3)">
+      </div>
+      <div class="field">
+        <label>Έτος Κατασκευής</label>
+        <input type="number" id="ak_etos" value="${f['Έτος κατασκευής']||''}" placeholder="π.χ. 2010">
+      </div>
+      <div class="field">
         <label>Διεύθυνση</label>
-        <input type="text" id="f_diefthinsi" value="${f['Διεύθυνση']||''}" placeholder="Οδός αριθμός">
+        <input type="text" id="ak_dieft" value="${f['Διεύθυνση']||''}" placeholder="Οδός αριθμός">
       </div>
-      <div class="form-group">
+      <div class="field">
         <label>Συνεργασίες</label>
-        <input type="text" id="f_sinergasies" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική">
+        <input type="text" id="ak_sinerg" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική">
       </div>
-      <div class="form-group" style="display:flex;align-items:center;gap:16px;padding-top:20px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input type="checkbox" id="f_asanser" ${f['Ασανσέρ']?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
-          Ασανσέρ
+      <div class="field" style="display:flex;gap:16px;align-items:center;padding-top:18px">
+        <label class="check-row" style="flex:1;margin-bottom:0">
+          <input type="checkbox" id="ak_asanser" ${f['Ασανσέρ']?'checked':''}> Ασανσέρ
         </label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input type="checkbox" id="f_apothiki" ${f['Αποθήκη']?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
-          Αποθήκη
+        <label class="check-row" style="flex:1;margin-bottom:0">
+          <input type="checkbox" id="ak_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
         </label>
       </div>
-      <div class="form-group">
-        <label>Φωτογραφίες</label>
-        <input type="file" id="f_photos" multiple accept="image/*" style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);width:100%">
-        ${f['Φωτογραφίες'] ? `<div style="margin-top:8px;font-size:12px;color:var(--success)">✅ Υπάρχουν ${(f['Φωτογραφίες']||[]).length} φωτογραφίες</div>` : ''}
-      </div>
-      <div class="form-group">
-        <label>Video</label>
-        <input type="file" id="f_video" accept="video/*" style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);width:100%">
-        ${f['Video'] ? `<div style="margin-top:8px;font-size:12px;color:var(--success)">✅ Υπάρχει video</div>` : ''}
-      </div>
-      <div class="form-group form-full">
+      <div class="field fspan">
         <label>Σημειώσεις</label>
-        <textarea id="f_simeioseis" rows="3" placeholder="Περιγραφή ακινήτου...">${f['Σημειώσεις']||''}</textarea>
+        <textarea id="ak_notes" rows="3" placeholder="Περιγραφή...">${f['Σημειώσεις']||''}</textarea>
       </div>
     </div>
   `, `
-    <button class="btn btn-secondary" onclick="closeModal()">Ακύρωση</button>
-    <button class="btn btn-primary" onclick="saveAkinito('${id || ''}')">
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveAk('${id||''}')">
       ${isEdit ? '💾 Αποθήκευση' : '+ Δημιουργία'}
     </button>
   `);
-
-  document.getElementById('f_periochi').addEventListener('change', function() {
-    if (this.value === '__new__') {
-      const newVal = prompt('Νέα Περιοχή:');
-      if (newVal) {
-        const opt = new Option(newVal, newVal, true, true);
-        this.insertBefore(opt, this.lastElementChild);
-        this.value = newVal;
-      }
-    }
-  });
-
-  document.getElementById('f_eidos').addEventListener('change', function() {
-    if (this.value === '__new__') {
-      const newVal = prompt('Νέο Είδος Ακινήτου:');
-      if (newVal) {
-        const opt = new Option(newVal, newVal, true, true);
-        this.insertBefore(opt, this.lastElementChild);
-        this.value = newVal;
-      }
-    }
-  });
 }
 
-function calcTimiMetro() {
-  const timi = parseFloat(document.getElementById('f_timi')?.value) || 0;
-  const emvado = parseFloat(document.getElementById('f_emvado')?.value) || 0;
-  const el = document.getElementById('f_timi_tm');
-  if (el && timi > 0 && emvado > 0) {
-    el.value = (timi/emvado).toLocaleString('el-GR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+function handleNewOpt(sel, inputId) {
+  if (sel.value === '__new__') {
+    const val = prompt('Νέο στοιχείο:');
+    if (val && val.trim()) {
+      const opt = new Option(val.trim(), val.trim(), true, true);
+      sel.insertBefore(opt, sel.lastElementChild);
+      sel.value = val.trim();
+    } else {
+      sel.value = '';
+    }
   }
 }
 
-async function saveAkinito(id) {
-  const timi = parseFloat(document.getElementById('f_timi').value) || null;
-  const emvado = parseFloat(document.getElementById('f_emvado').value) || null;
-  const timiMetro = (timi && emvado) ? parseFloat((timi/emvado).toFixed(2)) : null;
-  const userId = document.getElementById('f_user').value;
+function calcTM() {
+  const t = parseFloat(document.getElementById('ak_timi')?.value)||0;
+  const e = parseFloat(document.getElementById('ak_emv')?.value)||0;
+  const el = document.getElementById('ak_tm');
+  if (el && t>0 && e>0) {
+    el.value = (t/e).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €/τ.μ.';
+  }
+}
+
+async function saveAk(id) {
+  const timi = parseFloat(document.getElementById('ak_timi').value)||null;
+  const emv = parseFloat(document.getElementById('ak_emv').value)||null;
+  const userId = document.getElementById('ak_user').value;
 
   const fields = {
-    'Περιοχή': document.getElementById('f_periochi').value || null,
-    'Είδος ακινήτου': document.getElementById('f_eidos').value || null,
-    'Status': document.getElementById('f_status').value || null,
-    'Ημερομηνία': document.getElementById('f_date').value || null,
+    'Ημερομηνία': document.getElementById('ak_date').value || null,
+    'Περιοχή': document.getElementById('ak_periochi').value || null,
+    'Είδος ακινήτου': document.getElementById('ak_eidos').value || null,
+    'Status': document.getElementById('ak_status').value || null,
+    'Όροφος': document.getElementById('ak_oros').value || null,
+    'Δωμάτια': document.getElementById('ak_domata').value || null,
+    'Θέση Στάθμευσης': document.getElementById('ak_stath').value || null,
     'Τιμή': timi,
-    'Εκτίμηση': parseFloat(document.getElementById('f_ektimisi').value) || null,
-    'Εμβ. Μεικτό': emvado,
-    'Εμβαδό Καθαρό': parseFloat(document.getElementById('f_emvado_k').value) || null,
-    'Τιμή ανά Τετρ.μέτρο': timiMetro,
-    'Δωμάτια': document.getElementById('f_domata').value || null,
-    'Έτος κατασκευής': parseInt(document.getElementById('f_etos').value) || null,
-    'Όροφος': document.getElementById('f_oros').value || null,
-    'Θέση Στάθμευσης': document.getElementById('f_stathmeusi').value || null,
-    'Διεύθυνση': document.getElementById('f_diefthinsi').value || null,
-    'Συνεργασίες': document.getElementById('f_sinergasies').value || null,
-    'Ασανσέρ': document.getElementById('f_asanser').checked,
-    'Αποθήκη': document.getElementById('f_apothiki').checked,
-    'Σημειώσεις': document.getElementById('f_simeioseis').value || null,
+    'Εκτίμηση': parseFloat(document.getElementById('ak_ektimisi').value)||null,
+    'Εμβ. Μεικτό': emv,
+    'Εμβαδό Καθαρό': parseFloat(document.getElementById('ak_emvk').value)||null,
+    'Τιμή ανά Τετρ.μέτρο': (timi&&emv) ? parseFloat((timi/emv).toFixed(2)) : null,
+    'Έτος κατασκευής': parseInt(document.getElementById('ak_etos').value)||null,
+    'Διεύθυνση': document.getElementById('ak_dieft').value || null,
+    'Συνεργασίες': document.getElementById('ak_sinerg').value || null,
+    'Σημειώσεις': document.getElementById('ak_notes').value || null,
   };
 
+  if (document.getElementById('ak_asanser').checked) fields['Ασανσέρ'] = true;
+  if (document.getElementById('ak_apothiki').checked) fields['Αποθήκη'] = true;
   if (userId) fields['User'] = [userId];
-  // Remove false checkboxes to avoid overwriting
-  if (!fields['Ασανσέρ']) delete fields['Ασανσέρ'];
-  if (!fields['Αποθήκη']) delete fields['Αποθήκη'];
 
-  // Remove null values
-  Object.keys(fields).forEach(k => (fields[k] === null || fields[k] === '') && delete fields[k]);console.log('Sending fields:', JSON.stringify(fields));
+  Object.keys(fields).forEach(k => (fields[k]===null||fields[k]==='') && delete fields[k]);
 
-  showLoading(true);
+  setLoading(true);
   try {
-    if (id) {
-      await updateRecord(CONFIG.TABLES.AKINITA, id, fields);
-      showToast('Ακίνητο ενημερώθηκε! ✅', 'success');
-    } else {
-      await createRecord(CONFIG.TABLES.AKINITA, fields);
-      showToast('Νέο ακίνητο δημιουργήθηκε! ✅', 'success');
-    }
+    if (id) { await updateRec(CFG.T.AK, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.AK, fields); toast('Δημιουργήθηκε!','s'); }
     closeModal();
-    await loadAllData();
-    renderAkinita(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα αποθήκευσης', 'error');
-  }
-  showLoading(false);
+    await loadAll();
+    pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { console.error(e); toast('Σφάλμα αποθήκευσης','e'); }
+  setLoading(false);
 }
 
-async function deleteAkinito(id) {
-  if (!confirm('Σίγουρα θέλεις να διαγράψεις αυτό το ακίνητο;')) return;
-  showLoading(true);
+async function delAk(id) {
+  if (!confirm('Διαγραφή ακινήτου;')) return;
+  setLoading(true);
   try {
-    await deleteRecord(CONFIG.TABLES.AKINITA, id);
-    showToast('Ακίνητο διαγράφηκε', 'success');
-    await loadAllData();
-    renderAkinita(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα διαγραφής', 'error');
-  }
-  showLoading(false);
+    await deleteRec(CFG.T.AK, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα διαγραφής','e'); }
+  setLoading(false);
+}
+
+function printAk(id) {
+  const rec = DB.ak.find(r=>r.id===id);
+  if (!rec) return;
+  printFields(rec.fields, 'Ακίνητο');
+}
+
+function viberAk(id) {
+  const rec = DB.ak.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const t = `Ακίνητο\n${f['Περιοχή']||''} - ${f['Είδος ακινήτου']||''}\n${f['Εμβ. Μεικτό']||''} τ.μ.\n€${Number(f['Τιμή']||0).toLocaleString('el-GR')}\n${f['Status']||''}`;
+  window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
 // ============================================================
 // ΖΗΤΗΣΕΙΣ PAGE
 // ============================================================
-function renderZitiseis(content, actions) {
-  const canEdit = ['admin', 'agent'].includes(currentUser.role);
-  const isAdmin = currentUser.role === 'admin';
+function pgZitiseis(c, a) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  a.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openZiForm()">+ Νέα Ζήτηση</button>` : '';
 
-  actions.innerHTML = canEdit ? `
-    <button class="btn btn-primary" onclick="openZitisiForm()">+ Νέα Ζήτηση</button>
-  ` : '';
-
-  let filtered = isAdmin ? allData.zitiseis : allData.zitiseis.filter(r =>
-    JSON.stringify(r.fields['USER'] || r.fields['User'] || []).includes(currentUser.id)
-  );
-
-  content.innerHTML = `
-    <div class="table-container">
-      <div class="table-header">
-        <div class="table-title">Ζητήσεις <span style="color:var(--text-muted);font-size:16px">(${filtered.length})</span></div>
-        <input class="search-box" type="text" placeholder="🔍 Αναζήτηση..." id="zitisiSearch" oninput="filterZitiseis()">
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header">
+        <div>
+          <span class="list-title">Ζητήσεις</span>
+          <span class="list-count" id="ziCount"></span>
+        </div>
+        <div style="margin-left:auto">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input placeholder="Αναζήτηση..." id="ziSearch" oninput="filterZi()">
+          </div>
+        </div>
       </div>
       <div style="overflow-x:auto">
         <table>
-          <thead>
-            <tr>
-              <th>Α/Α</th>
-              <th>Περιοχή</th>
-              <th>Είδος</th>
-              <th>Τιμή Min-Max</th>
-              <th>Δωμάτια</th>
-              <th>Ημερομηνία</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="zitisiTableBody">
-          </tbody>
+          <thead><tr>
+            <th>Α/Α</th>
+            <th>Agent</th>
+            <th>Περιοχή</th>
+            <th>Είδος</th>
+            <th>Τιμή</th>
+            <th>Δωμάτια</th>
+            <th>Ημερομηνία</th>
+          </tr></thead>
+          <tbody id="ziBody"></tbody>
         </table>
       </div>
     </div>
   `;
 
-  renderZitisiRows(filtered);
+  renderZiRows(getMyZi());
 }
 
-function renderZitisiRows(records) {
-  const tbody = document.getElementById('zitisiTableBody');
-  if (!tbody) return;
+function getMyZi() {
+  return ME.role === 'admin' ? DB.zi : DB.zi.filter(r => {
+    const u = r.fields['USER'] || r.fields['User'];
+    return Array.isArray(u) && u.includes(ME.id);
+  });
+}
 
-  if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7">
-      <div class="empty-state">
-        <div class="empty-state-icon">🔍</div>
-        <div class="empty-state-text">Δεν βρέθηκαν ζητήσεις</div>
-      </div>
-    </td></tr>`;
+function renderZiRows(recs) {
+  const tbody = document.getElementById('ziBody');
+  if (!tbody) return;
+  const el = document.getElementById('ziCount');
+  if (el) el.textContent = ` (${recs.length})`;
+
+  if (!recs.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Δεν βρέθηκαν ζητήσεις</div></div></td></tr>`;
     return;
   }
 
-  tbody.innerHTML = records.map(r => {
+  tbody.innerHTML = recs.map(r => {
     const f = r.fields;
-    const periochi = Array.isArray(f['Περιοχή']) ? f['Περιοχή'].join(', ') : (f['Περιοχή'] || '-');
-    const eidos = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'].join(', ') : (f['Είδος ακινήτου'] || '-');
-    const timiMin = f['Τιμή Min'] || f['ΤΙΜΗ ΜΙΝ'] ? `€${Number(f['Τιμή Min']||f['ΤΙΜΗ ΜΙΝ']).toLocaleString('el-GR')}` : '-';
-    const timiMax = f['Τιμή Max'] || f['ΤΙΜΗ ΜΑΧ'] ? `€${Number(f['Τιμή Max']||f['ΤΙΜΗ ΜΑΧ']).toLocaleString('el-GR')}` : '-';
-    const domata = f['Δωμάτια'] || f['ΔΩΜΑΤΙΑ'] || '-';
-    const date = f['Ημερομηνία'] ? new Date(f['Ημερομηνία']).toLocaleDateString('el-GR') : '-';
-    const aa = f['Α/A Ζήτησης'] || r.fields['Α/A'] || '-';
-    const canEdit = ['admin', 'agent'].includes(currentUser.role);
+    const periochi = Array.isArray(f['Περιοχή']) ? f['Περιοχή'].join(', ') : (f['Περιοχή']||'—');
+    const eidos = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'].join(', ') : (f['Είδος ακινήτου']||'—');
+    const tMin = f['Τιμή Min'] ? `€${Number(f['Τιμή Min']).toLocaleString('el-GR')}` : '';
+    const tMax = f['Τιμή Max'] ? `€${Number(f['Τιμή Max']).toLocaleString('el-GR')}` : '';
+    const timi = tMin && tMax ? `${tMin}–${tMax}` : tMin || tMax || '—';
+    const date = f['Ημερομηνία'] ? new Date(f['Ημερομηνία']).toLocaleDateString('el-GR') : '—';
+    const userId = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : null;
+    const agentRec = userId ? DB.us.find(u=>u.id===userId) : null;
+    const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
 
-    return `<tr>
-      <td><strong>${aa}</strong></td>
+    return `<tr onclick="viewZi('${r.id}')">
+      <td><strong>${f['Α/A Ζήτησης']||f['Α/A']||'—'}</strong></td>
+      <td style="color:var(--text2)">${agentName}</td>
       <td>${periochi}</td>
       <td>${eidos}</td>
-      <td style="font-size:12px">${timiMin} — ${timiMax}</td>
-      <td>${domata}</td>
-      <td style="font-size:12px;color:var(--text-muted)">${date}</td>
-      <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="viewZitisi('${r.id}')">👁️</button>
-          ${canEdit ? `
-            <button class="btn btn-secondary btn-sm" onclick="openZitisiForm('${r.id}')">✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteZitisi('${r.id}')">🗑️</button>
-          ` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="printRecord('${r.id}','zitiseis')">📄</button>
-          <button class="btn btn-secondary btn-sm" onclick="shareViber('${r.id}','zitiseis')">💬</button>
-        </div>
-      </td>
+      <td style="font-size:12px">${timi}</td>
+      <td>${f['Δωμάτια']||'—'}</td>
+      <td style="color:var(--text3);font-size:12px">${date}</td>
     </tr>`;
   }).join('');
 }
 
-function filterZitiseis() {
-  const search = (document.getElementById('zitisiSearch')?.value || '').toLowerCase();
-  const isAdmin = currentUser.role === 'admin';
-  let filtered = isAdmin ? allData.zitiseis : allData.zitiseis.filter(r =>
-    JSON.stringify(r.fields['USER'] || r.fields['User'] || []).includes(currentUser.id)
-  );
-  if (search) filtered = filtered.filter(r => JSON.stringify(r.fields).toLowerCase().includes(search));
-  renderZitisiRows(filtered);
+function filterZi() {
+  const s = (document.getElementById('ziSearch')?.value||'').toLowerCase();
+  let r = getMyZi();
+  if (s) r = r.filter(x => JSON.stringify(x.fields).toLowerCase().includes(s));
+  renderZiRows(r);
 }
 
-function viewZitisi(id) {
-  const record = allData.zitiseis.find(r => r.id === id);
-  if (!record) return;
-  const f = record.fields;
-  const fields = Object.entries(f).filter(([k,v]) => v);
+function viewZi(id) {
+  const rec = DB.zi.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const isOwner = ME.role==='admin' || (() => {
+    const u = f['USER']||f['User'];
+    return Array.isArray(u) && u.includes(ME.id);
+  })();
+
+  const userId = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : null;
+  const agentRec = userId ? DB.us.find(u=>u.id===userId) : null;
+  const agentName = agentRec ? (agentRec.fields['Name']||'') : '—';
+
+  const val = (v) => {
+    if (!v) return '—';
+    if (Array.isArray(v)) return v.map(x=>typeof x==='object'?x.name||x:x).join(', ');
+    return v;
+  };
 
   openModal('🔍 Ζήτηση', `
-    <div class="property-detail-grid">
-      ${fields.map(([k,v])=>`
-        <div class="property-detail-item">
-          <div class="property-detail-label">${k}</div>
-          <div class="property-detail-value">${Array.isArray(v) ? v.map(x=>typeof x==='object'?x.name:x).join(', ') : v}</div>
-        </div>
-      `).join('')}
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Ημερομηνία</div><div class="detail-value">${f['Ημερομηνία']?new Date(f['Ημερομηνία']).toLocaleDateString('el-GR'):'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Agent</div><div class="detail-value">${agentName}</div></div>
+      <div class="detail-item"><div class="detail-label">Περιοχή</div><div class="detail-value">${val(f['Περιοχή'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Είδος</div><div class="detail-value">${val(f['Είδος ακινήτου'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Από Έτος</div><div class="detail-value">${f['Από Έτος']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Έως Έτος</div><div class="detail-value">${f['Έως Έτος']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Δωμάτια</div><div class="detail-value">${f['Δωμάτια']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Όροφος</div><div class="detail-value">${val(f['Όροφος'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Εμβαδό Min</div><div class="detail-value">${f['Εμβαδό Min']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Εμβαδό Max</div><div class="detail-value">${f['Εμβαδό Max']||'—'} τ.μ.</div></div>
+      <div class="detail-item"><div class="detail-label">Θέση Στάθμευσης</div><div class="detail-value">${f['Θέση Στάθμευσης']||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Αποθήκη</div><div class="detail-value">${f['Αποθήκη']?'✅ Ναί':'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Τιμή Min</div><div class="detail-value">${f['Τιμή Min']?'€'+Number(f['Τιμή Min']).toLocaleString('el-GR'):'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Τιμή Max</div><div class="detail-value">${f['Τιμή Max']?'€'+Number(f['Τιμή Max']).toLocaleString('el-GR'):'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Τρόπος Πληρωμής</div><div class="detail-value">${val(f['Τρόπος Πληρωμής'])}</div></div>
+      <div class="detail-item"><div class="detail-label">Hot</div><div class="detail-value">${f['Hot']?'🔥 Ναί':'—'}</div></div>
     </div>
+    ${f['Ειδικά Χαρακτηριστικά']?.length ? `<div style="margin-top:12px;padding:12px;background:var(--bg2);border-radius:var(--radius2)"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px">Ειδικά Χαρακτηριστικά</div><div style="display:flex;flex-wrap:wrap;gap:6px">${(Array.isArray(f['Ειδικά Χαρακτηριστικά'])?f['Ειδικά Χαρακτηριστικά']:[f['Ειδικά Χαρακτηριστικά']]).map(x=>`<span class="badge badge-blue">${typeof x==='object'?x.name||x:x}</span>`).join('')}</div></div>` : ''}
   `, `
-    <button class="btn btn-secondary" onclick="printRecord('${id}','zitiseis')">📄 PDF</button>
-    <button class="btn btn-secondary" onclick="shareViber('${id}','zitiseis')">💬 Viber</button>
-    <button class="btn btn-primary" onclick="closeModal()">Κλείσιμο</button>
+    <button class="btn btn-outline btn-sm" onclick="printZi('${id}')">📄 PDF</button>
+    <button class="btn btn-outline btn-sm" onclick="viberZi('${id}')">💬 Viber</button>
+    ${isOwner ? `
+    <button class="btn btn-danger btn-sm" onclick="delZi('${id}')">🗑️</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal();openZiForm('${id}')">✏️ Επεξεργασία</button>
+    ` : ''}
   `);
 }
 
-async function openZitisiForm(id = null) {
-  const record = id ? allData.zitiseis.find(r => r.id === id) : null;
-  const f = record?.fields || {};
+async function openZiForm(id=null) {
+  const rec = id ? DB.zi.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
   const isEdit = !!id;
+  const today = new Date().toISOString().split('T')[0];
 
-  const perioches = [...new Set(allData.akinita.map(r => r.fields['Περιοχή'] || r.fields['ΠΕΡΙΟΧΗ']).filter(Boolean))];
-  const eidi = [...new Set(allData.akinita.map(r => r.fields['Είδος ακινήτου'] || r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']).filter(Boolean))];
+  const userId = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : '';
+  const perioches = getUniqueOptions('Περιοχή');
+  const eidi = getUniqueOptions('Είδος ακινήτου');
+  const orofoi = ['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'];
+  const xar = getUniqueOptions('Ειδικά Χαρακτηριστικά', 'ak');
+  const selPerioches = Array.isArray(f['Περιοχή']) ? f['Περιοχή'] : (f['Περιοχή'] ? [f['Περιοχή']] : []);
+  const selEidi = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'] : (f['Είδος ακινήτου'] ? [f['Είδος ακινήτου']] : []);
+  const selOrofoi = Array.isArray(f['Όροφος']) ? f['Όροφος'] : (f['Όροφος'] ? [f['Όροφος']] : []);
+  const selXar = Array.isArray(f['Ειδικά Χαρακτηριστικά']) ? f['Ειδικά Χαρακτηριστικά'].map(x=>typeof x==='object'?x.name||x:x) : [];
+  const selTropo = Array.isArray(f['Τρόπος Πληρωμής']) ? f['Τρόπος Πληρωμής'].map(x=>typeof x==='object'?x.name||x:x) : (f['Τρόπος Πληρωμής']?[f['Τρόπος Πληρωμής']]:[]);
+  const tropoOpts = ['Μετρητά','Δάνειο Στεγαστικό','Home 2','Άλλο'];
 
   openModal(isEdit ? '✏️ Επεξεργασία Ζήτησης' : '+ Νέα Ζήτηση', `
-    <div class="form-grid">
-      <div class="form-group form-full">
-        <label>Περιοχές (πολλαπλή επιλογή)</label>
-        <select id="f_z_periochi" multiple style="height:100px">
-          ${perioches.map(p=>`<option value="${p}">${p}</option>`).join('')}
-        </select>
-        <small style="color:var(--text-muted);font-size:11px">Κρατήστε Ctrl για πολλαπλή επιλογή</small>
-      </div>
-      <div class="form-group form-full">
-        <label>Είδος Ακινήτου (πολλαπλή επιλογή)</label>
-        <select id="f_z_eidos" multiple style="height:80px">
-          ${eidi.map(e=>`<option value="${e}">${e}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Τιμή Min (€)</label>
-        <input type="number" id="f_z_timi_min" value="${f['Τιμή Min']||f['ΤΙΜΗ ΜΙΝ']||''}" placeholder="π.χ. 100000">
-      </div>
-      <div class="form-group">
-        <label>Τιμή Max (€)</label>
-        <input type="number" id="f_z_timi_max" value="${f['Τιμή Max']||f['ΤΙΜΗ ΜΑΧ']||''}" placeholder="π.χ. 200000">
-      </div>
-      <div class="form-group">
-        <label>Εμβαδό Min (τ.μ.)</label>
-        <input type="number" id="f_z_emv_min" value="${f['Εμβαδό Min']||''}" placeholder="π.χ. 70">
-      </div>
-      <div class="form-group">
-        <label>Εμβαδό Max (τ.μ.)</label>
-        <input type="number" id="f_z_emv_max" value="${f['Εμβαδό Max']||''}" placeholder="π.χ. 120">
-      </div>
-      <div class="form-group">
-        <label>Δωμάτια</label>
-        <select id="f_z_domata">
-          <option value="">Επιλογή...</option>
-          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${(f['Δωμάτια']||f['ΔΩΜΑΤΙΑ'])===d?'selected':''}>${d}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Έτος Κατασκευής</label>
-        <select id="f_z_etos">
-          <option value="">Επιλογή...</option>
-          ${['1960-1979','1980-1989','1990-1999','2000-2005','2006-2010','2011-2015','2016-2020','2021-2025'].map(e=>`
-            <option value="${e}" ${(f['Έτος κατασκευής']||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ'])===e?'selected':''}>${e}</option>
-          `).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Θέση Στάθμευσης</label>
-        <select id="f_z_stathmeusi">
-          <option value="">Δεν έχει σημασία</option>
-          <option value="Ναί">Ναί</option>
-          <option value="Ανοιχτή">Ανοιχτή</option>
-          <option value="Κλειστή">Κλειστή</option>
-          <option value="Πυλωτή">Πυλωτή</option>
-        </select>
-      </div>
-      <div class="form-group">
+    <div class="fgrid">
+      <div class="field">
         <label>Ημερομηνία</label>
-        <input type="date" id="f_z_date" value="${f['Ημερομηνία']||new Date().toISOString().split('T')[0]}">
+        <input type="date" id="zi_date" value="${f['Ημερομηνία']||today}">
+      </div>
+      <div class="field">
+        <label>Agent</label>
+        <select id="zi_user">
+          <option value="">Επιλογή...</option>
+          ${getUserOptions(userId)}
+        </select>
+      </div>
+      <div class="field fspan">
+        <label>Περιοχή (πολλαπλή — κλικ για επιλογή)</label>
+        ${buildMultiSelect('zi_periochi', perioches, selPerioches, true)}
+      </div>
+      <div class="field fspan">
+        <label>Είδος Ακινήτου (πολλαπλή επιλογή)</label>
+        ${buildMultiSelect('zi_eidos', eidi, selEidi, true)}
+      </div>
+      <div class="field">
+        <label>Από Έτος</label>
+        <input type="number" id="zi_etos_apo" value="${f['Από Έτος']||''}" placeholder="π.χ. 2000">
+      </div>
+      <div class="field">
+        <label>Έως Έτος</label>
+        <input type="number" id="zi_etos_eos" value="${f['Έως Έτος']||''}" placeholder="π.χ. 2010">
+      </div>
+      <div class="field">
+        <label>Δωμάτια</label>
+        <select id="zi_domata">
+          <option value="">Επιλογή...</option>
+          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${(f['Δωμάτια']||'')==d?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Όροφος (πολλαπλή)</label>
+        ${buildMultiSelect('zi_oros', orofoi, selOrofoi, false)}
+      </div>
+      <div class="field">
+        <label>Εμβαδό Min (τ.μ.)</label>
+        <input type="number" id="zi_emv_min" value="${f['Εμβαδό Min']||''}" placeholder="π.χ. 70">
+      </div>
+      <div class="field">
+        <label>Εμβαδό Max (τ.μ.)</label>
+        <input type="number" id="zi_emv_max" value="${f['Εμβαδό Max']||''}" placeholder="π.χ. 120">
+      </div>
+      <div class="field">
+        <label>Θέση Στάθμευσης</label>
+        <select id="zi_stath">
+          <option value="">Δεν έχει σημασία</option>
+          ${['Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field" style="padding-top:18px">
+        <label class="check-row">
+          <input type="checkbox" id="zi_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
+        </label>
+      </div>
+      <div class="field">
+        <label>Τιμή Min (€)</label>
+        <input type="number" id="zi_timi_min" value="${f['Τιμή Min']||''}" placeholder="π.χ. 100000">
+      </div>
+      <div class="field">
+        <label>Τιμή Max (€)</label>
+        <input type="number" id="zi_timi_max" value="${f['Τιμή Max']||''}" placeholder="π.χ. 200000">
+      </div>
+      <div class="field fspan">
+        <label>Τρόπος Πληρωμής</label>
+        ${buildMultiSelect('zi_tropo', tropoOpts, selTropo, true)}
+      </div>
+      <div class="field fspan">
+        <label>Ειδικά Χαρακτηριστικά</label>
+        ${buildMultiSelect('zi_xar', xar, selXar, true)}
+      </div>
+      <div class="field fspan" style="padding-top:8px">
+        <label class="check-row">
+          <input type="checkbox" id="zi_hot" ${f['Hot']?'checked':''}> 🔥 Hot Ζήτηση
+        </label>
       </div>
     </div>
   `, `
-    <button class="btn btn-secondary" onclick="closeModal()">Ακύρωση</button>
-    <button class="btn btn-primary" onclick="saveZitisi('${id || ''}')">
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveZi('${id||''}')">
       ${isEdit ? '💾 Αποθήκευση' : '+ Δημιουργία'}
     </button>
   `);
 }
 
-async function saveZitisi(id) {
-  const periochiSel = [...document.getElementById('f_z_periochi').selectedOptions].map(o=>o.value);
-  const eidosSel = [...document.getElementById('f_z_eidos').selectedOptions].map(o=>o.value);
+// MultiSelect builder
+function buildMultiSelect(id, options, selected=[], allowNew=false) {
+  const selArr = selected.map(x => typeof x==='object' ? x.name||x : x);
+  return `
+    <div class="ms-container" onclick="toggleMS('${id}')">
+      <div class="ms-tags" id="${id}_tags">
+        ${selArr.map(v=>`<span class="ms-tag">${v}<button type="button" onclick="event.stopPropagation();removeTag('${id}','${v}')">&times;</button></span>`).join('')}
+        <span style="font-size:12px;color:var(--text3);padding:2px 4px">Κλικ για επιλογή...</span>
+      </div>
+    </div>
+    <div class="ms-options" id="${id}_opts">
+      ${options.map(o=>`
+        <div class="ms-option" onclick="toggleTag('${id}','${o}')">
+          <input type="checkbox" ${selArr.includes(o)?'checked':''} onclick="event.stopPropagation();toggleTag('${id}','${o}')"> ${o}
+        </div>`).join('')}
+      ${allowNew ? `
+      <div class="ms-add">
+        <input type="text" id="${id}_new" placeholder="Νέα επιλογή..." onclick="event.stopPropagation()">
+        <button type="button" onclick="event.stopPropagation();addMSOption('${id}')">+</button>
+      </div>` : ''}
+    </div>
+    <input type="hidden" id="${id}_val" value="${selArr.join(',')}">
+  `;
+}
 
+function toggleMS(id) {
+  const opts = document.getElementById(id+'_opts');
+  if (opts) opts.classList.toggle('open');
+}
+
+function toggleTag(id, val) {
+  const hiddenInput = document.getElementById(id+'_val');
+  const tagsEl = document.getElementById(id+'_tags');
+  const opts = document.getElementById(id+'_opts');
+  if (!hiddenInput) return;
+
+  let vals = hiddenInput.value ? hiddenInput.value.split(',').filter(Boolean) : [];
+  const idx = vals.indexOf(val);
+  if (idx >= 0) vals.splice(idx, 1);
+  else vals.push(val);
+
+  hiddenInput.value = vals.join(',');
+
+  // Update tags display
+  tagsEl.innerHTML = vals.map(v=>`<span class="ms-tag">${v}<button type="button" onclick="event.stopPropagation();removeTag('${id}','${v}')">&times;</button></span>`).join('') +
+    `<span style="font-size:12px;color:var(--text3);padding:2px 4px">Κλικ για επιλογή...</span>`;
+
+  // Update checkboxes
+  if (opts) {
+    opts.querySelectorAll('.ms-option').forEach(opt => {
+      const cb = opt.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = vals.includes(opt.textContent.trim());
+    });
+  }
+}
+
+function removeTag(id, val) {
+  toggleTag(id, val);
+}
+
+function addMSOption(id) {
+  const input = document.getElementById(id+'_new');
+  if (!input || !input.value.trim()) return;
+  const newVal = input.value.trim();
+  const opts = document.getElementById(id+'_opts');
+
+  // Add to options list
+  const addDiv = opts.querySelector('.ms-add');
+  const newOpt = document.createElement('div');
+  newOpt.className = 'ms-option';
+  newOpt.innerHTML = `<input type="checkbox"> ${newVal}`;
+  newOpt.onclick = () => toggleTag(id, newVal);
+  opts.insertBefore(newOpt, addDiv);
+
+  // Select it
+  toggleTag(id, newVal);
+  input.value = '';
+}
+
+function getMSValues(id) {
+  const el = document.getElementById(id+'_val');
+  if (!el || !el.value) return [];
+  return el.value.split(',').filter(Boolean);
+}
+
+async function saveZi(id) {
+  const userId = document.getElementById('zi_user').value;
   const fields = {
-    'Περιοχή': periochiSel,
-    'Είδος ακινήτου': eidosSel,
-    'Τιμή Min': parseFloat(document.getElementById('f_z_timi_min').value) || null,
-    'Τιμή Max': parseFloat(document.getElementById('f_z_timi_max').value) || null,
-    'Εμβαδό Min': parseFloat(document.getElementById('f_z_emv_min').value) || null,
-    'Εμβαδό Max': parseFloat(document.getElementById('f_z_emv_max').value) || null,
-    'Δωμάτια': document.getElementById('f_z_domata').value,
-    'Έτος κατασκευής': document.getElementById('f_z_etos').value,
-    'Θέση Στάθμευσης': document.getElementById('f_z_stathmeusi').value,
-    'Ημερομηνία': document.getElementById('f_z_date').value,
+    'Ημερομηνία': document.getElementById('zi_date').value || null,
+    'Περιοχή': getMSValues('zi_periochi'),
+    'Είδος ακινήτου': getMSValues('zi_eidos'),
+    'Από Έτος': parseInt(document.getElementById('zi_etos_apo').value)||null,
+    'Έως Έτος': parseInt(document.getElementById('zi_etos_eos').value)||null,
+    'Δωμάτια': document.getElementById('zi_domata').value || null,
+    'Όροφος': getMSValues('zi_oros'),
+    'Εμβαδό Min': parseFloat(document.getElementById('zi_emv_min').value)||null,
+    'Εμβαδό Max': parseFloat(document.getElementById('zi_emv_max').value)||null,
+    'Θέση Στάθμευσης': document.getElementById('zi_stath').value || null,
+    'Τιμή Min': parseFloat(document.getElementById('zi_timi_min').value)||null,
+    'Τιμή Max': parseFloat(document.getElementById('zi_timi_max').value)||null,
+    'Τρόπος Πληρωμής': getMSValues('zi_tropo'),
+    'Ειδικά Χαρακτηριστικά': getMSValues('zi_xar'),
+    'Hot': document.getElementById('zi_hot').checked || null,
   };
 
-  Object.keys(fields).forEach(k => (fields[k] === null || fields[k] === '' || (Array.isArray(fields[k]) && fields[k].length === 0)) && delete fields[k]);
+  if (document.getElementById('zi_apothiki').checked) fields['Αποθήκη'] = true;
+  if (userId) fields['USER'] = [userId];
 
-  showLoading(true);
+  Object.keys(fields).forEach(k => {
+    const v = fields[k];
+    if (v===null||v===''||(Array.isArray(v)&&v.length===0)||v===false) delete fields[k];
+  });
+
+  setLoading(true);
   try {
-    if (id) {
-      await updateRecord(CONFIG.TABLES.ZITISEIS, id, fields);
-      showToast('Ζήτηση ενημερώθηκε! ✅', 'success');
-    } else {
-      await createRecord(CONFIG.TABLES.ZITISEIS, fields);
-      showToast('Νέα ζήτηση δημιουργήθηκε! ✅', 'success');
-    }
+    if (id) { await updateRec(CFG.T.ZI, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.ZI, fields); toast('Δημιουργήθηκε!','s'); }
     closeModal();
-    await loadAllData();
-    renderZitiseis(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα αποθήκευσης', 'error');
-  }
-  showLoading(false);
+    await loadAll();
+    pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { console.error(e); toast('Σφάλμα αποθήκευσης','e'); }
+  setLoading(false);
 }
 
-async function deleteZitisi(id) {
-  if (!confirm('Σίγουρα θέλεις να διαγράψεις αυτή τη ζήτηση;')) return;
-  showLoading(true);
+async function delZi(id) {
+  if (!confirm('Διαγραφή ζήτησης;')) return;
+  setLoading(true);
   try {
-    await deleteRecord(CONFIG.TABLES.ZITISEIS, id);
-    showToast('Ζήτηση διαγράφηκε', 'success');
-    await loadAllData();
-    renderZitiseis(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα διαγραφής', 'error');
-  }
-  showLoading(false);
+    await deleteRec(CFG.T.ZI, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
+}
+
+function printZi(id) {
+  const rec = DB.zi.find(r=>r.id===id);
+  if (rec) printFields(rec.fields, 'Ζήτηση');
+}
+
+function viberZi(id) {
+  const rec = DB.zi.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const p = Array.isArray(f['Περιοχή'])?f['Περιοχή'].join(', '):(f['Περιοχή']||'');
+  const t = `Ζήτηση Ακινήτου\n${p}\n€${Number(f['Τιμή Min']||0).toLocaleString('el-GR')} - €${Number(f['Τιμή Max']||0).toLocaleString('el-GR')}`;
+  window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
 // ============================================================
-// MATCHING ΣΚΟΡ PAGE
+// MATCHING PAGE
 // ============================================================
-function renderMatching(content, actions) {
-  actions.innerHTML = `
-    <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Ανανέωση</button>
-  `;
+function pgMatching(c, a) {
+  a.innerHTML = `<button class="btn btn-outline btn-sm" onclick="doRefresh()">↻</button>`;
 
-  const records = allData.matching.sort((a,b) => (b.fields['Σκορ %']||0) - (a.fields['Σκορ %']||0));
-
-  content.innerHTML = `
-    <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <input class="search-box" type="text" placeholder="🔍 Αναζήτηση..." id="matchSearch" oninput="filterMatching()">
-      <select class="filter-select" id="matchScoreFilter" onchange="filterMatching()">
-        <option value="">Όλα τα σκορ</option>
+  c.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input placeholder="Αναζήτηση..." id="maSearch" oninput="filterMa()">
+      </div>
+      <select class="filter-select" id="maScore" onchange="filterMa()">
+        <option value="0">Όλα τα σκορ</option>
         <option value="90">90%+</option>
         <option value="80">80%+</option>
         <option value="70">70%+</option>
-        <option value="60">60%+</option>
       </select>
     </div>
-    <div class="matching-grid" id="matchingGrid">
-    </div>
+    <div class="score-grid" id="maGrid"></div>
   `;
 
-  renderMatchingCards(records);
+  renderMaCards(DB.ma.sort((a,b)=>(b.fields['Σκορ %']||0)-(a.fields['Σκορ %']||0)));
 }
 
-function renderMatchingCards(records) {
-  const grid = document.getElementById('matchingGrid');
-  if (!grid) return;
-
-  if (records.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-state-icon">⭐</div>
-        <div class="empty-state-text">Δεν βρέθηκαν matching αποτελέσματα</div>
-        <div class="empty-state-sub">Τα αποτελέσματα εμφανίζονται αυτόματα όταν καταχωρηθεί νέα ζήτηση</div>
-      </div>
-    `;
+function renderMaCards(recs) {
+  const g = document.getElementById('maGrid');
+  if (!g) return;
+  if (!recs.length) {
+    g.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⭐</div><div class="empty-text">Δεν βρέθηκαν αποτελέσματα</div></div>`;
     return;
   }
 
-  grid.innerHTML = records.map(r => {
+  g.innerHTML = recs.map(r => {
     const f = r.fields;
-    const score = f['Σκορ %'] || 0;
-    const scoreClass = score >= 100 ? 'score-100' : score >= 90 ? 'score-90' : score >= 80 ? 'score-80' : score >= 70 ? 'score-70' : 'score-60';
-    const timi = f['Τιμή'] ? `€${Number(f['Τιμή']).toLocaleString('el-GR')}` : '-';
-    const emvado = f['Εμβ. Μεικτό'] || f['Εμβαδό'] || '-';
-    const date = f['Ημερομηνία Matching'] ? new Date(f['Ημερομηνία Matching']).toLocaleDateString('el-GR') : '-';
-
-    // Get linked property details from lookup fields
-    const getLookup = (key) => {
-      const arr = f[key];
-      if (Array.isArray(arr)) return arr[0] || '-';
-      return arr || '-';
-    };
+    const sc = f['Σκορ %']||0;
+    const scClass = sc>=90?'score-90':sc>=80?'score-80':sc>=70?'score-70':'score-60';
+    const timi = f['Τιμή']?`€${Number(f['Τιμή']).toLocaleString('el-GR')}`:'—';
+    const date = f['Ημερομηνία Matching']?new Date(f['Ημερομηνία Matching']).toLocaleDateString('el-GR'):'—';
 
     return `
-      <div class="match-card">
-        <div class="match-card-header">
-          <div class="match-info">
-            <div class="match-periochi">${f['ΠΕΡΙΟΧΗ'] || f['Περιοχή'] || '-'}</div>
-            <div class="match-eidos">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'] || f['Είδος ακινήτου'] || '-'}</div>
+      <div class="score-card" onclick="viewMa('${r.id}')">
+        <div class="score-card-head">
+          <div class="score-info">
+            <div class="score-periochi">${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||'—'}</div>
+            <div class="score-eidos">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||'—'}</div>
           </div>
-          <div class="match-score-circle ${scoreClass}">
-            <span>${score}%</span>
-            <span class="match-score-label">Match</span>
+          <div class="score-circle ${scClass}">
+            <span>${sc}%</span>
+            <span class="score-label">match</span>
           </div>
         </div>
-        <div class="match-card-body">
-          <div class="match-timi">${timi}</div>
-          <div class="match-details">
-            <div class="match-detail-item">
-              <div class="match-detail-label">Εμβαδό</div>
-              <div class="match-detail-value">${emvado} τ.μ.</div>
-            </div>
-            <div class="match-detail-item">
-              <div class="match-detail-label">Δωμάτια</div>
-              <div class="match-detail-value">${f['ΔΩΜΑΤΙΑ'] || f['Δωμάτια'] || '-'}</div>
-            </div>
-            <div class="match-detail-item">
-              <div class="match-detail-label">Έτος</div>
-              <div class="match-detail-value">${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ'] || f['Έτος κατασκευής'] || '-'}</div>
-            </div>
-            <div class="match-detail-item">
-              <div class="match-detail-label">Στάθμευση</div>
-              <div class="match-detail-value">${f['Θέση Στάθμευσης'] || '-'}</div>
-            </div>
+        <div class="score-card-body">
+          <div class="score-timi">${timi}</div>
+          <div class="score-details">
+            <div><div class="score-det-label">Εμβαδό</div><div class="score-det-val">${f['Εμβαδό']||f['Εμβ. Μεικτό']||'—'} τ.μ.</div></div>
+            <div><div class="score-det-label">Δωμάτια</div><div class="score-det-val">${f['ΔΩΜΑΤΙΑ']||f['Δωμάτια']||'—'}</div></div>
+            <div><div class="score-det-label">Έτος</div><div class="score-det-val">${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||f['Έτος κατασκευής']||'—'}</div></div>
+            <div><div class="score-det-label">Στάθμευση</div><div class="score-det-val">${f['Θέση Στάθμευσης']||'—'}</div></div>
           </div>
-          <div class="score-bar-container">
-            <div class="score-bar-label">
-              <span>Matching Score</span>
-              <span>${score}%</span>
-            </div>
-            <div class="score-bar">
-              <div class="score-bar-fill" style="width:${score}%"></div>
-            </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-label"><span>Matching Score</span><span>${sc}%</span></div>
+            <div class="progress"><div class="progress-fill" style="width:${sc}%"></div></div>
           </div>
-          <div style="font-size:11px;color:var(--text-muted)">📅 ${date}</div>
+          <div style="font-size:11px;color:var(--text3)">📅 ${date}</div>
         </div>
-        <div class="match-card-footer">
-          <button class="btn btn-primary btn-sm" onclick="viewMatchAkinito('${r.id}')">🏢 Δες Ακίνητο</button>
-          <button class="btn btn-secondary btn-sm" onclick="printMatch('${r.id}')">📄 PDF</button>
-          <button class="btn btn-secondary btn-sm" onclick="shareMatchViber('${r.id}')">💬 Viber</button>
+        <div class="score-card-foot">
+          <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();viewMa('${r.id}')">🏢 Λεπτομέρειες</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();printMa('${r.id}')">📄</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();viberMa('${r.id}')">💬</button>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
-function filterMatching() {
-  const search = (document.getElementById('matchSearch')?.value || '').toLowerCase();
-  const minScore = parseInt(document.getElementById('matchScoreFilter')?.value || '0') || 0;
-
-  let filtered = allData.matching.filter(r => {
-    const score = r.fields['Σκορ %'] || 0;
-    return score >= minScore;
-  });
-
-  if (search) {
-    filtered = filtered.filter(r => JSON.stringify(r.fields).toLowerCase().includes(search));
-  }
-
-  filtered.sort((a,b) => (b.fields['Σκορ %']||0) - (a.fields['Σκορ %']||0));
-  renderMatchingCards(filtered);
+function filterMa() {
+  const s = (document.getElementById('maSearch')?.value||'').toLowerCase();
+  const minSc = parseInt(document.getElementById('maScore')?.value||'0')||0;
+  let r = DB.ma.filter(x => (x.fields['Σκορ %']||0) >= minSc);
+  if (s) r = r.filter(x => JSON.stringify(x.fields).toLowerCase().includes(s));
+  r.sort((a,b)=>(b.fields['Σκορ %']||0)-(a.fields['Σκορ %']||0));
+  renderMaCards(r);
 }
 
-function viewMatchAkinito(matchId) {
-  const match = allData.matching.find(r => r.id === matchId);
-  if (!match) return;
-  const f = match.fields;
+function viewMa(id) {
+  const ma = DB.ma.find(r=>r.id===id);
+  if (!ma) return;
+  const f = ma.fields;
+  const sc = f['Σκορ %']||0;
+  const akId = Array.isArray(f['Ακίνητο ID']) ? f['Ακίνητο ID'][0] : f['Ακίνητο ID'];
+  const ak = DB.ak.find(r=>r.id===akId);
+  const sf = ak ? ak.fields : {};
 
-  // Try to find the property using Ακίνητο ID
-  const akinitoId = Array.isArray(f['Ακίνητο ID']) ? f['Ακίνητο ID'][0] : f['Ακίνητο ID'];
-  const akinito = allData.akinita.find(r => r.id === akinitoId);
+  const timi = (sf['Τιμή']||f['Τιμή']) ? `€${Number(sf['Τιμή']||f['Τιμή']).toLocaleString('el-GR')}` : '—';
 
-  // Build detail from lookup fields + direct akinito record
-  const sourceFields = akinito ? akinito.fields : {};
+  // Lookup fields
+  const getLU = key => {
+    const v = f[key];
+    if (!v) return '—';
+    if (Array.isArray(v)) return v[0] || '—';
+    return v;
+  };
 
-  // Collect all available lookup fields from match record
-  const lookupFields = Object.entries(f).filter(([k]) =>
-    k.includes('(from Ακίνητο ID)') || k.includes('from ΑΚΙΝΗΤΑ')
-  );
+  const allFields = ak ? sf : f;
+  const displayItems = [
+    ['Περιοχή', allFields['Περιοχή']||f['ΠΕΡΙΟΧΗ']],
+    ['Είδος', allFields['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']],
+    ['Status', getLU('Status (from Ακίνητο ID)')||allFields['Status']],
+    ['Εμβαδό Μεικτό', (getLU('Εμβ. Μεικτό (from Ακίνητο ID)')||allFields['Εμβ. Μεικτό']||f['Εμβαδό'])+(allFields['Εμβ. Μεικτό']?' τ.μ.':'')],
+    ['Δωμάτια', getLU('Δωμάτια (from Ακίνητο ID)')||allFields['Δωμάτια']||f['ΔΩΜΑΤΙΑ']],
+    ['Έτος Κατ/σης', getLU('Έτος κατασκευής (from Ακίνητο ID)')||allFields['Έτος κατασκευής']||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']],
+    ['Όροφος', getLU('Όροφος (from Ακίνητο ID)')||allFields['Όροφος']],
+    ['Θέση Στάθμευσης', getLU('Θέση Στάθμευσης (from Ακίνητο ID)')||allFields['Θέση Στάθμευσης']||f['Θέση Στάθμευσης']],
+    ['Ασανσέρ', (getLU('Ασανσέρ (from Ακίνητο ID)')||allFields['Ασανσέρ']) ? '✅' : '❌'],
+    ['Αποθήκη', (getLU('Αποθήκη (from Ακίνητο ID)')||allFields['Αποθήκη']) ? '✅' : '❌'],
+    ['Διεύθυνση', getLU('Διεύθυνση (from Ακίνητο ID)')||allFields['Διεύθυνση']],
+    ['Σημειώσεις', getLU('Σημειώσεις (from Ακίνητο ID)')||allFields['Σημειώσεις']],
+  ].filter(([,v]) => v && v !== '—' && v !== 'undefined');
 
-  const displayFields = akinito
-    ? Object.entries(akinito.fields)
-    : lookupFields.map(([k,v]) => [k.replace(' (from Ακίνητο ID)', ''), v]);
-
-  const timi = sourceFields['Τιμή'] || f['Τιμή'] ? `€${Number(sourceFields['Τιμή']||f['Τιμή']).toLocaleString('el-GR')}` : '-';
-
-  openModal('🏢 Στοιχεία Ακινήτου', `
-    <div style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div>
-          <div style="font-family:var(--font-display);font-size:24px">${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||'-'}</div>
-          <div style="color:var(--text-muted)">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||'-'}</div>
-        </div>
-        <div style="font-family:var(--font-display);font-size:28px;color:var(--accent)">${timi}</div>
+  openModal('🏢 Στοιχεία Matching', `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:20px;font-weight:700">${allFields['Περιοχή']||f['ΠΕΡΙΟΧΗ']||'—'}</div>
+        <div style="color:var(--text2)">${allFields['Είδος ακινήτου']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'—'}</div>
       </div>
-      <div class="property-detail-grid">
-        ${displayFields.filter(([k,v]) => v && k !== 'User' && !k.startsWith('Name')).map(([k,v])=>`
-          <div class="property-detail-item">
-            <div class="property-detail-label">${k.replace(' (from Ακίνητο ID)','')}</div>
-            <div class="property-detail-value">${Array.isArray(v)?v.map(x=>typeof x==='object'?x.name||x:x).join(', '):v}</div>
-          </div>
-        `).join('')}
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:var(--gold)">${timi}</div>
       </div>
     </div>
-    <div style="background:rgba(201,169,110,0.1);border-radius:var(--radius);padding:16px">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">MATCHING SCORE</div>
-      <div class="score-bar">
-        <div class="score-bar-fill" style="width:${f['Σκορ %']||0}%"></div>
+    <div class="detail-grid">
+      ${displayItems.map(([k,v])=>`<div class="detail-item"><div class="detail-label">${k}</div><div class="detail-value">${v||'—'}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:16px;padding:14px;background:var(--bg2);border-radius:var(--radius2)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text2)">Matching Score</span>
+        <strong style="color:var(--gold)">${sc}%</strong>
       </div>
-      <div style="text-align:right;font-size:20px;font-weight:700;color:var(--accent);margin-top:8px">${f['Σκορ %']||0}%</div>
+      <div class="progress"><div class="progress-fill" style="width:${sc}%"></div></div>
     </div>
   `, `
-    <button class="btn btn-secondary" onclick="printMatch('${matchId}')">📄 PDF</button>
-    <button class="btn btn-secondary" onclick="shareMatchViber('${matchId}')">💬 Viber</button>
-    <button class="btn btn-primary" onclick="closeModal()">Κλείσιμο</button>
+    <button class="btn btn-outline btn-sm" onclick="printMa('${id}')">📄 PDF</button>
+    <button class="btn btn-outline btn-sm" onclick="viberMa('${id}')">💬 Viber</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal()">Κλείσιμο</button>
   `);
 }
 
-function printMatch(id) {
-  const match = allData.matching.find(r => r.id === id);
-  if (!match) return;
-  printRecordData(match.fields, 'Matching Αποτέλεσμα');
+function printMa(id) {
+  const ma = DB.ma.find(r=>r.id===id);
+  if (ma) printFields(ma.fields, 'Matching');
 }
 
-function shareMatchViber(id) {
-  const match = allData.matching.find(r => r.id === id);
-  if (!match) return;
-  const f = match.fields;
-  const text = `🏠 Matching Ακίνητο\n📍 ${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||''}\n🏢 ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||''}\n💰 €${Number(f['Τιμή']||0).toLocaleString('el-GR')}\n⭐ Σκορ: ${f['Σκορ %']}%`;
-  window.open(`viber://forward?text=${encodeURIComponent(text)}`);
+function viberMa(id) {
+  const ma = DB.ma.find(r=>r.id===id);
+  if (!ma) return;
+  const f = ma.fields;
+  const t = `Matching Ακίνητο\n${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||''} - ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||''}\n€${Number(f['Τιμή']||0).toLocaleString('el-GR')}\nScore: ${f['Σκορ %']}%`;
+  window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
 // ============================================================
-// ΚΑΤΑΣΚΕΥΑΣΤΕΣ PAGE
+// ΚΑΤΑΣΚΕΥΑΣΤΕΣ
 // ============================================================
-function renderKataskevastes(content, actions) {
-  const canEdit = ['admin', 'agent'].includes(currentUser.role);
+function pgKataskevastes(c, a) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  a.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openKaForm()">+ Νέος</button>` : '';
 
-  actions.innerHTML = canEdit ? `
-    <button class="btn btn-primary" onclick="openKataskevastisForm()">+ Νέος Κατασκευαστής</button>
-  ` : '';
-
-  content.innerHTML = `
-    <div class="table-container">
-      <div class="table-header">
-        <div class="table-title">Κατασκευαστές <span style="color:var(--text-muted);font-size:16px">(${allData.kataskevastes.length})</span></div>
-        <input class="search-box" type="text" placeholder="🔍 Αναζήτηση..." id="katSearch" oninput="filterKataskevastes()">
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header">
+        <span class="list-title">Κατασκευαστές</span>
+        <span class="list-count" id="kaCount"> (${DB.ka.length})</span>
+        <div style="margin-left:auto">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input placeholder="Αναζήτηση..." id="kaSearch" oninput="filterKa()">
+          </div>
+        </div>
       </div>
       <div style="overflow-x:auto">
         <table>
-          <thead>
-            <tr>
-              <th>Όνομα</th>
-              <th>Τηλέφωνο</th>
-              <th>Email</th>
-              <th>Περιοχή</th>
-              <th>Ειδικότητα</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="katTableBody"></tbody>
+          <thead><tr><th>Όνομα</th><th>Τηλέφωνο</th><th>Email</th><th>Περιοχή</th><th>Ειδικότητα</th></tr></thead>
+          <tbody id="kaBody"></tbody>
         </table>
       </div>
     </div>
   `;
-
-  renderKatRows(allData.kataskevastes);
+  renderKaRows(DB.ka);
 }
 
-function renderKatRows(records) {
-  const tbody = document.getElementById('katTableBody');
+function renderKaRows(recs) {
+  const tbody = document.getElementById('kaBody');
   if (!tbody) return;
-
-  if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">👷</div><div class="empty-state-text">Δεν βρέθηκαν κατασκευαστές</div></div></td></tr>`;
+  if (!recs.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🔧</div><div class="empty-text">Δεν βρέθηκαν κατασκευαστές</div></div></td></tr>`;
     return;
   }
-
-  const canEdit = ['admin', 'agent'].includes(currentUser.role);
-
-  tbody.innerHTML = records.map(r => {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  tbody.innerHTML = recs.map(r => {
     const f = r.fields;
-    return `<tr>
-      <td><strong>${f['Name']||f['Όνομα']||'-'}</strong></td>
-      <td>${f['Phone']||f['Τηλέφωνο']||'-'}</td>
-      <td>${f['Email']||'-'}</td>
-      <td>${f['Περιοχή']||'-'}</td>
-      <td>${f['Ειδικότητα']||'-'}</td>
-      <td>
-        <div style="display:flex;gap:6px">
-          ${canEdit ? `
-            <button class="btn btn-secondary btn-sm" onclick="openKataskevastisForm('${r.id}')">✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteKataskevastis('${r.id}')">🗑️</button>
-          ` : ''}
-        </div>
-      </td>
+    return `<tr onclick="viewKa('${r.id}')">
+      <td><strong>${f['Name']||f['Όνομα']||'—'}</strong></td>
+      <td>${f['Phone']||f['Τηλέφωνο']||'—'}</td>
+      <td>${f['Email']||'—'}</td>
+      <td>${f['Περιοχή']||'—'}</td>
+      <td>${f['Ειδικότητα']||'—'}</td>
     </tr>`;
   }).join('');
 }
 
-function filterKataskevastes() {
-  const search = (document.getElementById('katSearch')?.value || '').toLowerCase();
-  const filtered = search ? allData.kataskevastes.filter(r => JSON.stringify(r.fields).toLowerCase().includes(search)) : allData.kataskevastes;
-  renderKatRows(filtered);
+function filterKa() {
+  const s = (document.getElementById('kaSearch')?.value||'').toLowerCase();
+  renderKaRows(s ? DB.ka.filter(x=>JSON.stringify(x.fields).toLowerCase().includes(s)) : DB.ka);
 }
 
-async function openKataskevastisForm(id = null) {
-  const record = id ? allData.kataskevastes.find(r => r.id === id) : null;
-  const f = record?.fields || {};
-
-  openModal(id ? '✏️ Επεξεργασία Κατασκευαστή' : '+ Νέος Κατασκευαστής', `
-    <div class="form-grid">
-      <div class="form-group form-full">
-        <label>Όνομα / Εταιρεία *</label>
-        <input type="text" id="k_name" value="${f['Name']||f['Όνομα']||''}" placeholder="Όνομα κατασκευαστή">
-      </div>
-      <div class="form-group">
-        <label>Τηλέφωνο</label>
-        <input type="tel" id="k_phone" value="${f['Phone']||f['Τηλέφωνο']||''}" placeholder="69xxxxxxxx">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="k_email" value="${f['Email']||''}" placeholder="email@example.com">
-      </div>
-      <div class="form-group">
-        <label>Περιοχή</label>
-        <input type="text" id="k_periochi" value="${f['Περιοχή']||''}" placeholder="Θεσσαλονίκη">
-      </div>
-      <div class="form-group">
-        <label>Ειδικότητα</label>
-        <input type="text" id="k_eidikotita" value="${f['Ειδικότητα']||''}" placeholder="π.χ. Ανακαινίσεις">
-      </div>
-      <div class="form-group form-full">
-        <label>Σημειώσεις</label>
-        <textarea id="k_notes" rows="3" placeholder="Σημειώσεις...">${f['Σημειώσεις']||''}</textarea>
-      </div>
+function viewKa(id) {
+  const rec = DB.ka.find(r=>r.id===id);
+  if (!rec) return;
+  const f = rec.fields;
+  const canEdit = ['admin','agent'].includes(ME.role);
+  openModal('🔧 Κατασκευαστής', `
+    <div class="detail-grid">
+      ${Object.entries(f).filter(([k,v])=>v&&k!=='id').map(([k,v])=>`<div class="detail-item"><div class="detail-label">${k}</div><div class="detail-value">${v}</div></div>`).join('')}
     </div>
   `, `
-    <button class="btn btn-secondary" onclick="closeModal()">Ακύρωση</button>
-    <button class="btn btn-primary" onclick="saveKataskevastis('${id||''}')">
-      ${id ? '💾 Αποθήκευση' : '+ Δημιουργία'}
-    </button>
+    ${canEdit ? `
+    <button class="btn btn-danger btn-sm" onclick="delKa('${id}')">🗑️</button>
+    <button class="btn btn-dark btn-sm" onclick="closeModal();openKaForm('${id}')">✏️ Επεξεργασία</button>
+    ` : ''}
+    <button class="btn btn-outline btn-sm" onclick="closeModal()">Κλείσιμο</button>
   `);
 }
 
-async function saveKataskevastis(id) {
+async function openKaForm(id=null) {
+  const rec = id ? DB.ka.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
+  openModal(id?'✏️ Επεξεργασία':'+ Νέος Κατασκευαστής', `
+    <div class="fgrid">
+      <div class="field fspan"><label>Όνομα / Εταιρεία</label><input type="text" id="ka_name" value="${f['Name']||f['Όνομα']||''}"></div>
+      <div class="field"><label>Τηλέφωνο</label><input type="tel" id="ka_phone" value="${f['Phone']||f['Τηλέφωνο']||''}"></div>
+      <div class="field"><label>Email</label><input type="email" id="ka_email" value="${f['Email']||''}"></div>
+      <div class="field"><label>Περιοχή</label><input type="text" id="ka_per" value="${f['Περιοχή']||''}"></div>
+      <div class="field"><label>Ειδικότητα</label><input type="text" id="ka_eid" value="${f['Ειδικότητα']||''}"></div>
+      <div class="field fspan"><label>Σημειώσεις</label><textarea id="ka_notes" rows="3">${f['Σημειώσεις']||''}</textarea></div>
+    </div>
+  `, `
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveKa('${id||''}')">💾 Αποθήκευση</button>
+  `);
+}
+
+async function saveKa(id) {
   const fields = {
-    'Name': document.getElementById('k_name').value,
-    'Phone': document.getElementById('k_phone').value,
-    'Email': document.getElementById('k_email').value,
-    'Περιοχή': document.getElementById('k_periochi').value,
-    'Ειδικότητα': document.getElementById('k_eidikotita').value,
-    'Σημειώσεις': document.getElementById('k_notes').value,
+    'Name': document.getElementById('ka_name').value,
+    'Phone': document.getElementById('ka_phone').value,
+    'Email': document.getElementById('ka_email').value,
+    'Περιοχή': document.getElementById('ka_per').value,
+    'Ειδικότητα': document.getElementById('ka_eid').value,
+    'Σημειώσεις': document.getElementById('ka_notes').value,
   };
-
-  showLoading(true);
+  Object.keys(fields).forEach(k => !fields[k] && delete fields[k]);
+  setLoading(true);
   try {
-    if (id) {
-      await updateRecord(CONFIG.TABLES.KATASKEVASTES, id, fields);
-      showToast('Κατασκευαστής ενημερώθηκε! ✅', 'success');
-    } else {
-      await createRecord(CONFIG.TABLES.KATASKEVASTES, fields);
-      showToast('Νέος κατασκευαστής δημιουργήθηκε! ✅', 'success');
-    }
+    if (id) { await updateRec(CFG.T.KA, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.KA, fields); toast('Δημιουργήθηκε!','s'); }
     closeModal();
-    await loadAllData();
-    renderKataskevastes(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα αποθήκευσης', 'error');
-  }
-  showLoading(false);
+    await loadAll();
+    pgKataskevastes(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
 }
 
-async function deleteKataskevastis(id) {
-  if (!confirm('Σίγουρα θέλεις να διαγράψεις αυτόν τον κατασκευαστή;')) return;
-  showLoading(true);
+async function delKa(id) {
+  if (!confirm('Διαγραφή;')) return;
+  setLoading(true);
   try {
-    await deleteRecord(CONFIG.TABLES.KATASKEVASTES, id);
-    showToast('Κατασκευαστής διαγράφηκε', 'success');
-    await loadAllData();
-    renderKataskevastes(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα διαγραφής', 'error');
-  }
-  showLoading(false);
+    await deleteRec(CFG.T.KA, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgKataskevastes(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
 }
 
 // ============================================================
-// USERS PAGE (Admin only)
+// USERS
 // ============================================================
-function renderUsers(content, actions) {
-  if (currentUser.role !== 'admin') {
-    content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔒</div><div class="empty-state-text">Δεν έχεις πρόσβαση</div></div>`;
-    return;
-  }
+function pgUsers(c, a) {
+  if (ME.role !== 'admin') { c.innerHTML = '<div class="empty"><div class="empty-icon">🔒</div><div class="empty-text">Δεν έχεις πρόσβαση</div></div>'; return; }
+  a.innerHTML = `<button class="btn btn-dark" onclick="openUsForm()">+ Νέος Χρήστης</button>`;
 
-  actions.innerHTML = `<button class="btn btn-primary" onclick="openUserForm()">+ Νέος Χρήστης</button>`;
-
-  content.innerHTML = `
-    <div class="table-container">
-      <div class="table-header">
-        <div class="table-title">Χρήστες <span style="color:var(--text-muted);font-size:16px">(${allData.users.length})</span></div>
-      </div>
+  c.innerHTML = `
+    <div class="list-container">
+      <div class="list-header"><span class="list-title">Χρήστες</span><span class="list-count"> (${DB.us.length})</span></div>
       <table>
-        <thead>
-          <tr>
-            <th>Όνομα</th>
-            <th>Email</th>
-            <th>Κινητό</th>
-            <th>Ρόλος</th>
-            <th>Ενέργειες</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Όνομα</th><th>Email</th><th>Κινητό</th><th>Ρόλος</th></tr></thead>
         <tbody>
-          ${allData.users.map(r => {
-            const f = r.fields;
-            const role = f['Role']||f['Ρόλος']||'agent';
-            const roleClass = role==='admin'?'badge-red':role==='agent'?'badge-blue':'badge-gray';
-            return `<tr>
-              <td><strong>${f['Name']||f['Ονοματεπώνυμο']||'-'}</strong></td>
-              <td>${f['Email']||'-'}</td>
-              <td>${f['Phone']||f['Κινητό']||'-'}</td>
-              <td><span class="badge ${roleClass}">${role}</span></td>
-              <td>
-                <div style="display:flex;gap:6px">
-                  <button class="btn btn-secondary btn-sm" onclick="openUserForm('${r.id}')">✏️</button>
-                  <button class="btn btn-danger btn-sm" onclick="deleteUser('${r.id}')">🗑️</button>
-                </div>
-              </td>
+          ${DB.us.map(r=>{
+            const f=r.fields;
+            const role=(f['Role']||'agent').toLowerCase();
+            const rc={admin:'badge-red',agent:'badge-blue',viewer:'badge-gray'}[role]||'badge-gray';
+            return `<tr onclick="openUsForm('${r.id}')">
+              <td><strong>${f['Name']||'—'}</strong></td>
+              <td>${f['Email']||'—'}</td>
+              <td>${f['Phone']||f['Κινητό']||'—'}</td>
+              <td><span class="badge ${rc}">${role}</span></td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -2605,217 +2427,228 @@ function renderUsers(content, actions) {
   `;
 }
 
-async function openUserForm(id = null) {
-  const record = id ? allData.users.find(r => r.id === id) : null;
-  const f = record?.fields || {};
-
-  openModal(id ? '✏️ Επεξεργασία Χρήστη' : '+ Νέος Χρήστης', `
-    <div class="form-grid">
-      <div class="form-group form-full">
-        <label>Ονοματεπώνυμο *</label>
-        <input type="text" id="u_name" value="${f['Name']||f['Ονοματεπώνυμο']||''}" placeholder="Όνομα Επώνυμο">
-      </div>
-      <div class="form-group">
-        <label>Email *</label>
-        <input type="email" id="u_email" value="${f['Email']||''}" placeholder="email@example.com">
-      </div>
-      <div class="form-group">
-        <label>Κινητό</label>
-        <input type="tel" id="u_phone" value="${f['Phone']||f['Κινητό']||''}" placeholder="69xxxxxxxx">
-      </div>
-      <div class="form-group">
-        <label>Κωδικός ${id?'(αφήστε κενό για να μην αλλάξει)':''}</label>
-        <input type="password" id="u_password" placeholder="••••••••">
-      </div>
-      <div class="form-group">
-        <label>Ρόλος</label>
-        <select id="u_role">
-          <option value="admin" ${(f['Role']||f['Ρόλος'])==='admin'?'selected':''}>Admin</option>
-          <option value="agent" ${(f['Role']||f['Ρόλος'])==='agent'?'selected':''}>Agent</option>
-          <option value="viewer" ${(f['Role']||f['Ρόλος'])==='viewer'?'selected':''}>Viewer</option>
+async function openUsForm(id=null) {
+  const rec = id ? DB.us.find(r=>r.id===id) : null;
+  const f = rec?.fields || {};
+  openModal(id?'✏️ Επεξεργασία Χρήστη':'+ Νέος Χρήστης', `
+    <div class="fgrid">
+      <div class="field fspan"><label>Ονοματεπώνυμο</label><input type="text" id="us_name" value="${f['Name']||''}"></div>
+      <div class="field"><label>Email</label><input type="email" id="us_email" value="${f['Email']||''}"></div>
+      <div class="field"><label>Κωδικός ${id?'(κενό = χωρίς αλλαγή)':''}</label><input type="password" id="us_pass"></div>
+      <div class="field"><label>Κινητό</label><input type="tel" id="us_phone" value="${f['Phone']||f['Κινητό']||''}"></div>
+      <div class="field"><label>Ρόλος</label>
+        <select id="us_role">
+          ${['admin','agent','viewer'].map(r=>`<option value="${r}" ${(f['Role']||'').toLowerCase()===r?'selected':''}>${r}</option>`).join('')}
         </select>
       </div>
     </div>
   `, `
-    <button class="btn btn-secondary" onclick="closeModal()">Ακύρωση</button>
-    <button class="btn btn-primary" onclick="saveUser('${id||''}')">
-      ${id ? '💾 Αποθήκευση' : '+ Δημιουργία'}
-    </button>
+    ${id ? `<button class="btn btn-danger btn-sm" onclick="delUs('${id}')">🗑️</button>` : ''}
+    <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveUs('${id||''}')">💾 Αποθήκευση</button>
   `);
 }
 
-async function saveUser(id) {
-  const password = document.getElementById('u_password').value;
+async function saveUs(id) {
+  const pass = document.getElementById('us_pass').value;
   const fields = {
-    'Name': document.getElementById('u_name').value,
-    'Email': document.getElementById('u_email').value,
-    'Phone': document.getElementById('u_phone').value,
-    'Role': document.getElementById('u_role').value,
+    'Name': document.getElementById('us_name').value,
+    'Email': document.getElementById('us_email').value,
+    'Phone': document.getElementById('us_phone').value,
+    'Role': document.getElementById('us_role').value,
   };
-  if (password) fields['Password'] = password;
-
-  showLoading(true);
+  if (pass) fields['Password'] = pass;
+  Object.keys(fields).forEach(k => !fields[k] && delete fields[k]);
+  setLoading(true);
   try {
-    if (id) {
-      await updateRecord(CONFIG.TABLES.USERS, id, fields);
-      showToast('Χρήστης ενημερώθηκε! ✅', 'success');
-    } else {
-      await createRecord(CONFIG.TABLES.USERS, fields);
-      showToast('Νέος χρήστης δημιουργήθηκε! ✅', 'success');
-    }
+    if (id) { await updateRec(CFG.T.US, id, fields); toast('Αποθηκεύτηκε!','s'); }
+    else { await createRec(CFG.T.US, fields); toast('Δημιουργήθηκε!','s'); }
     closeModal();
-    await loadAllData();
-    renderUsers(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα αποθήκευσης', 'error');
-  }
-  showLoading(false);
+    await loadAll();
+    pgUsers(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
 }
 
-async function deleteUser(id) {
-  if (!confirm('Σίγουρα θέλεις να διαγράψεις αυτόν τον χρήστη;')) return;
-  showLoading(true);
+async function delUs(id) {
+  if (!confirm('Διαγραφή χρήστη;')) return;
+  setLoading(true);
   try {
-    await deleteRecord(CONFIG.TABLES.USERS, id);
-    showToast('Χρήστης διαγράφηκε', 'success');
-    await loadAllData();
-    renderUsers(document.getElementById('pageContent'), document.getElementById('topBarActions'));
-  } catch(err) {
-    showToast('Σφάλμα διαγραφής', 'error');
-  }
-  showLoading(false);
+    await deleteRec(CFG.T.US, id);
+    toast('Διαγράφηκε','s');
+    closeModal();
+    await loadAll();
+    pgUsers(document.getElementById('pageContent'), document.getElementById('topActions'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  setLoading(false);
 }
 
 // ============================================================
-// PDF / PRINT / VIBER
+// PRINT / VIBER
 // ============================================================
-function printRecord(id, type) {
-  const record = allData[type]?.find(r => r.id === id);
-  if (!record) return;
-  printRecordData(record.fields, type === 'akinita' ? 'Ακίνητο' : 'Ζήτηση');
-}
-
-function printRecordData(fields, title) {
-  const win = window.open('', '_blank');
-  const rows = Object.entries(fields)
-    .filter(([k,v]) => v && k !== 'User')
-    .map(([k,v]) => `
-      <tr>
-        <td style="font-weight:600;padding:8px 12px;border-bottom:1px solid #eee;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:1px;width:40%">${k}</td>
-        <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:14px">${Array.isArray(v)?v.map(x=>typeof x==='object'?x.name||x:x).join(', '):v}</td>
-      </tr>
-    `).join('');
-
-  win.document.write(`
-    <!DOCTYPE html><html><head>
-    <meta charset="UTF-8">
-    <title>${title}</title>
-    <style>
-      body{font-family:'Georgia',serif;max-width:700px;margin:40px auto;color:#1a1a2e}
-      h1{font-size:28px;font-weight:300;letter-spacing:2px;border-bottom:2px solid #c9a96e;padding-bottom:16px;margin-bottom:24px}
-      table{width:100%;border-collapse:collapse}
-      @media print{button{display:none}}
-    </style>
-    </head><body>
-    <h1>TerraHomes — ${title}</h1>
-    <table>${rows}</table>
-    <p style="margin-top:24px;font-size:12px;color:#999">Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</p>
-    <button onclick="window.print()" style="margin-top:16px;padding:10px 24px;background:#c9a96e;border:none;color:#fff;cursor:pointer;border-radius:8px;font-size:14px">🖨️ Εκτύπωση / PDF</button>
-    </body></html>
-  `);
-  win.document.close();
-}
-
-function shareViber(id, type) {
-  const record = allData[type]?.find(r => r.id === id);
-  if (!record) return;
-  const f = record.fields;
-  let text = '';
-
-  if (type === 'akinita') {
-    text = `🏠 Ακίνητο προς πώληση\n📍 ${f['Περιοχή']||''}\n🏢 ${f['Είδος ακινήτου']||''}\n📐 ${f['Εμβ. Μεικτό']||''} τ.μ.\n💰 €${Number(f['Τιμή']||0).toLocaleString('el-GR')}\n🔑 ${f['Status']||''}`;
-  } else {
-    text = `🔍 Ζήτηση Ακινήτου\n📍 ${Array.isArray(f['Περιοχή'])?f['Περιοχή'].join(', '):f['Περιοχή']||''}\n💰 €${Number(f['Τιμή Min']||0).toLocaleString('el-GR')} - €${Number(f['Τιμή Max']||0).toLocaleString('el-GR')}`;
-  }
-
-  window.open(`viber://forward?text=${encodeURIComponent(text)}`);
+function printFields(fields, title) {
+  const w = window.open('', '_blank');
+  const rows = Object.entries(fields).filter(([k,v])=>v&&k!=='User'&&k!=='USER').map(([k,v])=>`
+    <tr>
+      <td style="font-weight:600;padding:8px 12px;border-bottom:1px solid #eee;color:#666;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:35%">${k}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:13px">${Array.isArray(v)?v.map(x=>typeof x==='object'?x.name||x:x).join(', '):v}</td>
+    </tr>`).join('');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
+  <style>body{font-family:-apple-system,sans-serif;max-width:700px;margin:40px auto;color:#111}h1{font-size:22px;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #c9a96e}table{width:100%;border-collapse:collapse}@media print{.noprint{display:none}}</style>
+  </head><body>
+  <h1>${title}</h1><table>${rows}</table>
+  <p style="margin-top:20px;font-size:11px;color:#999">Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</p>
+  <button class="noprint" onclick="window.print()" style="margin-top:16px;padding:10px 24px;background:#c9a96e;border:none;color:#fff;cursor:pointer;border-radius:6px">🖨️ Εκτύπωση / PDF</button>
+  </body></html>`);
+  w.document.close();
 }
 
 // ============================================================
-// MODAL HELPERS
+// LOGO
 // ============================================================
-function openModal(title, body, footer) {
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalBody').innerHTML = body;
-  document.getElementById('modalFooter').innerHTML = footer || '';
-  document.getElementById('modalOverlay').classList.add('open');
+function triggerLogoUpload() {
+  document.getElementById('logoFile').click();
+}
+
+async function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64 = e.target.result;
+    // Save to Airtable as a config record
+    try {
+      await saveLogoToAirtable(base64);
+      applyLogo(base64);
+      toast('Logo ανανεώθηκε!','s');
+    } catch(err) {
+      // Fallback to localStorage
+      localStorage.setItem('crm_logo', base64);
+      applyLogo(base64);
+      toast('Logo αποθηκεύτηκε τοπικά','i');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveLogoToAirtable(base64) {
+  // Store as base64 in a special USERS record or use a config approach
+  // For now store in localStorage as fallback
+  localStorage.setItem('crm_logo', base64);
+}
+
+function applyLogo(src) {
+  const el = document.getElementById('sbLogoContent');
+  if (el) el.innerHTML = `<img src="${src}" style="max-height:48px;max-width:180px;object-fit:contain">`;
+  const loginLogo = document.getElementById('loginLogoWrap');
+  if (loginLogo) loginLogo.innerHTML = `<img src="${src}" style="max-height:60px;max-width:200px;object-fit:contain">`;
+}
+
+function loadLogo() {
+  const saved = localStorage.getItem('crm_logo');
+  if (saved) applyLogo(saved);
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('crm_theme', newTheme);
+  document.querySelector('.sb-footer .sb-btn:first-child').textContent = isDark ? '🌙' : '☀️';
+}
+
+function loadTheme() {
+  const t = localStorage.getItem('crm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  const btn = document.querySelector('.sb-footer .sb-btn:first-child');
+  if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(title, body, foot='') {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = body;
+  document.getElementById('mFoot').innerHTML = foot;
+  document.getElementById('overlay').classList.add('open');
 }
 
 function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
 }
 
-// Close modal on overlay click
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
+document.getElementById('overlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
-// ============================================================
-// TOAST NOTIFICATIONS
-// ============================================================
-function showToast(msg, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'⚠️'}</span> ${msg}`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
-}
-
-// ============================================================
-// UTILITIES
-// ============================================================
-function showLoading(show) {
-  document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
-}
-
-async function refreshData() {
-  showLoading(true);
-  await loadAllData();
-  showLoading(false);
-  showPage(currentPage);
-  showToast('Δεδομένα ανανεώθηκαν!');
-}
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('mobile-open');
-}
-
-// ============================================================
-// KEYBOARD SHORTCUTS
-// ============================================================
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
-    handleLogin();
+// Close MS dropdowns on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ms-container') && !e.target.closest('.ms-options')) {
+    document.querySelectorAll('.ms-options.open').forEach(el => el.classList.remove('open'));
   }
 });
 
 // ============================================================
-// AUTO-LOGIN CHECK
+// TOAST
 // ============================================================
-window.addEventListener('load', async function() {
-  const saved = localStorage.getItem('terraUser');
-  if (saved) {
+function toast(msg, type='i') {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<span>${type==='s'?'✓':type==='e'?'✕':'ℹ'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ============================================================
+// LOADING
+// ============================================================
+function setLoading(show) {
+  document.getElementById('loader').style.display = show ? 'flex' : 'none';
+}
+
+// ============================================================
+// SIDEBAR MOBILE
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('open');
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
+});
+
+// ============================================================
+// AUTO LOGIN
+// ============================================================
+window.addEventListener('load', async () => {
+  const savedUser = localStorage.getItem('crm_user');
+  const savedToken = localStorage.getItem('crm_token');
+  if (savedUser && savedToken) {
     try {
-      currentUser = JSON.parse(saved);
-      CONFIG.AIRTABLE_TOKEN = localStorage.getItem('at') || '';
+      ME = JSON.parse(savedUser);
+      CFG.TOKEN = savedToken;
       await initApp();
     } catch(e) {
-      localStorage.removeItem('terraUser');
+      localStorage.removeItem('crm_user');
+      localStorage.removeItem('crm_token');
     }
   }
-  showLoading(false);
+  setLoading(false);
 });
 </script>
 </body>
