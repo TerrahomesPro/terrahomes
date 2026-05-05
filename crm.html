@@ -921,6 +921,33 @@ tr:hover td { background:var(--bg2); cursor:pointer; }
 
 .sb-overlay.open { display:block; }
 
+/* CUSTOM CHECKBOX */
+.check-row input[type="checkbox"] {
+  -webkit-appearance: checkbox !important;
+  appearance: checkbox !important;
+  width: 18px !important;
+  height: 18px !important;
+  cursor: pointer;
+  accent-color: var(--gold);
+  flex-shrink: 0;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius2);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color var(--transition);
+}
+
+.check-row:hover { border-color: var(--gold); }
+.check-row.checked { border-color: var(--gold); background: rgba(201,169,110,0.08); }
+
 /* SCORE BAR in detail */
 .score-bar-wrap { margin:16px 0; }
 .score-bar-label { display:flex; justify-content:space-between; font-size:12px; color:var(--text2); margin-bottom:6px; }
@@ -1639,10 +1666,10 @@ async function openAkForm(id=null) {
         <input type="text" id="ak_sinerg" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική">
       </div>
       <div class="field" style="display:flex;gap:16px;align-items:center;padding-top:18px">
-        <label class="check-row" style="flex:1;margin-bottom:0">
+        <label class="check-row ${f['Ασανσέρ']?'checked':''}" style="flex:1;margin-bottom:0" onclick="this.classList.toggle('checked')">
           <input type="checkbox" id="ak_asanser" ${f['Ασανσέρ']?'checked':''}> Ασανσέρ
         </label>
-        <label class="check-row" style="flex:1;margin-bottom:0">
+        <label class="check-row ${f['Αποθήκη']?'checked':''}" style="flex:1;margin-bottom:0" onclick="this.classList.toggle('checked')">
           <input type="checkbox" id="ak_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
         </label>
       </div>
@@ -1992,7 +2019,7 @@ async function openZiForm(id=null) {
         </select>
       </div>
       <div class="field" style="padding-top:18px">
-        <label class="check-row">
+        <label class="check-row ${f['Αποθήκη']?'checked':''}" onclick="this.classList.toggle('checked')">
           <input type="checkbox" id="zi_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
         </label>
       </div>
@@ -2013,7 +2040,7 @@ async function openZiForm(id=null) {
         ${buildMultiSelect('zi_xar', xar, selXar, true)}
       </div>
       <div class="field fspan" style="padding-top:8px">
-        <label class="check-row">
+        <label class="check-row ${f['HOT 🔥']?'checked':''}" onclick="this.classList.toggle('checked')">
           <input type="checkbox" id="zi_hot" ${f['HOT 🔥']?'checked':''}> 🔥 Hot Ζήτηση
         </label>
       </div>
