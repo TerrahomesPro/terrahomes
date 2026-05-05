@@ -1547,8 +1547,9 @@ async function openAkForm(id=null) {
       </div>
       <div class="field">
         <label>Status</label>
-        <select id="ak_status">
-          ${['Διαθέσιμο','Off Market','Πουλήθηκε','Αποσύρθηκε'].map(s=>`<option value="${s}" ${(f['Status']||'')==s?'selected':''}>${s}</option>`).join('')}
+        <select id="ak_status" onchange="handleNewOpt(this,'ak_status_new')">
+          ${[...new Set(['Διαθέσιμο','Off Market','Πουλήθηκε','Αποσύρθηκε',...DB.ak.map(r=>r.fields['Status']).filter(Boolean)])].map(s=>`<option value="${s}" ${(f['Status']||'')==s?'selected':''}>${s}</option>`).join('')}
+          <option value="__new__">+ Νέο Status</option>
         </select>
       </div>
       <div class="field">
@@ -1612,6 +1613,16 @@ async function openAkForm(id=null) {
           <input type="checkbox" id="ak_apothiki" ${f['Αποθήκη']?'checked':''}> Αποθήκη
         </label>
       </div>
+      <div class="field">
+        <label>Φωτογραφίες</label>
+        <input type="file" id="ak_photos" multiple accept="image/*" style="padding:8px;border:1.5px solid var(--border);border-radius:var(--radius2);width:100%;background:var(--bg2);color:var(--text)">
+        ${Array.isArray(f['Φωτογραφίες'])&&f['Φωτογραφίες'].length ? `<div style="margin-top:6px;font-size:11px;color:var(--success)">✅ ${f['Φωτογραφίες'].length} φωτογραφίες</div>` : ''}
+      </div>
+      <div class="field">
+        <label>Video</label>
+        <input type="file" id="ak_video" accept="video/*" style="padding:8px;border:1.5px solid var(--border);border-radius:var(--radius2);width:100%;background:var(--bg2);color:var(--text)">
+        ${Array.isArray(f['Video'])&&f['Video'].length ? `<div style="margin-top:6px;font-size:11px;color:var(--success)">✅ Video υπάρχει</div>` : ''}
+      </div>
       <div class="field fspan">
         <label>Σημειώσεις</label>
         <textarea id="ak_notes" rows="3" placeholder="Περιγραφή...">${f['Σημειώσεις']||''}</textarea>
@@ -1664,18 +1675,21 @@ async function saveAk(id) {
     'Εκτίμηση': parseFloat(document.getElementById('ak_ektimisi').value)||null,
     'Εμβ. Μεικτό': emv,
     'Εμβαδό Καθαρό': parseFloat(document.getElementById('ak_emvk').value)||null,
-    'Τιμή ανά Τετρ.μέτρο': (timi&&emv) ? parseFloat((timi/emv).toFixed(2)) : null,
+    // 'Τιμή ανά Τετρ.μέτρο' is computed in Airtable - skip
     'Έτος κατασκευής': parseInt(document.getElementById('ak_etos').value)||null,
     'Διεύθυνση': document.getElementById('ak_dieft').value || null,
     'Συνεργασίες': document.getElementById('ak_sinerg').value || null,
     'Σημειώσεις': document.getElementById('ak_notes').value || null,
   };
 
-  if (document.getElementById('ak_asanser').checked) fields['Ασανσέρ'] = true;
-  if (document.getElementById('ak_apothiki').checked) fields['Αποθήκη'] = true;
+  fields['Ασανσέρ'] = document.getElementById('ak_asanser').checked;
+  fields['Αποθήκη'] = document.getElementById('ak_apothiki').checked;
   if (userId) fields['User'] = [userId];
 
-  Object.keys(fields).forEach(k => (fields[k]===null||fields[k]==='') && delete fields[k]);
+  Object.keys(fields).forEach(k => {
+    if (fields[k]===null || fields[k]==='') delete fields[k];
+    else if (Array.isArray(fields[k]) && fields[k].length===0) delete fields[k];
+  });
 
   setLoading(true);
   try {
@@ -2051,8 +2065,8 @@ async function saveZi(id) {
   const userId = document.getElementById('zi_user').value;
   const fields = {
     'Ημερομηνία': document.getElementById('zi_date').value || null,
-    'Περιοχή': getMSValues('zi_periochi'),
-    'Είδος ακινήτου': getMSValues('zi_eidos'),
+    'Περιοχή': getMSValues('zi_periochi').map(v => v.trim()).filter(Boolean),
+    'Είδος ακινήτου': getMSValues('zi_eidos').map(v => v.trim()).filter(Boolean),
     'Από Έτος': parseInt(document.getElementById('zi_etos_apo').value)||null,
     'Έως Έτος': parseInt(document.getElementById('zi_etos_eos').value)||null,
     'Δωμάτια': document.getElementById('zi_domata').value || null,
@@ -2062,17 +2076,18 @@ async function saveZi(id) {
     'Θέση Στάθμευσης': document.getElementById('zi_stath').value || null,
     'Τιμή Min': parseFloat(document.getElementById('zi_timi_min').value)||null,
     'Τιμή Max': parseFloat(document.getElementById('zi_timi_max').value)||null,
-    'Τρόπος Πληρωμής': getMSValues('zi_tropo'),
-    'Ειδικά Χαρακτηριστικά': getMSValues('zi_xar'),
+    'Τρόπος Πληρωμής': getMSValues('zi_tropo').map(v => v.trim()).filter(Boolean),
+    'Ειδικά Χαρακτηριστικά': getMSValues('zi_xar').map(v => v.trim()).filter(Boolean),
     'Hot': document.getElementById('zi_hot').checked || null,
   };
 
-  if (document.getElementById('zi_apothiki').checked) fields['Αποθήκη'] = true;
+  fields['Αποθήκη'] = document.getElementById('zi_apothiki').checked;
   if (userId) fields['USER'] = [userId];
 
   Object.keys(fields).forEach(k => {
     const v = fields[k];
-    if (v===null||v===''||(Array.isArray(v)&&v.length===0)||v===false) delete fields[k];
+    if (v===null||v==='') delete fields[k];
+    else if (Array.isArray(v) && v.length===0) delete fields[k];
   });
 
   setLoading(true);
