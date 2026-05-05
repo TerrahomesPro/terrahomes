@@ -1556,21 +1556,46 @@ async function openAkForm(id=null) {
         <label>Όροφος</label>
         <select id="ak_oros">
           <option value="">Επιλογή...</option>
-          ${['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'].map(o=>`<option value="${o}" ${(f['Όροφος']||'')==o?'selected':''}>${o}</option>`).join('')}
+          <option value="">Επιλογή...</option>
+          <option value="Υπόγειο" ${(f['Όροφος']||'')==='Υπόγειο'?'selected':''}>Υπόγειο</option>
+          <option value="Ημιυπόγειο" ${(f['Όροφος']||'')==='Ημιυπόγειο'?'selected':''}>Ημιυπόγειο</option>
+          <option value="Ισόγειο" ${(f['Όροφος']||'')==='Ισόγειο'?'selected':''}>Ισόγειο</option>
+          <option value="Ημιόροφος" ${(f['Όροφος']||'')==='Ημιόροφος'?'selected':''}>Ημιόροφος</option>
+          <option value="Ανώγειο" ${(f['Όροφος']||'')==='Ανώγειο'?'selected':''}>Ανώγειο</option>
+          <option value="1ος" ${(f['Όροφος']||'')==='1ος'?'selected':''}>1ος</option>
+          <option value="2ος" ${(f['Όροφος']||'')==='2ος'?'selected':''}>2ος</option>
+          <option value="3ος" ${(f['Όροφος']||'')==='3ος'?'selected':''}>3ος</option>
+          <option value="4ος" ${(f['Όροφος']||'')==='4ος'?'selected':''}>4ος</option>
+          <option value="5ος" ${(f['Όροφος']||'')==='5ος'?'selected':''}>5ος</option>
+          <option value="6ος" ${(f['Όροφος']||'')==='6ος'?'selected':''}>6ος</option>
+          <option value="7ος" ${(f['Όροφος']||'')==='7ος'?'selected':''}>7ος</option>
+          <option value="8ος" ${(f['Όροφος']||'')==='8ος'?'selected':''}>8ος</option>
+          <option value="9ος" ${(f['Όροφος']||'')==='9ος'?'selected':''}>9ος</option>
+          <option value="Άλλο" ${(f['Όροφος']||'')==='Άλλο'?'selected':''}>Άλλο</option>
         </select>
       </div>
       <div class="field">
         <label>Δωμάτια</label>
         <select id="ak_domata">
           <option value="">Επιλογή...</option>
-          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${((f['Δωμάτια']||'')==d)?'selected':''}>${d}</option>`).join('')}
+          <option value="">Επιλογή...</option>
+          <option value="Μονόχωρο" ${(f['Δωμάτια']||'')==='Μονόχωρο'?'selected':''}>Μονόχωρο</option>
+          <option value="1" ${(f['Δωμάτια']||'')==='1'?'selected':''}>1</option>
+          <option value="2" ${(f['Δωμάτια']||'')==='2'?'selected':''}>2</option>
+          <option value="3" ${(f['Δωμάτια']||'')==='3'?'selected':''}>3</option>
+          <option value="4+" ${(f['Δωμάτια']||'')==='4+'?'selected':''}>4+</option>
         </select>
       </div>
       <div class="field">
         <label>Θέση Στάθμευσης</label>
         <select id="ak_stath">
           <option value="">Επιλογή...</option>
-          ${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
+          <option value="">Επιλογή...</option>
+          <option value="Όχι" ${(f['Θέση Στάθμευσης']||'')==='Όχι'?'selected':''}>Όχι</option>
+          <option value="Ναί" ${(f['Θέση Στάθμευσης']||'')==='Ναί'?'selected':''}>Ναί</option>
+          <option value="Ανοιχτή" ${(f['Θέση Στάθμευσης']||'')==='Ανοιχτή'?'selected':''}>Ανοιχτή</option>
+          <option value="Κλειστή" ${(f['Θέση Στάθμευσης']||'')==='Κλειστή'?'selected':''}>Κλειστή</option>
+          <option value="Πυλωτή" ${(f['Θέση Στάθμευσης']||'')==='Πυλωτή'?'selected':''}>Πυλωτή</option>
         </select>
       </div>
       <div class="field">
@@ -1670,7 +1695,7 @@ async function saveAk(id) {
     'Status': document.getElementById('ak_status').value || null,
     'Όροφος': document.getElementById('ak_oros').value || null,
     'Δωμάτια': document.getElementById('ak_domata').value || null,
-    'Θέση Στάθμευσης': document.getElementById('ak_stath').value.replace(/["']/g,'').trim() || null,
+    'Θέση Στάθμευσης': document.getElementById('ak_stath').value || null,
     'Τιμή': timi,
     'Εκτίμηση': parseFloat(document.getElementById('ak_ektimisi').value)||null,
     'Εμβ. Μεικτό': emv,
@@ -1920,7 +1945,12 @@ async function openZiForm(id=null) {
         <label>Δωμάτια</label>
         <select id="zi_domata">
           <option value="">Επιλογή...</option>
-          ${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${(f['Δωμάτια']||'')==d?'selected':''}>${d}</option>`).join('')}
+          <option value="">Επιλογή...</option>
+          <option value="Μονόχωρο" ${(f['Δωμάτια']||'')==='Μονόχωρο'?'selected':''}>Μονόχωρο</option>
+          <option value="1" ${(f['Δωμάτια']||'')==='1'?'selected':''}>1</option>
+          <option value="2" ${(f['Δωμάτια']||'')==='2'?'selected':''}>2</option>
+          <option value="3" ${(f['Δωμάτια']||'')==='3'?'selected':''}>3</option>
+          <option value="4+" ${(f['Δωμάτια']||'')==='4+'?'selected':''}>4+</option>
         </select>
       </div>
       <div class="field">
@@ -1939,7 +1969,10 @@ async function openZiForm(id=null) {
         <label>Θέση Στάθμευσης</label>
         <select id="zi_stath">
           <option value="">Δεν έχει σημασία</option>
-          ${['Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${(f['Θέση Στάθμευσης']||'')==s?'selected':''}>${s}</option>`).join('')}
+          <option value="Ναί" ${(f['Θέση Στάθμευσης']||'')==='Ναί'?'selected':''}>Ναί</option>
+          <option value="Ανοιχτή" ${(f['Θέση Στάθμευσης']||'')==='Ανοιχτή'?'selected':''}>Ανοιχτή</option>
+          <option value="Κλειστή" ${(f['Θέση Στάθμευσης']||'')==='Κλειστή'?'selected':''}>Κλειστή</option>
+          <option value="Πυλωτή" ${(f['Θέση Στάθμευσης']||'')==='Πυλωτή'?'selected':''}>Πυλωτή</option>
         </select>
       </div>
       <div class="field" style="padding-top:18px">
