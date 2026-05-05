@@ -1503,6 +1503,14 @@ function getUniqueOptions(field, dataset='ak') {
 }
 
 async function openAkForm(id=null) {
+  // Always get fresh data if editing
+  if (id) {
+    try {
+      const fresh = await api(CFG.T.AK, 'GET', null, id);
+      const idx = DB.ak.findIndex(r=>r.id===id);
+      if (idx>=0 && fresh) DB.ak[idx] = fresh;
+    } catch(e) {}
+  }
   const rec = id ? DB.ak.find(r=>r.id===id) : null;
   const f = rec?.fields || {};
   const isEdit = !!id;
@@ -1719,11 +1727,19 @@ async function saveAk(id) {
   console.log('FIELDS:', JSON.stringify(fields));
   setLoading(true);
   try {
-    if (id) { await updateRec(CFG.T.AK, id, fields); toast('Αποθηκεύτηκε!','s'); }
-    else { await createRec(CFG.T.AK, fields); toast('Δημιουργήθηκε!','s'); }
-    closeModal();
-    await loadAll();
-    pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+    if (id) { 
+      await updateRec(CFG.T.AK, id, fields); 
+      toast('Αποθηκεύτηκε!','s');
+      closeModal();
+      await loadAll();
+      pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+    } else { 
+      await createRec(CFG.T.AK, fields); 
+      toast('Δημιουργήθηκε!','s');
+      closeModal();
+      await loadAll();
+      pgAkinita(document.getElementById('pageContent'), document.getElementById('topActions'));
+    }
   } catch(e) { console.error(e); toast('Σφάλμα αποθήκευσης','e'); }
   setLoading(false);
 }
@@ -2126,11 +2142,19 @@ async function saveZi(id) {
 
   setLoading(true);
   try {
-    if (id) { await updateRec(CFG.T.ZI, id, fields); toast('Αποθηκεύτηκε!','s'); }
-    else { await createRec(CFG.T.ZI, fields); toast('Δημιουργήθηκε!','s'); }
-    closeModal();
-    await loadAll();
-    pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+    if (id) {
+      await updateRec(CFG.T.ZI, id, fields);
+      toast('Αποθηκεύτηκε!','s');
+      closeModal();
+      await loadAll();
+      pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+    } else {
+      await createRec(CFG.T.ZI, fields);
+      toast('Δημιουργήθηκε!','s');
+      closeModal();
+      await loadAll();
+      pgZitiseis(document.getElementById('pageContent'), document.getElementById('topActions'));
+    }
   } catch(e) { console.error(e); toast('Σφάλμα αποθήκευσης','e'); }
   setLoading(false);
 }
