@@ -183,6 +183,8 @@ tbody tr:hover td{background:var(--bg2);cursor:pointer}
 .ms-dropdown.open{display:block}
 .ms-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px;transition:background var(--t)}
 .ms-opt:hover{background:var(--bg2)}
+.ms-opt.ms-sel{background:rgba(201,169,110,0.1);font-weight:500}
+.ms-opt.ms-sel input[type=checkbox]{accent-color:var(--gold)}
 .ms-opt input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
 .ms-add-row{padding:6px 10px;border-top:1px solid var(--border);display:flex;gap:6px}
 .ms-add-row input{flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:var(--f)}
@@ -999,7 +1001,7 @@ async function openZiForm(id=null) {
   const selOr = Array.isArray(f['Όροφος']) ? f['Όροφος'].map(x=>typeof x==='object'?x.name||x:x) : (f['Όροφος']?[f['Όροφος']]:[]);
   const selTr = Array.isArray(f['Τρόπος Πληρωμής']) ? f['Τρόπος Πληρωμής'].map(x=>typeof x==='object'?x.name||x:x) : [];
   const selXar = Array.isArray(f['Ειδικά Χαρακτηριστικά']) ? f['Ειδικά Χαρακτηριστικά'].map(x=>typeof x==='object'?x.name||x:x) : [];
-  const xarOpts = getOpts('Ειδικά Χαρακτηριστικά','ak');
+  const xarOpts = uniq([...getOpts('Ειδικά Χαρακτηριστικά','zi'),...getOpts('Ειδικά Χαρακτηριστικά','ak')]);
   const tropoOpts = uniq(['Μετρητά','Δάνειο Στεγαστικό','Home 2','Άλλο',...(getOpts('Τρόπος Πληρωμής','zi'))]);
   const orofoi = ['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'];
 
@@ -1035,8 +1037,8 @@ async function saveZi(id) {
   const uid = document.getElementById('z_us').value;
   const fields = {
     'Ημερομηνία': document.getElementById('z_dt').value||null,
-    'Περιοχή': getMS('z_per'),
-    'Είδος ακινήτου': getMS('z_ei'),
+    'Περιοχή': getMS('z_per').map(v=>String(v).trim()).filter(Boolean),
+    'Είδος ακινήτου': getMS('z_ei').map(v=>String(v).trim()).filter(Boolean),
     'Από Έτος': parseInt(document.getElementById('z_ea').value)||null,
     'Έως Έτος': parseInt(document.getElementById('z_ee').value)||null,
     'Δωμάτια': document.getElementById('z_do').value||null,
@@ -1047,8 +1049,8 @@ async function saveZi(id) {
     'Αποθήκη': document.getElementById('z_ap').value||null,
     'Τιμή Min': parseFloat(document.getElementById('z_t1').value)||null,
     'Τιμή Max': parseFloat(document.getElementById('z_t2').value)||null,
-    'Τρόπος Πληρωμής': getMS('z_tr'),
-    'Ειδικά Χαρακτηριστικά': getMS('z_xar'),
+    'Τρόπος Πληρωμής': getMS('z_tr').map(v=>String(v).trim()).filter(Boolean),
+    'Ειδικά Χαρακτηριστικά': getMS('z_xar').map(v=>String(v).trim()).filter(Boolean),
     'ΑΞΙΟΛΟΓΗΣΗ': document.getElementById('z_ax').value||null,
     'ΠΕΛΑΤΗΣ': document.getElementById('z_pe').value||null,
     'ΤΗΛΕΦΩΝΟ': document.getElementById('z_te').value||null,
@@ -1138,7 +1140,7 @@ function buildMS(id, opts, sel=[], allowNew=false) {
         <span style="color:var(--text3);font-size:10px;margin-left:4px">▼</span>
       </div>
       <div class="ms-dropdown" id="mso_${id}">
-        ${opts.map(o=>`<div class="ms-opt" onclick="event.stopPropagation();tgTag('${id}','${o.replace(/'/g,"\\'")}')">
+        ${opts.map(o=>`<div class="ms-opt ${selArr.includes(o)?'ms-sel':''}" onclick="event.stopPropagation();tgTag('${id}','${o.replace(/'/g,"\\'")}')">
           <input type="checkbox" ${selArr.includes(o)?'checked':''} onclick="event.stopPropagation();tgTag('${id}','${o.replace(/'/g,"\\'")}')"> ${o}
         </div>`).join('')}
         ${allowNew?`<div class="ms-add-row"><input type="text" id="msn_${id}" placeholder="Νέα επιλογή..." onclick="event.stopPropagation()"><button onclick="event.stopPropagation();addMSOpt('${id}')">+</button></div>`:''}
