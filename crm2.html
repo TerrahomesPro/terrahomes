@@ -480,7 +480,7 @@ function getAgentName(fields) {
   const u = uid ? getUser(uid) : null;
   return u ? (u.fields['Name'] || '') : '—';
 }
-function fmt€(v) { return v ? `€${Number(v).toLocaleString('el-GR')}` : '—'; }
+function fmtEuro(v) { return v ? `€${Number(v).toLocaleString('el-GR')}` : '—'; }
 function fmtDate(v) { return v ? new Date(v).toLocaleDateString('el-GR') : '—'; }
 function arrVal(v) {
   if (!v) return '—';
@@ -602,7 +602,7 @@ function renderAkRows(recs) {
       <td>${f['Είδος ακινήτου']||'—'}</td>
       <td><span class="badge ${sc[f['Status']]||'b-gray'}">${f['Status']||'—'}</span></td>
       <td>${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':'—'}</td>
-      <td><strong>${fmt€(f['Τιμή'])}</strong></td>
+      <td><strong>${fmtEuro(f['Τιμή'])}</strong></td>
       <td style="color:var(--text2);font-size:12px">${getAgentName(f)}</td>
     </tr>`;
   }).join('');
@@ -641,8 +641,8 @@ function viewAk(id) {
         <span class="badge ${sc[f['Status']]||'b-gray'}">${f['Status']||''}</span>
       </div>
       <div style="text-align:right">
-        <div style="font-size:21px;font-weight:700;color:var(--gold)">${fmt€(f['Τιμή'])}</div>
-        ${f['Τιμή ανά Τετρ.μέτρο']?`<div style="font-size:12px;color:var(--text3)">${fmt€(f['Τιμή ανά Τετρ.μέτρο'])}/τ.μ.</div>`:''}
+        <div style="font-size:21px;font-weight:700;color:var(--gold)">${fmtEuro(f['Τιμή'])}</div>
+        ${f['Τιμή ανά Τετρ.μέτρο']?`<div style="font-size:12px;color:var(--text3)">${fmtEuro(f['Τιμή ανά Τετρ.μέτρο'])}/τ.μ.</div>`:''}
       </div>
     </div>
     <div class="dg">
@@ -650,8 +650,8 @@ function viewAk(id) {
       <div class="di"><div class="di-lbl">Ημερομηνία</div><div class="di-val">${fmtDate(f['Ημερομηνία'])}</div></div>
       <div class="di"><div class="di-lbl">Εμβαδό Μεικτό</div><div class="di-val">${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':'—'}</div></div>
       <div class="di"><div class="di-lbl">Εμβαδό Καθαρό</div><div class="di-val">${f['Εμβαδό Καθαρό']?f['Εμβαδό Καθαρό']+' τ.μ.':'—'}</div></div>
-      <div class="di"><div class="di-lbl">Τιμή</div><div class="di-val" style="color:var(--gold);font-weight:700">${fmt€(f['Τιμή'])}</div></div>
-      <div class="di"><div class="di-lbl">Εκτίμηση</div><div class="di-val">${fmt€(f['Εκτίμηση'])}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή</div><div class="di-val" style="color:var(--gold);font-weight:700">${fmtEuro(f['Τιμή'])}</div></div>
+      <div class="di"><div class="di-lbl">Εκτίμηση</div><div class="di-val">${fmtEuro(f['Εκτίμηση'])}</div></div>
       <div class="di"><div class="di-lbl">Έτος Κατασκευής</div><div class="di-val">${f['Έτος κατασκευής']||'—'}</div></div>
       <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${f['Όροφος']||'—'}</div></div>
       <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['Δωμάτια']||'—'}</div></div>
@@ -828,8 +828,8 @@ function printAk(id) {
         <tr><td>Είδος Ακινήτου</td><td>${f['Είδος ακινήτου']||'—'}</td></tr>
         <tr><td>Περιοχή</td><td>${f['Περιοχή']||'—'}</td></tr>
         <tr><td>Status</td><td>${f['Status']||'—'}</td></tr>
-        <tr><td>Τιμή</td><td>${fmt€(f['Τιμή'])}</td></tr>
-        <tr><td>Τιμή/τ.μ.</td><td>${f['Τιμή ανά Τετρ.μέτρο']?fmt€(f['Τιμή ανά Τετρ.μέτρο']):''}</td></tr>
+        <tr><td>Τιμή</td><td>${fmtEuro(f['Τιμή'])}</td></tr>
+        <tr><td>Τιμή/τ.μ.</td><td>${f['Τιμή ανά Τετρ.μέτρο']?fmtEuro(f['Τιμή ανά Τετρ.μέτρο']):''}</td></tr>
         <tr><td>Εμβαδό Μεικτό</td><td>${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':'—'}</td></tr>
       </table>
     </div>
@@ -844,7 +844,7 @@ function printAk(id) {
     <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'—'}</td></tr>
     <tr><td>Ασανσέρ</td><td>${f['Ασανσέρ']?'Ναί':'Όχι'}</td></tr>
     <tr><td>Αποθήκη</td><td>${f['Αποθήκη']?'Ναί':'Όχι'}</td></tr>
-    <tr><td>Εκτίμηση</td><td>${fmt€(f['Εκτίμηση'])}</td></tr>
+    <tr><td>Εκτίμηση</td><td>${fmtEuro(f['Εκτίμηση'])}</td></tr>
     <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['Τρόπος Πληρωμής'])}</td></tr>
     <tr><td>Συνεργασίες</td><td>${f['Συνεργασίες']||'—'}</td></tr>
     <tr><td>User Email</td><td>${ME.email}</td></tr>
@@ -859,7 +859,7 @@ function printAk(id) {
 function viberAk(id) {
   const rec = DB.ak.find(r=>r.id===id); if(!rec) return;
   const f = rec.fields;
-  const t = `🏠 Ακίνητο\nΠεριοχή: ${f['Περιοχή']||''}\nΕίδος: ${f['Είδος ακινήτου']||''}\nΕμβαδό: ${f['Εμβ. Μεικτό']||''} τ.μ.\nΤιμή: ${fmt€(f['Τιμή'])}\nStatus: ${f['Status']||''}`;
+  const t = `🏠 Ακίνητο\nΠεριοχή: ${f['Περιοχή']||''}\nΕίδος: ${f['Είδος ακινήτου']||''}\nΕμβαδό: ${f['Εμβ. Μεικτό']||''} τ.μ.\nΤιμή: ${fmtEuro(f['Τιμή'])}\nStatus: ${f['Status']||''}`;
   window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
@@ -889,7 +889,7 @@ function renderZiRows(recs) {
   tb.innerHTML = recs.map(r => {
     const f = r.fields;
     const pe = arrVal(f['Περιοχή']); const ei = arrVal(f['Είδος ακινήτου']);
-    const tMin = f['Τιμή Min']?fmt€(f['Τιμή Min']):''; const tMax = f['Τιμή Max']?fmt€(f['Τιμή Max']):'';
+    const tMin = f['Τιμή Min']?fmtEuro(f['Τιμή Min']):''; const tMax = f['Τιμή Max']?fmtEuro(f['Τιμή Max']):'';
     const ax = f['ΑΞΙΟΛΟΓΗΣΗ']||'';
     return `<tr onclick="viewZi('${r.id}')">
       <td><strong>${f['Α/A Ζήτησης']||f['Α/A']||'—'}</strong></td>
@@ -933,8 +933,8 @@ function viewZi(id) {
       <div class="di"><div class="di-lbl">Εμβαδό Max</div><div class="di-val">${f['Εμβαδό Max']?f['Εμβαδό Max']+' τ.μ.':'—'}</div></div>
       <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${f['Θέση Στάθμευσης']||'—'}</div></div>
       <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['Αποθήκη']||'—'}</div></div>
-      <div class="di"><div class="di-lbl">Τιμή Min</div><div class="di-val">${fmt€(f['Τιμή Min'])}</div></div>
-      <div class="di"><div class="di-lbl">Τιμή Max</div><div class="di-val">${fmt€(f['Τιμή Max'])}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή Min</div><div class="di-val">${fmtEuro(f['Τιμή Min'])}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή Max</div><div class="di-val">${fmtEuro(f['Τιμή Max'])}</div></div>
       <div class="di"><div class="di-lbl">Τρόπος Πληρωμής</div><div class="di-val">${arrVal(f['Τρόπος Πληρωμής'])}</div></div>
       <div class="di"><div class="di-lbl">Αξιολόγηση</div><div class="di-val">${ax?`<span class="badge ${axBadge[ax]||'b-gray'}">${ax}</span>`:''}</div></div>
       ${f['Ειδικά Χαρακτηριστικά']?`<div class="di fspan"><div class="di-lbl">Ειδικά Χαρακτηριστικά</div><div class="di-val">${arrVal(f['Ειδικά Χαρακτηριστικά'])}</div></div>`:''}
@@ -955,7 +955,7 @@ function viewZi(id) {
               <div style="font-size:13px;font-weight:600">${ak.fields['Περιοχή']||''} · ${ak.fields['Είδος ακινήτου']||''}</div>
               <div style="font-size:11px;color:var(--text3)">${ak.fields['Εμβ. Μεικτό']?ak.fields['Εμβ. Μεικτό']+' τ.μ. · ':''}<span class="badge ${{'Διαθέσιμο':'b-green','Off Market':'b-gold'}[ak.fields['Status']]||'b-gray'}">${ak.fields['Status']||''}</span></div>
             </div>
-            <div style="font-size:14px;font-weight:700;color:var(--gold)">${fmt€(ak.fields['Τιμή'])}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--gold)">${fmtEuro(ak.fields['Τιμή'])}</div>
           </div>`).join('')}
       </div>
     </div>` : ''}
@@ -1100,8 +1100,8 @@ function printZi(id) {
     <tr><td>Έως Έτος</td><td>${f['Έως Έτος']||'—'}</td></tr>
     <tr><td>Εμβαδό Min</td><td>${f['Εμβαδό Min']?f['Εμβαδό Min']+' τ.μ.':'—'}</td></tr>
     <tr><td>Εμβαδό Max</td><td>${f['Εμβαδό Max']?f['Εμβαδό Max']+' τ.μ.':'—'}</td></tr>
-    <tr><td>Τιμή Min</td><td>${fmt€(f['Τιμή Min'])}</td></tr>
-    <tr><td>Τιμή Max</td><td>${fmt€(f['Τιμή Max'])}</td></tr>
+    <tr><td>Τιμή Min</td><td>${fmtEuro(f['Τιμή Min'])}</td></tr>
+    <tr><td>Τιμή Max</td><td>${fmtEuro(f['Τιμή Max'])}</td></tr>
     <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'—'}</td></tr>
     <tr><td>Αποθήκη</td><td>${f['Αποθήκη']||'—'}</td></tr>
     <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['Τρόπος Πληρωμής'])}</td></tr>
@@ -1121,7 +1121,7 @@ function printZi(id) {
 function viberZi(id) {
   const rec = DB.zi.find(r=>r.id===id); if(!rec) return;
   const f = rec.fields;
-  const t = `Ζήτηση Ακινήτου\nΠεριοχή: ${arrVal(f['Περιοχή'])}\nΕίδος: ${arrVal(f['Είδος ακινήτου'])}\nΤιμή: ${fmt€(f['Τιμή Min'])} - ${fmt€(f['Τιμή Max'])}\nΔωμάτια: ${f['Δωμάτια']||'—'}`;
+  const t = `Ζήτηση Ακινήτου\nΠεριοχή: ${arrVal(f['Περιοχή'])}\nΕίδος: ${arrVal(f['Είδος ακινήτου'])}\nΤιμή: ${fmtEuro(f['Τιμή Min'])} - ${fmtEuro(f['Τιμή Max'])}\nΔωμάτια: ${f['Δωμάτια']||'—'}`;
   window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
@@ -1224,7 +1224,7 @@ function renderMaCards(recs) {
         <div class="sc-circle ${cls}"><span>${sc}%</span><span class="sc-lbl">match</span></div>
       </div>
       <div class="sc-body">
-        <div class="sc-timi">${fmt€(f['Τιμή'])}</div>
+        <div class="sc-timi">${fmtEuro(f['Τιμή'])}</div>
         <div class="sc-dets">
           <div><div class="sc-dl">Εμβαδό</div><div class="sc-dv">${f['Εμβαδό']||f['Εμβ. Μεικτό']||'—'} τ.μ.</div></div>
           <div><div class="sc-dl">Δωμάτια</div><div class="sc-dv">${f['ΔΩΜΑΤΙΑ']||f['Δωμάτια']||'—'}</div></div>
@@ -1263,7 +1263,7 @@ function viewMa(id) {
   openModal('🏢 Matching Ακίνητο', `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <div><div style="font-size:18px;font-weight:700">${g('Περιοχή')||f['ΠΕΡΙΟΧΗ']||'—'}</div><div style="color:var(--text2)">${g('Είδος ακινήτου')||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'—'}</div></div>
-      <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:var(--gold)">${fmt€(g('Τιμή')||f['Τιμή'])}</div></div>
+      <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:var(--gold)">${fmtEuro(g('Τιμή')||f['Τιμή'])}</div></div>
     </div>
     <div class="dg">
       ${[['Εμβαδό Μεικτό',(g('Εμβ. Μεικτό')||f['Εμβαδό'])&&((g('Εμβ. Μεικτό')||f['Εμβαδό'])+' τ.μ.')],
@@ -1299,7 +1299,7 @@ function printMa(id) {
   <table>
     <tr><td>Περιοχή</td><td>${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||'—'}</td></tr>
     <tr><td>Είδος</td><td>${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||'—'}</td></tr>
-    <tr><td>Τιμή</td><td>${fmt€(f['Τιμή'])}</td></tr>
+    <tr><td>Τιμή</td><td>${fmtEuro(f['Τιμή'])}</td></tr>
     <tr><td>Εμβαδό</td><td>${f['Εμβαδό']||f['Εμβ. Μεικτό']||'—'} τ.μ.</td></tr>
     <tr><td>Δωμάτια</td><td>${f['ΔΩΜΑΤΙΑ']||f['Δωμάτια']||'—'}</td></tr>
     <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'—'}</td></tr>
@@ -1314,7 +1314,7 @@ function printMa(id) {
 function viberMa(id) {
   const ma=DB.ma.find(r=>r.id===id); if(!ma) return;
   const f=ma.fields;
-  window.open(`viber://forward?text=${encodeURIComponent(`Matching Ακίνητο\n${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||''} · ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||''}\n${fmt€(f['Τιμή'])}\nScore: ${f['Σκορ %']}%`)}`);
+  window.open(`viber://forward?text=${encodeURIComponent(`Matching Ακίνητο\n${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||''} · ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||''}\n${fmtEuro(f['Τιμή'])}\nScore: ${f['Σκορ %']}%`)}`);
 }
 
 // ── ΚΑΤΑΣΚΕΥΑΣΤΕΣ ─────────────────────────────────────────────
