@@ -525,6 +525,9 @@ function pgHome(C2, A) {
   ak.forEach(r => { const p = r.fields['Περιοχή']||'Άλλη'; byP[p] = (byP[p]||0)+1; });
   const mE = Math.max(...Object.values(byE),1), mP = Math.max(...Object.values(byP),1);
 
+  // DEBUG - remove after fix
+  console.log('STATUSES:', DB.ak.map(r=>r.fields['Status']));
+  console.log('DATES:', DB.ak.map(r=>r.fields['Ημερομηνία']));
   // Date calculations
   const now = new Date();
   const days30 = new Date(now - 30*24*60*60*1000);
