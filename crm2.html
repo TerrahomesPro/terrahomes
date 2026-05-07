@@ -544,7 +544,7 @@ function pgHome(C2, A) {
   }
   const newAk30 = ak.filter(r => { const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=days30; }).length;
   const newZi30 = DB.zi.filter(r => { const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=days30; }).length;
-  const poulimenа = DB.ak.filter(r => { if(r.fields['Status']!=='Πουλήθηκε') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=startOfYear; }).length;
+  const poulimenа = DB.ak.filter(r => { if(r.fields['Status']!=='Πωλήθηκε') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=startOfYear; }).length;
   const maktika = ak.filter(r => { if(r.fields['Status']!=='Διαθέσιμο'&&r.fields['Status']!=='Off Market') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); if(!d) return false; return (now-d)/(24*60*60*1000)>90; });
 
   const agentsH = ME.role==='admin' ? DB.us.map(u => {
@@ -645,7 +645,7 @@ function renderAkRows(recs) {
   if (!tb) return;
   if (cnt) cnt.textContent = ` (${recs.length})`;
   if (!recs.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-ic">🏢</div><div class="empty-tx">Δεν βρέθηκαν ακίνητα</div></div></td></tr>`; return; }
-  const sc = { 'Διαθέσιμο':'b-green','Off Market':'b-gold','Πουλήθηκε':'b-gray','Αποσύρθηκε':'b-red' };
+  const sc = { 'Διαθέσιμο':'b-green','Off Market':'b-gold','Πωλήθηκε':'b-gray','Αποσύρθηκε':'b-red' };
   tb.innerHTML = recs.map(r => {
     const f = r.fields;
     return `<tr onclick="viewAk('${r.id}')">
@@ -682,7 +682,7 @@ function viewAk(id) {
   const mainPhoto = photos[0] ? `<img src="${photos[0].url}" style="width:80px;height:80px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);flex-shrink:0;cursor:pointer" onclick="window.open('${photos[0].url}','_blank')">` : '';
   const extraPhotos = photos.slice(1).map(p => `<img src="${p.url}" style="width:60px;height:60px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);cursor:pointer" onclick="window.open('${p.url}','_blank')">`).join('');
   const videoLinks = videos.map(v => `<a href="${v.url}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-size:12px;color:var(--text2);text-decoration:none">▶ ${v.filename||'Video'}</a>`).join('');
-  const sc = {'Διαθέσιμο':'b-green','Off Market':'b-gold','Πουλήθηκε':'b-gray','Αποσύρθηκε':'b-red'};
+  const sc = {'Διαθέσιμο':'b-green','Off Market':'b-gold','Πωλήθηκε':'b-gray','Αποσύρθηκε':'b-red'};
 
   openModal(`🏢 Ακίνητο #${f['Α/A']||''}`, `
     <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;flex-wrap:wrap">
@@ -736,7 +736,7 @@ async function openAkForm(id=null) {
   const tm = timi&&emv ? (timi/emv).toFixed(2)+' €/τ.μ.' : '';
   const perioches = getOpts('Περιοχή');
   const eidi = getOpts('Είδος ακινήτου');
-  const statuses = uniq(['Διαθέσιμο','Off Market','Πουλήθηκε','Αποσύρθηκε',...getOpts('Status')]);
+  const statuses = uniq(['Διαθέσιμο','Off Market','Πωλήθηκε','Αποσύρθηκε',...getOpts('Status')]);
 
   openModal(id?'✏️ Επεξεργασία Ακινήτου':'+ Νέο Ακίνητο', `
     <div class="fg">
