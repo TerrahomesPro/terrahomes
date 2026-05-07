@@ -401,10 +401,12 @@ async function doLogin() {
   load(true);
   try {
     const users = await getAll(C.T.US);
+    console.log('Users found:', users.length, 'Fields:', users[0]?.fields ? Object.keys(users[0].fields) : []);
     const u = users.find(x => (x.fields['EMAIL']||'').toLowerCase().trim() === email);
     if (!u) { lErr('Δεν βρέθηκε χρήστης'); load(false); return; }
-    if (u.fields['PASSWORD'] !== pass) { lErr('Λανθασμένος κωδικός'); load(false); return; }
-    ME = { id: u.id, name: u.fields['NAME'] || email, email, role: (u.fields['ROLE']||u.fields['Role']||'agent').toLowerCase(), photo: u.fields['PHOTO'] };
+    const storedPass = u.fields['PASSWORD']||u.fields['Password']||u.fields['password']||'';
+    if (storedPass !== pass) { lErr('Λανθασμένος κωδικός'); load(false); return; }
+    ME = { id: u.id, name: u.fields['NAME']||u.fields['Name']||email, email, role: (u.fields['ROLE']||u.fields['Role']||'agent').toLowerCase(), photo: u.fields['PHOTO']||u.fields['Photo'] };
     localStorage.setItem('crm_u', JSON.stringify(ME));
     localStorage.setItem('crm_t', token);
     await boot();
