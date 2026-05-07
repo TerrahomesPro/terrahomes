@@ -803,7 +803,7 @@ async function openAkForm(id=null) {
   openModal(id?'✏️ Επεξεργασία Ακινήτου':'+ Νέο Ακίνητο', `
     <div class="fg">
       <div class="f"><label>Ημερομηνία</label><input type="date" id="a_dt" value="${f['ΗΜΕΡΟΜΗΝΙΑ']||today}"></div>
-      <div class="f"><label>Agent</label><select id="a_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['NAME']||u.fields['EMAIL']}</option>`).join('')}</select></div>
+      <div class="f"><label>Agent</label><select id="a_us"><option value="">— Επιλογή Agent —</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['Name']||u.fields['Email']||''}</option>`).join('')}</select></div>
       <div class="f"><label>Περιοχή *</label><select id="a_pe" onchange="chkNew(this)"><option value="">Επιλογή...</option>${perioches.map(p=>`<option value="${p}" ${f['ΠΕΡΙΟΧΗ']===p?'selected':''}>${p}</option>`).join('')}<option value="__new__">+ Νέα</option></select></div>
       <div class="f"><label>Είδος Ακινήτου *</label><select id="a_ei" onchange="chkNew(this)"><option value="">Επιλογή...</option>${eidi.map(e=>`<option value="${e}" ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']===e?'selected':''}>${e}</option>`).join('')}<option value="__new__">+ Νέο</option></select></div>
       <div class="f"><label>Status</label><select id="a_st" onchange="chkNew(this)"><option value="">Επιλογή...</option>${statuses.map(s=>`<option value="${s}" ${f['STATUS']===s?'selected':''}>${s}</option>`).join('')}<option value="__new__">+ Νέο</option></select></div>
@@ -1200,7 +1200,7 @@ async function openZiForm(id=null) {
   openModal(id?'✏️ Επεξεργασία Ζήτησης':'+ Νέα Ζήτηση', `
     <div class="fg">
       <div class="f"><label>Ημερομηνία</label><input type="date" id="z_dt" value="${f['ΗΜΕΡΟΜΗΝΙΑ']||today}"></div>
-      <div class="f"><label>Agent</label><select id="z_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['NAME']||u.fields['EMAIL']}</option>`).join('')}</select></div>
+      <div class="f"><label>Agent</label><select id="z_us"><option value="">— Επιλογή Agent —</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['Name']||u.fields['Email']||''}</option>`).join('')}</select></div>
       <div class="f fspan"><label>Περιοχή (πολλαπλή επιλογή)</label>${buildMS('z_per',perioches,selPer,true)}</div>
       <div class="f fspan"><label>Είδος Ακινήτου (πολλαπλή επιλογή)</label>${buildMS('z_ei',eidi,selEi,true)}</div>
       <div class="f"><label>Από έτος</label><input type="number" id="z_ea" value="${f['ΑΠΟ ΕΤΟΣ']||''}" placeholder="π.χ. 2000"></div>
@@ -1209,13 +1209,13 @@ async function openZiForm(id=null) {
       <div class="f fspan"><label>Όροφος (πολλαπλή)</label>${buildMS('z_or',orofoi,selOr,false)}</div>
       <div class="f"><label>Εμβαδό Min (τ.μ.)</label><input type="number" id="z_em1" value="${f['ΕΜΒΑΔΟ Min']||''}" placeholder="π.χ. 70"></div>
       <div class="f"><label>Εμβαδό Max (τ.μ.)</label><input type="number" id="z_em2" value="${f['ΕΜΒΑΔΟ Max']||''}" placeholder="π.χ. 120"></div>
-      <div class="f"><label>Θέση Στάθμευσης</label><select id="z_sta"><option value="">-</option>${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div class="f"><label>Αποθήκη</label><select id="z_ap"><option value="">-</option>${['Όχι','Ναι','Ως Παρακολούθημα'].map(s=>`<option value="${s}" ${f['ΑΠΟΘΗΚΗ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Θέση Στάθμευσης</label><select id="z_sta"><option value="">— Επιλογή Agent —</option>${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Αποθήκη</label><select id="z_ap"><option value="">— Επιλογή Agent —</option>${['Όχι','Ναι','Ως Παρακολούθημα'].map(s=>`<option value="${s}" ${f['ΑΠΟΘΗΚΗ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
       <div class="f"><label>Τιμή Min (€)</label><input type="number" id="z_t1" value="${f['ΤΙΜΗ Min']||''}" placeholder="π.χ. 100000"></div>
       <div class="f"><label>Τιμή Max (€)</label><input type="number" id="z_t2" value="${f['ΤΙΜΗ Max']||''}" placeholder="π.χ. 200000"></div>
       <div class="f fspan"><label>Τρόπος Πληρωμής</label>${buildMS('z_tr',tropoOpts,selTr,true)}</div>
       <div class="f fspan"><label>Ειδικά Χαρακτηριστικά</label>${buildMS('z_xar',xarOpts,selXar,true)}</div>
-      <div class="f"><label>Αξιολόγηση</label><select id="z_ax"><option value="">-</option>${['HOT','MEDIUM','COLD'].map(s=>`<option value="${s}" ${f['ΑΞΙΟΛΟΓΗΣΗ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Αξιολόγηση</label><select id="z_ax"><option value="">— Επιλογή Agent —</option>${['HOT','MEDIUM','COLD'].map(s=>`<option value="${s}" ${f['ΑΞΙΟΛΟΓΗΣΗ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
       <div class="f"><label>Πελάτης</label><input type="text" id="z_pe" value="${f['ΠΕΛΑΤΗΣ']||''}" placeholder="Όνομα πελάτη"></div>
       <div class="f"><label>Τηλέφωνο</label><input type="tel" id="z_te" value="${f['ΤΗΛΕΦΩΝΟ']||''}" placeholder="69xxxxxxxx"></div>
     </div>
