@@ -834,7 +834,7 @@ function chkNew(sel) {
   if (sel.value !== '__new__') return;
   const v = prompt('Νέα επιλογή:');
   if (v && v.trim()) {
-    const opt = new Option(v.trim(), v.trim(), true, true);
+    const clean = v.trim().replace(/['"]/g, ''); const opt = new Option(clean, clean, true, true);
     sel.insertBefore(opt, sel.lastElementChild);
     sel.value = v.trim();
   } else { sel.value = ''; }
