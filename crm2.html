@@ -401,10 +401,10 @@ async function doLogin() {
   load(true);
   try {
     const users = await getAll(C.T.US);
-    const u = users.find(x => (x.fields['Email']||'').toLowerCase().trim() === email);
+    const u = users.find(x => (x.fields['EMAIL']||'').toLowerCase().trim() === email);
     if (!u) { lErr('Δεν βρέθηκε χρήστης'); load(false); return; }
-    if (u.fields['Password'] !== pass) { lErr('Λανθασμένος κωδικός'); load(false); return; }
-    ME = { id: u.id, name: u.fields['Name'] || email, email, role: (u.fields['Role']||'agent').toLowerCase(), photo: u.fields['Photo'] };
+    if (u.fields['PASSWORD'] !== pass) { lErr('Λανθασμένος κωδικός'); load(false); return; }
+    ME = { id: u.id, name: u.fields['NAME'] || email, email, role: (u.fields['ROLE']||u.fields['Role']||'agent').toLowerCase(), photo: u.fields['PHOTO'] };
     localStorage.setItem('crm_u', JSON.stringify(ME));
     localStorage.setItem('crm_t', token);
     await boot();
@@ -480,7 +480,7 @@ function getUser(id) { return DB.us.find(u => u.id === id); }
 function getAgentName(fields) {
   const uid = Array.isArray(fields['User']) ? fields['User'][0] : (Array.isArray(fields['USER']) ? fields['USER'][0] : null);
   const u = uid ? getUser(uid) : null;
-  return u ? (u.fields['Name'] || '') : '-';
+  return u ? (u.fields['NAME'] || '') : '-';
 }
 function fmtEuro(v) { if(!v) return '-'; return String.fromCharCode(8364) + Number(v).toLocaleString('el-GR'); }
 function fmtDate(v) { if(!v) return '-'; return new Date(v).toLocaleDateString('el-GR'); }
@@ -528,11 +528,11 @@ function parseDate(d) {
 function pgHome(C2, A) {
   A.innerHTML = `<button class="btn btn-out btn-sm" onclick="doRefresh()">↻ Ανανέωση</button>`;
   const ak = myAk();
-  const diath = ak.filter(r => r.fields['Status'] === 'Διαθέσιμο').length;
-  const offm = ak.filter(r => r.fields['Status'] === 'Off Market').length;
+  const diath = ak.filter(r => r.fields['STATUS'] === 'Διαθέσιμο').length;
+  const offm = ak.filter(r => r.fields['STATUS'] === 'Off Market').length;
   const byE = {}, byP = {};
-  ak.forEach(r => { const e = r.fields['Είδος ακινήτου']||'Άλλο'; byE[e] = (byE[e]||0)+1; });
-  ak.forEach(r => { const p = r.fields['Περιοχή']||'Άλλη'; byP[p] = (byP[p]||0)+1; });
+  ak.forEach(r => { const e = r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'Άλλο'; byE[e] = (byE[e]||0)+1; });
+  ak.forEach(r => { const p = r.fields['ΠΕΡΙΟΧΗ']||'Άλλη'; byP[p] = (byP[p]||0)+1; });
   const mE = Math.max(...Object.values(byE),1), mP = Math.max(...Object.values(byP),1);
 
   // Date calculations
@@ -540,16 +540,16 @@ function pgHome(C2, A) {
   const days30 = new Date(now - 30*24*60*60*1000);
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   // parseDate is global
-  const newAk30 = ak.filter(r => { const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=days30; }).length;
-  const newZi30 = DB.zi.filter(r => { const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=days30; }).length;
-  const poulimenа = DB.ak.filter(r => { if(r.fields['Status']!=='Πωλήθηκε') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=startOfYear; }).length;
-  const maktika = ak.filter(r => { if(r.fields['Status']!=='Διαθέσιμο'&&r.fields['Status']!=='Off Market') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); if(!d) return false; return (now-d)/(24*60*60*1000)>90; });
+  const newAk30 = ak.filter(r => { const d=parseDate(r.fields['ΗΜΕΡΟΜΗΝΙΑ']||r.fields['Created Time']); return d&&d>=days30; }).length;
+  const newZi30 = DB.zi.filter(r => { const d=parseDate(r.fields['ΗΜΕΡΟΜΗΝΙΑ']||r.fields['Created Time']); return d&&d>=days30; }).length;
+  const poulimenа = DB.ak.filter(r => { if(r.fields['STATUS']!=='Πωλήθηκε') return false; const d=parseDate(r.fields['ΗΜΕΡΟΜΗΝΙΑ']||r.fields['Created Time']); return d&&d>=startOfYear; }).length;
+  const maktika = ak.filter(r => { if(r.fields['STATUS']!=='Διαθέσιμο'&&r.fields['STATUS']!=='Off Market') return false; const d=parseDate(r.fields['ΗΜΕΡΟΜΗΝΙΑ']||r.fields['Created Time']); if(!d) return false; return (now-d)/(24*60*60*1000)>90; });
 
   const agentsH = ME.role==='admin' ? DB.us.map(u => {
     const cnt = DB.ak.filter(r => Array.isArray(r.fields['User']) && r.fields['User'].includes(u.id)).length;
-    return `<div class="agent-card" onclick="filterByAgent('${u.id}','${(u.fields['Name']||'').replace(/'/g,'')}')">
+    return `<div class="agent-card" onclick="filterByAgent('${u.id}','${(u.fields['NAME']||'').replace(/'/g,'')}')">
       <div class="agent-cnt">${cnt}</div>
-      <div class="agent-name">${u.fields['Name']||u.fields['Email']||''}</div>
+      <div class="agent-name">${u.fields['NAME']||u.fields['EMAIL']||''}</div>
     </div>`;
   }).join('') : '';
 
@@ -585,7 +585,7 @@ function pgHome(C2, A) {
     ${maktika.length>0?`<div class="chart" style="margin-bottom:16px">
       <div class="chart-ttl" style="color:var(--err)">Ακίνητα πάνω από 90 μέρες στην αγορά</div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        ${maktika.slice(0,5).map(r=>{const f=r.fields;const d=parseDate(f['Ημερομηνία']||f['Created Time']);const days=d?Math.floor((now-d)/(24*60*60*1000)):0;return `<div onclick="viewAk('${r.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border-radius:var(--r2);font-size:13px;cursor:pointer;transition:all var(--t)" onmouseover="this.style.borderLeft='3px solid var(--err)'" onmouseout="this.style.borderLeft=''"><div><strong>${f['Περιοχή']||''}</strong> - ${f['Είδος ακινήτου']||''}<div style="font-size:11px;color:var(--text3)">${fmtEuro(f['Τιμή'])} · ${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':''}</div></div><div style="font-size:12px;font-weight:700;color:var(--err)">${days} μέρες</div></div>`;}).join('')}
+        ${maktika.slice(0,5).map(r=>{const f=r.fields;const d=parseDate(f['ΗΜΕΡΟΜΗΝΙΑ']||f['Created Time']);const days=d?Math.floor((now-d)/(24*60*60*1000)):0;return `<div onclick="viewAk('${r.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border-radius:var(--r2);font-size:13px;cursor:pointer;transition:all var(--t)" onmouseover="this.style.borderLeft='3px solid var(--err)'" onmouseout="this.style.borderLeft=''"><div><strong>${f['ΠΕΡΙΟΧΗ']||''}</strong> - ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||''}<div style="font-size:11px;color:var(--text3)">${fmtEuro(f['ΤΙΜΗ'])} · ${f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']?f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']+' τ.μ.':''}</div></div><div style="font-size:12px;font-weight:700;color:var(--err)">${days} μέρες</div></div>`;}).join('')}
       </div>
     </div>`:''}
     <div class="charts">
@@ -608,7 +608,7 @@ function pgHome(C2, A) {
 function filterByStatus(status) {
   goP('ak', document.querySelector('.sb-item[data-p="ak"]'));
   setTimeout(() => {
-    renderAkRows(DB.ak.filter(r => r.fields['Status'] === status));
+    renderAkRows(DB.ak.filter(r => r.fields['STATUS'] === status));
     const ttl = document.querySelector('.list-ttl');
     if (ttl) ttl.textContent = 'Ακίνητα — ' + status;
   }, 80);
@@ -623,9 +623,9 @@ function filterByAgent(uid, name) {
 function pgAk(C2, A) {
   const canEdit = ['admin','agent'].includes(ME.role);
   A.innerHTML = canEdit ? `<button class="btn btn-dark" onclick="openAkForm()">+ Νέο Ακίνητο</button>` : '';
-  const statuses = uniq(DB.ak.map(r=>r.fields['Status']));
-  const eidi = uniq(DB.ak.map(r=>r.fields['Είδος ακινήτου']));
-  const perioches = uniq(DB.ak.map(r=>r.fields['Περιοχή']));
+  const statuses = uniq(DB.ak.map(r=>r.fields['STATUS']));
+  const eidi = uniq(DB.ak.map(r=>r.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']));
+  const perioches = uniq(DB.ak.map(r=>r.fields['ΠΕΡΙΟΧΗ']));
 
   C2.innerHTML = `
     <div class="list-box">
@@ -643,7 +643,7 @@ function pgAk(C2, A) {
         <tbody id="akBody"></tbody></table>
       </div>
     </div>`;
-  renderAkRows(myAk().sort((a,b) => { const da=parseDate(a.fields['Ημερομηνία'])||new Date(0); const db=parseDate(b.fields['Ημερομηνία'])||new Date(0); return db-da; }));
+  renderAkRows(myAk().sort((a,b) => { const da=parseDate(a.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); const db=parseDate(b.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); return db-da; }));
 }
 
 function renderAkRows(recs) {
@@ -656,15 +656,15 @@ function renderAkRows(recs) {
   tb.innerHTML = recs.map(r => {
     const f = r.fields;
     const agentName = getAgentName(f);
-    const dt = fmtDate(f['Ημερομηνία']);
+    const dt = fmtDate(f['ΗΜΕΡΟΜΗΝΙΑ']);
     return `<tr onclick="viewAk('${r.id}')">
-      <td><strong>${f['Α/A']||'-'}</strong></td>
+      <td><strong>${f['Α/A ΖΗΤΗΣΗΣ']||'-'}</strong></td>
       <td style="font-size:12px;color:var(--text3)">${dt}</td>
-      <td>${f['Περιοχή']||'-'}</td>
-      <td>${f['Είδος ακινήτου']||'-'}</td>
-      <td><span class="badge ${sc[f['Status']]||'b-gray'}">${f['Status']||'-'}</span></td>
-      <td>${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':'-'}</td>
-      <td><strong>${fmtEuro(f['Τιμή'])}</strong></td>
+      <td>${f['ΠΕΡΙΟΧΗ']||'-'}</td>
+      <td>${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}</td>
+      <td><span class="badge ${sc[f['STATUS']]||'b-gray'}">${f['STATUS']||'-'}</span></td>
+      <td>${f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']?f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']+' τ.μ.':'-'}</td>
+      <td><strong>${fmtEuro(f['ΤΙΜΗ'])}</strong></td>
       <td style="color:var(--text2);font-size:12px">${getAgentName(f)}</td>
     </tr>`;
   }).join('');
@@ -677,53 +677,53 @@ function filterAk() {
   const pe=document.getElementById('fPe')?.value||'';
   let r=myAk();
   if(s) r=r.filter(x=>JSON.stringify(x.fields).toLowerCase().includes(s));
-  if(st) r=r.filter(x=>x.fields['Status']===st);
-  if(ei) r=r.filter(x=>x.fields['Είδος ακινήτου']===ei);
-  if(pe) r=r.filter(x=>x.fields['Περιοχή']===pe);
-  r.sort((a,b)=>{ const da=parseDate(a.fields['Ημερομηνία'])||new Date(0); const db=parseDate(b.fields['Ημερομηνία'])||new Date(0); return db-da; }); renderAkRows(r);
+  if(st) r=r.filter(x=>x.fields['STATUS']===st);
+  if(ei) r=r.filter(x=>x.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']===ei);
+  if(pe) r=r.filter(x=>x.fields['ΠΕΡΙΟΧΗ']===pe);
+  r.sort((a,b)=>{ const da=parseDate(a.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); const db=parseDate(b.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); return db-da; }); renderAkRows(r);
 }
 
 function viewAk(id) {
   const rec = DB.ak.find(r=>r.id===id); if(!rec) return;
   const f = rec.fields;
   const own = isOwnerAk(f);
-  const photos = Array.isArray(f['Φωτογραφίες']) ? f['Φωτογραφίες'] : [];
-  const videos = Array.isArray(f['Video']) ? f['Video'] : [];
+  const photos = Array.isArray(f['ΦΩΤΟΓΡΑΦΙΕΣ']) ? f['ΦΩΤΟΓΡΑΦΙΕΣ'] : [];
+  const videos = Array.isArray(f['VIDEO']) ? f['VIDEO'] : [];
   const mainPhoto = photos[0] ? `<img src="${photos[0].url}" style="width:80px;height:80px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);flex-shrink:0;cursor:pointer" onclick="window.open('${photos[0].url}','_blank')">` : '';
   const extraPhotos = photos.slice(1).map(p => `<img src="${p.url}" style="width:60px;height:60px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);cursor:pointer" onclick="window.open('${p.url}','_blank')">`).join('');
-  const videoLinks = videos.map(v => `<a href="${v.url}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-size:12px;color:var(--text2);text-decoration:none">▶ ${v.filename||'Video'}</a>`).join('');
+  const videoLinks = videos.map(v => `<a href="${v.url}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-size:12px;color:var(--text2);text-decoration:none">▶ ${v.filename||'VIDEO'}</a>`).join('');
   const sc = {'Διαθέσιμο':'b-green','Off Market':'b-gold','Πωλήθηκε':'b-gray','Αποσύρθηκε':'b-red'};
 
-  openModal(`🏢 Ακίνητο #${f['Α/A']||''}`, `
+  openModal(`🏢 Ακίνητο #${f['Α/A ΖΗΤΗΣΗΣ']||''}`, `
     <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;flex-wrap:wrap">
       ${mainPhoto}
       <div style="flex:1;min-width:160px">
-        <div style="font-size:19px;font-weight:700;margin-bottom:2px">${f['Περιοχή']||'-'}</div>
-        <div style="color:var(--text2);margin-bottom:6px">${f['Είδος ακινήτου']||'-'}${f['Δωμάτια']?' · '+f['Δωμάτια']+' δωμ.':''}</div>
-        <span class="badge ${sc[f['Status']]||'b-gray'}">${f['Status']||''}</span>
+        <div style="font-size:19px;font-weight:700;margin-bottom:2px">${f['ΠΕΡΙΟΧΗ']||'-'}</div>
+        <div style="color:var(--text2);margin-bottom:6px">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}${f['ΔΩΜΑΤΙΑ']?' · '+f['ΔΩΜΑΤΙΑ']+' δωμ.':''}</div>
+        <span class="badge ${sc[f['STATUS']]||'b-gray'}">${f['STATUS']||''}</span>
       </div>
       <div style="text-align:right">
-        <div style="font-size:21px;font-weight:700;color:var(--gold)">${fmtEuro(f['Τιμή'])}</div>
-        ${f['Τιμή ανά Τετρ.μέτρο']?`<div style="font-size:12px;color:var(--text3)">${fmtEuro(f['Τιμή ανά Τετρ.μέτρο'])}/τ.μ.</div>`:''}
+        <div style="font-size:21px;font-weight:700;color:var(--gold)">${fmtEuro(f['ΤΙΜΗ'])}</div>
+        ${f['ΤΙΜΗ ΑΝΑ ΤΕΤΡ.ΜΕΤΡΟ']?`<div style="font-size:12px;color:var(--text3)">${fmtEuro(f['ΤΙΜΗ ΑΝΑ ΤΕΤΡ.ΜΕΤΡΟ'])}/τ.μ.</div>`:''}
       </div>
     </div>
     <div class="dg">
       <div class="di"><div class="di-lbl">Agent</div><div class="di-val">${getAgentName(f)}</div></div>
-      <div class="di"><div class="di-lbl">Ημερομηνία</div><div class="di-val">${fmtDate(f['Ημερομηνία'])}</div></div>
-      <div class="di"><div class="di-lbl">Εμβαδό Μεικτό</div><div class="di-val">${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':'-'}</div></div>
-      <div class="di"><div class="di-lbl">Εμβαδό Καθαρό</div><div class="di-val">${f['Εμβαδό Καθαρό']?f['Εμβαδό Καθαρό']+' τ.μ.':'-'}</div></div>
-      <div class="di"><div class="di-lbl">Τιμή</div><div class="di-val" style="color:var(--gold);font-weight:700">${fmtEuro(f['Τιμή'])}</div></div>
-      <div class="di"><div class="di-lbl">Εκτίμηση</div><div class="di-val">${fmtEuro(f['Εκτίμηση'])}</div></div>
-      <div class="di"><div class="di-lbl">Έτος Κατασκευής</div><div class="di-val">${f['Έτος κατασκευής']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${f['Όροφος']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['Δωμάτια']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${f['Θέση Στάθμευσης']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Ασανσέρ</div><div class="di-val">${f['Ασανσέρ']==='Ναι'?'✅ Ναι':f['Ασανσέρ']==='Οχι'?'❌ Οχι':'—'}</div></div>
-      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['Αποθήκη']==='Ναι'?'✅ Ναι':f['Αποθήκη']==='Οχι'?'❌ Οχι':f['Αποθήκη']||'—'}</div></div>
-      <div class="di"><div class="di-lbl">Διεύθυνση</div><div class="di-val">${f['Διεύθυνση']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Συνεργασίες</div><div class="di-val">${f['Συνεργασίες']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Ημερομηνία</div><div class="di-val">${fmtDate(f['ΗΜΕΡΟΜΗΝΙΑ'])}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Μεικτό</div><div class="di-val">${f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']?f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']+' τ.μ.':'-'}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Καθαρό</div><div class="di-val">${f['ΕΜΒΑΔΟ ΚΑΘΑΡΟ']?f['ΕΜΒΑΔΟ ΚΑΘΑΡΟ']+' τ.μ.':'-'}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή</div><div class="di-val" style="color:var(--gold);font-weight:700">${fmtEuro(f['ΤΙΜΗ'])}</div></div>
+      <div class="di"><div class="di-lbl">Εκτίμηση</div><div class="di-val">${fmtEuro(f['ΕΚΤΙΜΗΣΗ'])}</div></div>
+      <div class="di"><div class="di-lbl">Έτος Κατασκευής</div><div class="di-val">${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${f['ΟΡΟΦΟΣ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['ΔΩΜΑΤΙΑ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Ασανσέρ</div><div class="di-val">${f['ΑΣΑΝΣΕΡ']==='Ναι'?'✅ Ναι':f['ΑΣΑΝΣΕΡ']==='Οχι'?'❌ Οχι':'—'}</div></div>
+      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['ΑΠΟΘΗΚΗ']==='Ναι'?'✅ Ναι':f['ΑΠΟΘΗΚΗ']==='Οχι'?'❌ Οχι':f['ΑΠΟΘΗΚΗ']||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Διεύθυνση</div><div class="di-val">${f['ΔΙΕΥΘΥΝΣΗ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Συνεργασίες</div><div class="di-val">${f['ΣΥΝΕΡΓΑΣΙΕΣ']||'-'}</div></div>
     </div>
-    ${f['Σημειώσεις']?`<div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--r2)"><div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Σημειώσεις</div><div style="font-size:13px;line-height:1.5">${f['Σημειώσεις']}</div></div>`:''}
+    ${f['ΣΗΜΕΙΩΣΕΙΣ']?`<div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--r2)"><div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Σημειώσεις</div><div style="font-size:13px;line-height:1.5">${f['ΣΗΜΕΙΩΣΕΙΣ']}</div></div>`:''}
     ${extraPhotos?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Φωτογραφίες</div><div style="display:flex;flex-wrap:wrap;gap:6px">${extraPhotos}</div></div>`:''}
     ${videoLinks?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Video</div><div style="display:flex;flex-wrap:wrap;gap:6px">${videoLinks}</div></div>`:''}
   `, `
@@ -742,48 +742,48 @@ async function openAkForm(id=null) {
   load(false);
   const uid = Array.isArray(f['User'])?f['User'][0]:'';
   const today = new Date().toISOString().split('T')[0];
-  const timi = f['Τιμή']||'', emv = f['Εμβ. Μεικτό']||'';
+  const timi = f['ΤΙΜΗ']||'', emv = f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']||'';
   const tm = timi&&emv ? (timi/emv).toFixed(2)+' €/τ.μ.' : '';
   // Get options from both ΑΚΙΝΗΤΑ and ΖΗΤΗΣΕΙΣ to ensure all options show
-  const perioches = uniq([...getOpts('Περιοχή','ak'),...getOpts('Περιοχή','zi').flat()]);
-  const eidi = uniq([...getOpts('Είδος ακινήτου','ak'),...getOpts('Είδος ακινήτου','zi').flat()]);
-  const statuses = uniq(['Διαθέσιμο','Off Market','Πωλήθηκε','Αποσύρθηκε',...getOpts('Status')]);
+  const perioches = uniq([...getOpts('ΠΕΡΙΟΧΗ','ak'),...getOpts('ΠΕΡΙΟΧΗ','zi').flat()]);
+  const eidi = uniq([...getOpts('ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ','ak'),...getOpts('ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ','zi').flat()]);
+  const statuses = uniq(['Διαθέσιμο','Off Market','Πωλήθηκε','Αποσύρθηκε',...getOpts('STATUS')]);
 
   openModal(id?'✏️ Επεξεργασία Ακινήτου':'+ Νέο Ακίνητο', `
     <div class="fg">
-      <div class="f"><label>Ημερομηνία</label><input type="date" id="a_dt" value="${f['Ημερομηνία']||today}"></div>
-      <div class="f"><label>Agent</label><select id="a_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['Name']||u.fields['Email']}</option>`).join('')}</select></div>
-      <div class="f"><label>Περιοχή *</label><select id="a_pe" onchange="chkNew(this)"><option value="">Επιλογή...</option>${perioches.map(p=>`<option value="${p}" ${f['Περιοχή']===p?'selected':''}>${p}</option>`).join('')}<option value="__new__">+ Νέα</option></select></div>
-      <div class="f"><label>Είδος Ακινήτου *</label><select id="a_ei" onchange="chkNew(this)"><option value="">Επιλογή...</option>${eidi.map(e=>`<option value="${e}" ${f['Είδος ακινήτου']===e?'selected':''}>${e}</option>`).join('')}<option value="__new__">+ Νέο</option></select></div>
-      <div class="f"><label>Status</label><select id="a_st" onchange="chkNew(this)"><option value="">Επιλογή...</option>${statuses.map(s=>`<option value="${s}" ${f['Status']===s?'selected':''}>${s}</option>`).join('')}<option value="__new__">+ Νέο</option></select></div>
-      <div class="f"><label>Όροφος</label><select id="a_or"><option value="">Επιλογή...</option>${['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'].map(o=>`<option value="${o}" ${f['Όροφος']===o?'selected':''}>${o}</option>`).join('')}</select></div>
-      <div class="f"><label>Δωμάτια</label><select id="a_do"><option value="">Επιλογή...</option>${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${f['Δωμάτια']===d?'selected':''}>${d}</option>`).join('')}</select></div>
-      <div class="f"><label>Θέση Στάθμευσης</label><select id="a_sta"><option value="">Επιλογή...</option>${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${f['Θέση Στάθμευσης']===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Ημερομηνία</label><input type="date" id="a_dt" value="${f['ΗΜΕΡΟΜΗΝΙΑ']||today}"></div>
+      <div class="f"><label>Agent</label><select id="a_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['NAME']||u.fields['EMAIL']}</option>`).join('')}</select></div>
+      <div class="f"><label>Περιοχή *</label><select id="a_pe" onchange="chkNew(this)"><option value="">Επιλογή...</option>${perioches.map(p=>`<option value="${p}" ${f['ΠΕΡΙΟΧΗ']===p?'selected':''}>${p}</option>`).join('')}<option value="__new__">+ Νέα</option></select></div>
+      <div class="f"><label>Είδος Ακινήτου *</label><select id="a_ei" onchange="chkNew(this)"><option value="">Επιλογή...</option>${eidi.map(e=>`<option value="${e}" ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']===e?'selected':''}>${e}</option>`).join('')}<option value="__new__">+ Νέο</option></select></div>
+      <div class="f"><label>Status</label><select id="a_st" onchange="chkNew(this)"><option value="">Επιλογή...</option>${statuses.map(s=>`<option value="${s}" ${f['STATUS']===s?'selected':''}>${s}</option>`).join('')}<option value="__new__">+ Νέο</option></select></div>
+      <div class="f"><label>Όροφος</label><select id="a_or"><option value="">Επιλογή...</option>${['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'].map(o=>`<option value="${o}" ${f['ΟΡΟΦΟΣ']===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      <div class="f"><label>Δωμάτια</label><select id="a_do"><option value="">Επιλογή...</option>${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${f['ΔΩΜΑΤΙΑ']===d?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="f"><label>Θέση Στάθμευσης</label><select id="a_sta"><option value="">Επιλογή...</option>${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
       <div class="f"><label>Τιμή (€)</label><input type="number" id="a_ti" value="${timi}" placeholder="π.χ. 150000" oninput="calcTM()"></div>
-      <div class="f"><label>Εκτίμηση (€)</label><input type="number" id="a_ek" value="${f['Εκτίμηση']||''}" placeholder="π.χ. 160000"></div>
+      <div class="f"><label>Εκτίμηση (€)</label><input type="number" id="a_ek" value="${f['ΕΚΤΙΜΗΣΗ']||''}" placeholder="π.χ. 160000"></div>
       <div class="f"><label>Εμβαδό Μεικτό (τ.μ.)</label><input type="number" id="a_em" value="${emv}" placeholder="π.χ. 85" oninput="calcTM()"></div>
-      <div class="f"><label>Εμβαδό Καθαρό (τ.μ.)</label><input type="number" id="a_ek2" value="${f['Εμβαδό Καθαρό']||''}" placeholder="π.χ. 78"></div>
+      <div class="f"><label>Εμβαδό Καθαρό (τ.μ.)</label><input type="number" id="a_ek2" value="${f['ΕΜΒΑΔΟ ΚΑΘΑΡΟ']||''}" placeholder="π.χ. 78"></div>
       <div class="f"><label>Τιμή/τ.μ. (αυτόματο)</label><input type="text" id="a_tm" value="${tm}" readonly style="background:var(--bg3);color:var(--text3)"></div>
-      <div class="f"><label>Έτος Κατασκευής</label><input type="number" id="a_et" value="${f['Έτος κατασκευής']||''}" placeholder="π.χ. 2010"></div>
-      <div class="f"><label>Διεύθυνση</label><input type="text" id="a_di" value="${f['Διεύθυνση']||''}" placeholder="Οδός αριθμός"></div>
-      <div class="f"><label>Συνεργασίες</label><input type="text" id="a_si" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική"></div>
+      <div class="f"><label>Έτος Κατασκευής</label><input type="number" id="a_et" value="${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||''}" placeholder="π.χ. 2010"></div>
+      <div class="f"><label>Διεύθυνση</label><input type="text" id="a_di" value="${f['ΔΙΕΥΘΥΝΣΗ']||''}" placeholder="Οδός αριθμός"></div>
+      <div class="f"><label>Συνεργασίες</label><input type="text" id="a_si" value="${f['ΣΥΝΕΡΓΑΣΙΕΣ']||''}" placeholder="π.χ. Αποκλειστική"></div>
       <div class="f"><label>Ασανσέρ</label>
         <select id="a_as">
           <option value="">—</option>
-          <option value="Ναι" ${f['Ασανσέρ']==='Ναι'?'selected':''}>Ναι</option>
-          <option value="Οχι" ${f['Ασανσέρ']==='Οχι'?'selected':''}>Οχι</option>
+          <option value="Ναι" ${f['ΑΣΑΝΣΕΡ']==='Ναι'?'selected':''}>Ναι</option>
+          <option value="Οχι" ${f['ΑΣΑΝΣΕΡ']==='Οχι'?'selected':''}>Οχι</option>
         </select>
       </div>
       <div class="f"><label>Αποθήκη</label>
         <select id="a_ap">
           <option value="">—</option>
-          <option value="Ναι" ${f['Αποθήκη']==='Ναι'?'selected':''}>Ναι</option>
-          <option value="Οχι" ${f['Αποθήκη']==='Οχι'?'selected':''}>Οχι</option>
+          <option value="Ναι" ${f['ΑΠΟΘΗΚΗ']==='Ναι'?'selected':''}>Ναι</option>
+          <option value="Οχι" ${f['ΑΠΟΘΗΚΗ']==='Οχι'?'selected':''}>Οχι</option>
         </select>
       </div>
       <div class="f"><label>Φωτογραφίες</label><input type="file" id="a_ph" multiple accept="image/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)"></div>
       <div class="f"><label>Video</label><input type="file" id="a_vi" accept="video/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)"></div>
-      <div class="f fspan"><label>Σημειώσεις</label><textarea id="a_no" rows="3" placeholder="Περιγραφή...">${f['Σημειώσεις']||''}</textarea></div>
+      <div class="f fspan"><label>Σημειώσεις</label><textarea id="a_no" rows="3" placeholder="Περιγραφή...">${f['ΣΗΜΕΙΩΣΕΙΣ']||''}</textarea></div>
     </div>
   `, `
     <button class="btn btn-out" onclick="CM()">Ακύρωση</button>
@@ -831,23 +831,23 @@ async function saveAk(id) {
   const timi = parseFloat(document.getElementById('a_ti').value)||null;
   const emv = parseFloat(document.getElementById('a_em').value)||null;
   const fields = {
-    'Ημερομηνία': document.getElementById('a_dt').value||null,
-    'Περιοχή': document.getElementById('a_pe').value||null,
-    'Είδος ακινήτου': document.getElementById('a_ei').value||null,
-    'Status': document.getElementById('a_st').value||null,
-    'Όροφος': document.getElementById('a_or').value||null,
-    'Δωμάτια': document.getElementById('a_do').value||null,
-    'Θέση Στάθμευσης': document.getElementById('a_sta').value||null,
-    'Τιμή': timi,
-    'Εκτίμηση': parseFloat(document.getElementById('a_ek').value)||null,
-    'Εμβ. Μεικτό': emv,
-    'Εμβαδό Καθαρό': parseFloat(document.getElementById('a_ek2').value)||null,
-    'Έτος κατασκευής': parseInt(document.getElementById('a_et').value)||null,
-    'Διεύθυνση': document.getElementById('a_di').value||null,
-    'Συνεργασίες': document.getElementById('a_si').value||null,
-    'Ασανσέρ': document.getElementById('a_as').value||null,
-    'Αποθήκη': document.getElementById('a_ap').value||null,
-    'Σημειώσεις': document.getElementById('a_no').value||null,
+    'ΗΜΕΡΟΜΗΝΙΑ': document.getElementById('a_dt').value||null,
+    'ΠΕΡΙΟΧΗ': document.getElementById('a_pe').value||null,
+    'ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ': document.getElementById('a_ei').value||null,
+    'STATUS': document.getElementById('a_st').value||null,
+    'ΟΡΟΦΟΣ': document.getElementById('a_or').value||null,
+    'ΔΩΜΑΤΙΑ': document.getElementById('a_do').value||null,
+    'ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ': document.getElementById('a_sta').value||null,
+    'ΤΙΜΗ': timi,
+    'ΕΚΤΙΜΗΣΗ': parseFloat(document.getElementById('a_ek').value)||null,
+    'ΕΜΒΑΔΟ ΜΕΙΚΤΟ': emv,
+    'ΕΜΒΑΔΟ ΚΑΘΑΡΟ': parseFloat(document.getElementById('a_ek2').value)||null,
+    'ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ': parseInt(document.getElementById('a_et').value)||null,
+    'ΔΙΕΥΘΥΝΣΗ': document.getElementById('a_di').value||null,
+    'ΣΥΝΕΡΓΑΣΙΕΣ': document.getElementById('a_si').value||null,
+    'ΑΣΑΝΣΕΡ': document.getElementById('a_as').value||null,
+    'ΑΠΟΘΗΚΗ': document.getElementById('a_ap').value||null,
+    'ΣΗΜΕΙΩΣΕΙΣ': document.getElementById('a_no').value||null,
   };
   if (uid) fields['User'] = [uid];
   Object.keys(fields).forEach(k => { if (fields[k]===null||fields[k]==='') delete fields[k]; });
@@ -872,7 +872,7 @@ function printAk(id) {
   const rec = DB.ak.find(r=>r.id===id); if(!rec) return;
   const f = rec.fields;
   const agentName = getAgentName(f);
-  const photo1 = Array.isArray(f['Φωτογραφίες'])&&f['Φωτογραφίες'][0] ? f['Φωτογραφίες'][0].url : null;
+  const photo1 = Array.isArray(f['ΦΩΤΟΓΡΑΦΙΕΣ'])&&f['ΦΩΤΟΓΡΑΦΙΕΣ'][0] ? f['ΦΩΤΟΓΡΑΦΙΕΣ'][0].url : null;
   const w = window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ακίνητο</title>
   <style>body{font-family:-apple-system,sans-serif;max-width:720px;margin:36px auto;color:#111;font-size:13px}
@@ -890,39 +890,39 @@ function printAk(id) {
   .footer{margin-top:20px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:10px}
   @media print{.noprint{display:none}}</style>
   </head><body>
-  <h1>Ακίνητο #${f['Α/A']||''}</h1>
-  <div class="sub">${f['Είδος ακινήτου']||''} · ${f['Περιοχή']||''}</div>
+  <h1>Ακίνητο #${f['Α/A ΖΗΤΗΣΗΣ']||''}</h1>
+  <div class="sub">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||''} · ${f['ΠΕΡΙΟΧΗ']||''}</div>
   <div class="top">
     ${photo1?`<img class="photo" src="${photo1}">`:''}
     <div class="top-info">
       <table>
-        <tr><td>Α/Α</td><td>${f['Α/A']||'-'}</td></tr>
-        <tr><td>Ημερομηνία</td><td>${fmtDate(f['Ημερομηνία'])}</td></tr>
-        <tr><td>Είδος Ακινήτου</td><td>${f['Είδος ακινήτου']||'-'}</td></tr>
-        <tr><td>Περιοχή</td><td>${f['Περιοχή']||'-'}</td></tr>
-        <tr><td>Status</td><td>${f['Status']||'-'}</td></tr>
-        <tr><td>Τιμή</td><td>${fmtEuro(f['Τιμή'])}</td></tr>
-        <tr><td>Τιμή/τ.μ.</td><td>${f['Τιμή ανά Τετρ.μέτρο']?fmtEuro(f['Τιμή ανά Τετρ.μέτρο']):''}</td></tr>
-        <tr><td>Εμβαδό Μεικτό</td><td>${f['Εμβ. Μεικτό']?f['Εμβ. Μεικτό']+' τ.μ.':'-'}</td></tr>
+        <tr><td>Α/Α</td><td>${f['Α/A ΖΗΤΗΣΗΣ']||'-'}</td></tr>
+        <tr><td>Ημερομηνία</td><td>${fmtDate(f['ΗΜΕΡΟΜΗΝΙΑ'])}</td></tr>
+        <tr><td>Είδος Ακινήτου</td><td>${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}</td></tr>
+        <tr><td>Περιοχή</td><td>${f['ΠΕΡΙΟΧΗ']||'-'}</td></tr>
+        <tr><td>Status</td><td>${f['STATUS']||'-'}</td></tr>
+        <tr><td>Τιμή</td><td>${fmtEuro(f['ΤΙΜΗ'])}</td></tr>
+        <tr><td>Τιμή/τ.μ.</td><td>${f['ΤΙΜΗ ΑΝΑ ΤΕΤΡ.ΜΕΤΡΟ']?fmtEuro(f['ΤΙΜΗ ΑΝΑ ΤΕΤΡ.ΜΕΤΡΟ']):''}</td></tr>
+        <tr><td>Εμβαδό Μεικτό</td><td>${f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']?f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']+' τ.μ.':'-'}</td></tr>
       </table>
     </div>
   </div>
   <table>
     <tr><td>Agent</td><td>${agentName}</td></tr>
-    <tr><td>Διεύθυνση</td><td>${f['Διεύθυνση']||'-'}</td></tr>
-    <tr><td>Έτος Κατασκευής</td><td>${f['Έτος κατασκευής']||'-'}</td></tr>
-    <tr><td>Όροφος</td><td>${f['Όροφος']||'-'}</td></tr>
-    <tr><td>Δωμάτια</td><td>${f['Δωμάτια']||'-'}</td></tr>
-    <tr><td>Εμβαδό Καθαρό</td><td>${f['Εμβαδό Καθαρό']?f['Εμβαδό Καθαρό']+' τ.μ.':'-'}</td></tr>
-    <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'-'}</td></tr>
-    <tr><td>Ασανσέρ</td><td>${f['Ασανσέρ']||'—'}</td></tr>
-    <tr><td>Αποθήκη</td><td>${f['Αποθήκη']||'—'}</td></tr>
-    <tr><td>Εκτίμηση</td><td>${fmtEuro(f['Εκτίμηση'])}</td></tr>
-    <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['Τρόπος Πληρωμής'])}</td></tr>
-    <tr><td>Συνεργασίες</td><td>${f['Συνεργασίες']||'-'}</td></tr>
+    <tr><td>Διεύθυνση</td><td>${f['ΔΙΕΥΘΥΝΣΗ']||'-'}</td></tr>
+    <tr><td>Έτος Κατασκευής</td><td>${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||'-'}</td></tr>
+    <tr><td>Όροφος</td><td>${f['ΟΡΟΦΟΣ']||'-'}</td></tr>
+    <tr><td>Δωμάτια</td><td>${f['ΔΩΜΑΤΙΑ']||'-'}</td></tr>
+    <tr><td>Εμβαδό Καθαρό</td><td>${f['ΕΜΒΑΔΟ ΚΑΘΑΡΟ']?f['ΕΜΒΑΔΟ ΚΑΘΑΡΟ']+' τ.μ.':'-'}</td></tr>
+    <tr><td>Θέση Στάθμευσης</td><td>${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'-'}</td></tr>
+    <tr><td>Ασανσέρ</td><td>${f['ΑΣΑΝΣΕΡ']||'—'}</td></tr>
+    <tr><td>Αποθήκη</td><td>${f['ΑΠΟΘΗΚΗ']||'—'}</td></tr>
+    <tr><td>Εκτίμηση</td><td>${fmtEuro(f['ΕΚΤΙΜΗΣΗ'])}</td></tr>
+    <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ'])}</td></tr>
+    <tr><td>Συνεργασίες</td><td>${f['ΣΥΝΕΡΓΑΣΙΕΣ']||'-'}</td></tr>
     <tr><td>User Email</td><td>${ME.email}</td></tr>
   </table>
-  ${f['Σημειώσεις']?`<div class="notes"><div class="notes-lbl">Σημειώσεις</div>${f['Σημειώσεις']}</div>`:''}
+  ${f['ΣΗΜΕΙΩΣΕΙΣ']?`<div class="notes"><div class="notes-lbl">Σημειώσεις</div>${f['ΣΗΜΕΙΩΣΕΙΣ']}</div>`:''}
   <div class="footer">Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</div>
   <button class="noprint" onclick="window.print()" style="margin-top:14px;padding:9px 20px;background:#c9a96e;border:none;color:#fff;cursor:pointer;border-radius:6px;font-size:13px">🖨️ Εκτύπωση / PDF</button>
   </body></html>`);
@@ -932,7 +932,7 @@ function printAk(id) {
 function viberAk(id) {
   const rec = DB.ak.find(r=>r.id===id); if(!rec) return;
   const f = rec.fields;
-  const t = `🏠 Ακίνητο\nΠεριοχή: ${f['Περιοχή']||''}\nΕίδος: ${f['Είδος ακινήτου']||''}\nΕμβαδό: ${f['Εμβ. Μεικτό']||''} τ.μ.\nΤιμή: ${fmtEuro(f['Τιμή'])}\nStatus: ${f['Status']||''}`;
+  const t = `🏠 Ακίνητο\nΠεριοχή: ${f['ΠΕΡΙΟΧΗ']||''}\nΕίδος: ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||''}\nΕμβαδό: ${f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']||''} τ.μ.\nΤιμή: ${fmtEuro(f['ΤΙΜΗ'])}\nStatus: ${f['STATUS']||''}`;
   window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
@@ -951,7 +951,7 @@ function pgZi(C2, A) {
         <tbody id="ziBody"></tbody></table>
       </div>
     </div>`;
-  renderZiRows(myZi().sort((a,b) => { const da=parseDate(a.fields['Ημερομηνία'])||new Date(0); const db=parseDate(b.fields['Ημερομηνία'])||new Date(0); return db-da; }));
+  renderZiRows(myZi().sort((a,b) => { const da=parseDate(a.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); const db=parseDate(b.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); return db-da; }));
 }
 
 function renderZiRows(recs) {
@@ -961,17 +961,17 @@ function renderZiRows(recs) {
   const axBadge = {'HOT':'b-red','MEDIUM':'b-orange','COLD':'b-blue'};
   tb.innerHTML = recs.map(r => {
     const f = r.fields;
-    const pe = arrVal(f['Περιοχή']); const ei = arrVal(f['Είδος ακινήτου']);
-    const tMin = f['Τιμή Min']?fmtEuro(f['Τιμή Min']):''; const tMax = f['Τιμή Max']?fmtEuro(f['Τιμή Max']):'';
+    const pe = arrVal(f['ΠΕΡΙΟΧΗ']); const ei = arrVal(f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']);
+    const tMin = f['ΤΙΜΗ Min']?fmtEuro(f['ΤΙΜΗ Min']):''; const tMax = f['ΤΙΜΗ Max']?fmtEuro(f['ΤΙΜΗ Max']):'';
     const ax = f['ΑΞΙΟΛΟΓΗΣΗ']||'';
     return `<tr onclick="viewZi('${r.id}')">
-      <td><strong>${f['Α/A Ζήτησης']||f['Α/A']||'-'}</strong></td>
+      <td><strong>${f['Α/A ΖΗΤΗΣΗΣ']||f['Α/A ΖΗΤΗΣΗΣ']||'-'}</strong></td>
       <td style="font-size:12px;color:var(--text2)">${getAgentName(f)}</td>
       <td style="font-size:12px">${pe}</td><td style="font-size:12px">${ei}</td>
       <td style="font-size:11px">${tMin}${tMax?'–'+tMax:''}</td>
-      <td>${f['Δωμάτια']||'-'}</td>
+      <td>${f['ΔΩΜΑΤΙΑ']||'-'}</td>
       <td>${ax?`<span class="badge ${axBadge[ax]||'b-gray'}">${ax}</span>`:''}</td>
-      <td style="font-size:11px;color:var(--text3)">${fmtDate(f['Ημερομηνία'])}</td>
+      <td style="font-size:11px;color:var(--text3)">${fmtDate(f['ΗΜΕΡΟΜΗΝΙΑ'])}</td>
     </tr>`;
   }).join('');
 }
@@ -979,7 +979,7 @@ function renderZiRows(recs) {
 function filterZi() {
   const s=(document.getElementById('ziSrch')?.value||'').toLowerCase();
   let r=myZi(); if(s) r=r.filter(x=>JSON.stringify(x.fields).toLowerCase().includes(s));
-  r.sort((a,b)=>{ const da=parseDate(a.fields['Ημερομηνία'])||new Date(0); const db=parseDate(b.fields['Ημερομηνία'])||new Date(0); return db-da; }); renderZiRows(r);
+  r.sort((a,b)=>{ const da=parseDate(a.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); const db=parseDate(b.fields['ΗΜΕΡΟΜΗΝΙΑ'])||new Date(0); return db-da; }); renderZiRows(r);
 }
 
 function viewZi(id) {
@@ -992,26 +992,26 @@ function viewZi(id) {
   // Find matching properties for this request
   const matchingAk = findMatchingAk(f);
 
-  openModal(`🔍 Ζήτηση #${f['Α/A Ζήτησης']||f['Α/A']||''}`, `
+  openModal(`🔍 Ζήτηση #${f['Α/A ΖΗΤΗΣΗΣ']||f['Α/A ΖΗΤΗΣΗΣ']||''}`, `
     <div class="dg">
-      <div class="di"><div class="di-lbl">Α/Α</div><div class="di-val">${f['Α/A Ζήτησης']||f['Α/A']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Α/Α</div><div class="di-val">${f['Α/A ΖΗΤΗΣΗΣ']||f['Α/A ΖΗΤΗΣΗΣ']||'-'}</div></div>
       <div class="di"><div class="di-lbl">Agent</div><div class="di-val">${getAgentName(f)}</div></div>
-      <div class="di"><div class="di-lbl">Περιοχή</div><div class="di-val">${arrVal(f['Περιοχή'])}</div></div>
-      <div class="di"><div class="di-lbl">Είδος Ακινήτου</div><div class="di-val">${arrVal(f['Είδος ακινήτου'])}</div></div>
-      <div class="di"><div class="di-lbl">Από έτος</div><div class="di-val">${f['Από έτος']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Έως έτος</div><div class="di-val">${f['Έως έτος']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['Δωμάτια']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${arrVal(f['Όροφος'])}</div></div>
-      <div class="di"><div class="di-lbl">Εμβαδό Min</div><div class="di-val">${f['Εμβαδό Min']?f['Εμβαδό Min']+' τ.μ.':'-'}</div></div>
-      <div class="di"><div class="di-lbl">Εμβαδό Max</div><div class="di-val">${f['Εμβαδό Max']?f['Εμβαδό Max']+' τ.μ.':'-'}</div></div>
-      <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${f['Θέση Στάθμευσης']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['Αποθήκη']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Τιμή Min</div><div class="di-val">${fmtEuro(f['Τιμή Min'])}</div></div>
-      <div class="di"><div class="di-lbl">Τιμή Max</div><div class="di-val">${fmtEuro(f['Τιμή Max'])}</div></div>
-      <div class="di"><div class="di-lbl">Τρόπος Πληρωμής</div><div class="di-val">${arrVal(f['Τρόπος Πληρωμής'])}</div></div>
+      <div class="di"><div class="di-lbl">Περιοχή</div><div class="di-val">${arrVal(f['ΠΕΡΙΟΧΗ'])}</div></div>
+      <div class="di"><div class="di-lbl">Είδος Ακινήτου</div><div class="di-val">${arrVal(f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'])}</div></div>
+      <div class="di"><div class="di-lbl">Από έτος</div><div class="di-val">${f['ΑΠΟ ΕΤΟΣ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Έως έτος</div><div class="di-val">${f['ΕΩΣ ΕΤΟΣ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['ΔΩΜΑΤΙΑ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${arrVal(f['ΟΡΟΦΟΣ'])}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Min</div><div class="di-val">${f['ΕΜΒΑΔΟ Min']?f['ΕΜΒΑΔΟ Min']+' τ.μ.':'-'}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Max</div><div class="di-val">${f['ΕΜΒΑΔΟ Max']?f['ΕΜΒΑΔΟ Max']+' τ.μ.':'-'}</div></div>
+      <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['ΑΠΟΘΗΚΗ']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή Min</div><div class="di-val">${fmtEuro(f['ΤΙΜΗ Min'])}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή Max</div><div class="di-val">${fmtEuro(f['ΤΙΜΗ Max'])}</div></div>
+      <div class="di"><div class="di-lbl">Τρόπος Πληρωμής</div><div class="di-val">${arrVal(f['ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ'])}</div></div>
       <div class="di"><div class="di-lbl">Αξιολόγηση</div><div class="di-val">${ax?`<span class="badge ${axBadge[ax]||'b-gray'}">${ax}</span>`:''}</div></div>
-      ${f['Ειδικά Χαρακτηριστικά']?`<div class="di fspan"><div class="di-lbl">Ειδικά Χαρακτηριστικά</div><div class="di-val">${arrVal(f['Ειδικά Χαρακτηριστικά'])}</div></div>`:''}
-      <div class="di"><div class="di-lbl">Ημερομηνία</div><div class="di-val">${fmtDate(f['Ημερομηνία'])}</div></div>
+      ${f['ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ']?`<div class="di fspan"><div class="di-lbl">Ειδικά Χαρακτηριστικά</div><div class="di-val">${arrVal(f['ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ'])}</div></div>`:''}
+      <div class="di"><div class="di-lbl">Ημερομηνία</div><div class="di-val">${fmtDate(f['ΗΜΕΡΟΜΗΝΙΑ'])}</div></div>
       ${own&&f['ΠΕΛΑΤΗΣ']?`<div class="di"><div class="di-lbl">Πελάτης</div><div class="di-val">${f['ΠΕΛΑΤΗΣ']}</div></div>`:''}
       ${own&&f['ΤΗΛΕΦΩΝΟ']?`<div class="di"><div class="di-lbl">Τηλέφωνο</div><div class="di-val">${f['ΤΗΛΕΦΩΝΟ']}</div></div>`:''}
     </div>
@@ -1024,22 +1024,22 @@ function viewZi(id) {
         ${matchingAk.map(ak => {
         const sc = ak.score||0;
         const scColor = sc>=90?'#16a34a':sc>=75?'#2563eb':sc>=60?'#d97706':'#dc2626';
-        const stath = ak.fields['Θέση Στάθμευσης']||'';
+        const stath = ak.fields['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'';
         const stathIcon = {'Κλειστή':'🔒','Πυλωτή':'🏛️','Ανοιχτή':'🅿️','Ναί':'🅿️','Όχι':''}[stath]||'';
         return `
           <div onclick="CM();viewAk('${ak.id}')" style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all var(--t);gap:10px"
             onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
             <div style="flex:1">
-              <div style="font-size:13px;font-weight:600">${ak.fields['Περιοχή']||''} · ${ak.fields['Είδος ακινήτου']||''}</div>
+              <div style="font-size:13px;font-weight:600">${ak.fields['ΠΕΡΙΟΧΗ']||''} · ${ak.fields['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||''}</div>
               <div style="font-size:11px;color:var(--text3);margin-top:2px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                ${ak.fields['Εμβ. Μεικτό']?`<span>${ak.fields['Εμβ. Μεικτό']} τ.μ.</span>`:''}
-                ${ak.fields['Δωμάτια']?`<span>${ak.fields['Δωμάτια']} δωμ.</span>`:''}
+                ${ak.fields['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']?`<span>${ak.fields['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']} τ.μ.</span>`:''}
+                ${ak.fields['ΔΩΜΑΤΙΑ']?`<span>${ak.fields['ΔΩΜΑΤΙΑ']} δωμ.</span>`:''}
                 ${stathIcon?`<span>${stathIcon} ${stath}</span>`:''}
-                <span class="badge ${{'Διαθέσιμο':'b-green','Off Market':'b-gold'}[ak.fields['Status']]||'b-gray'}">${ak.fields['Status']||''}</span>
+                <span class="badge ${{'Διαθέσιμο':'b-green','Off Market':'b-gold'}[ak.fields['STATUS']]||'b-gray'}">${ak.fields['STATUS']||''}</span>
               </div>
             </div>
             <div style="text-align:right;flex-shrink:0">
-              <div style="font-size:14px;font-weight:700;color:var(--gold)">${fmtEuro(ak.fields['Τιμή'])}</div>
+              <div style="font-size:14px;font-weight:700;color:var(--gold)">${fmtEuro(ak.fields['ΤΙΜΗ'])}</div>
               <div style="font-size:11px;font-weight:700;color:${scColor};margin-top:2px">${sc}% match</div>
             </div>
           </div>`;}).join('')}
@@ -1054,17 +1054,17 @@ function viewZi(id) {
 
 // Live matching with scoring
 function findMatchingAk(zf) {
-  const zPer = Array.isArray(zf['Περιοχή']) ? zf['Περιοχή'].map(x=>typeof x==='object'?x.name||x:x) : (zf['Περιοχή']?[zf['Περιοχή']]:[]);
-  const zEi = Array.isArray(zf['Είδος ακινήτου']) ? zf['Είδος ακινήτου'].map(x=>typeof x==='object'?x.name||x:x) : (zf['Είδος ακινήτου']?[zf['Είδος ακινήτου']]:[]);
-  const tMin = parseFloat(zf['Τιμή Min'])||0;
-  const tMax = parseFloat(zf['Τιμή Max'])||999999999;
-  const emvMin = parseFloat(zf['Εμβαδό Min'])||0;
-  const emvMax = parseFloat(zf['Εμβαδό Max'])||999999;
-  const zDom = zf['Δωμάτια']||'';
-  const zEtosApo = parseInt(zf['Από έτος'])||0;
-  const zEtosEos = parseInt(zf['Έως έτος'])||9999;
-  const zStath = zf['Θέση Στάθμευσης']||'';
-  const zApothiki = zf['Αποθήκη']||'';
+  const zPer = Array.isArray(zf['ΠΕΡΙΟΧΗ']) ? zf['ΠΕΡΙΟΧΗ'].map(x=>typeof x==='object'?x.name||x:x) : (zf['ΠΕΡΙΟΧΗ']?[zf['ΠΕΡΙΟΧΗ']]:[]);
+  const zEi = Array.isArray(zf['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']) ? zf['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'].map(x=>typeof x==='object'?x.name||x:x) : (zf['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']?[zf['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']]:[]);
+  const tMin = parseFloat(zf['ΤΙΜΗ Min'])||0;
+  const tMax = parseFloat(zf['ΤΙΜΗ Max'])||999999999;
+  const emvMin = parseFloat(zf['ΕΜΒΑΔΟ Min'])||0;
+  const emvMax = parseFloat(zf['ΕΜΒΑΔΟ Max'])||999999;
+  const zDom = zf['ΔΩΜΑΤΙΑ']||'';
+  const zEtosApo = parseInt(zf['ΑΠΟ ΕΤΟΣ'])||0;
+  const zEtosEos = parseInt(zf['ΕΩΣ ΕΤΟΣ'])||9999;
+  const zStath = zf['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'';
+  const zApothiki = zf['ΑΠΟΘΗΚΗ']||'';
 
   // Parking score map
   const stathScore = { 'Κλειστή': 15, 'Πυλωτή': 10, 'Ανοιχτή': 5, 'Ναί': 5, 'Όχι': 0 };
@@ -1073,12 +1073,12 @@ function findMatchingAk(zf) {
 
   DB.ak.forEach(r => {
     const f = r.fields;
-    if (f['Status']!=='Διαθέσιμο' && f['Status']!=='Off Market') return;
+    if (f['STATUS']!=='Διαθέσιμο' && f['STATUS']!=='Off Market') return;
 
     // PRIMARY CHECK — must pass all 3
-    const perMatch = zPer.length===0 || zPer.includes(f['Περιοχή']);
-    const eiMatch = zEi.length===0 || zEi.includes(f['Είδος ακινήτου']);
-    const timi = parseFloat(f['Τιμή'])||0;
+    const perMatch = zPer.length===0 || zPer.includes(f['ΠΕΡΙΟΧΗ']);
+    const eiMatch = zEi.length===0 || zEi.includes(f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']);
+    const timi = parseFloat(f['ΤΙΜΗ'])||0;
     const timiMatch = timi>=tMin && timi<=tMax;
     if (!perMatch || !eiMatch || !timiMatch) return;
 
@@ -1086,21 +1086,21 @@ function findMatchingAk(zf) {
     let score = 50; // base: passed primary check (Περιοχή 20% + Είδος 20% + Τιμή 10%)
 
     // Εμβαδό (10%)
-    const emv = parseFloat(f['Εμβ. Μεικτό'])||0;
+    const emv = parseFloat(f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ'])||0;
     if (emvMin>0||emvMax<999999) {
       if (emv>=emvMin && emv<=emvMax) score += 10;
     } else score += 10;
 
     // Δωμάτια (10%)
-    if (!zDom || f['Δωμάτια']===zDom) score += 10;
+    if (!zDom || f['ΔΩΜΑΤΙΑ']===zDom) score += 10;
 
     // Έτος Κατασκευής (10%)
-    const etos = parseInt(f['Έτος κατασκευής'])||0;
+    const etos = parseInt(f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ'])||0;
     if (zEtosApo===0&&zEtosEos===9999) score += 10;
     else if (etos>=zEtosApo && etos<=zEtosEos) score += 10;
 
     // Θέση Στάθμευσης (15%) — σημαντικό κριτήριο
-    const aStath = f['Θέση Στάθμευσης']||'Όχι';
+    const aStath = f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'Όχι';
     if (!zStath || zStath==='') {
       // Ζήτηση δεν έχει προτίμηση — bonus αν έχει στάθμευση
       score += stathScore[aStath]||0;
@@ -1113,7 +1113,7 @@ function findMatchingAk(zf) {
     }
 
     // Αποθήκη (5%)
-    if (!zApothiki || zApothiki==='Όχι' || f['Αποθήκη']===true) score += 5;
+    if (!zApothiki || zApothiki==='Όχι' || f['ΑΠΟΘΗΚΗ']===true) score += 5;
 
     results.push({ ...r, score: Math.min(score, 100) });
   });
@@ -1131,33 +1131,33 @@ async function openZiForm(id=null) {
   const uid = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : '';
   const today = new Date().toISOString().split('T')[0];
   // Get options from both ΑΚΙΝΗΤΑ and ΖΗΤΗΣΕΙΣ to ensure all options show
-  const perioches = uniq([...getOpts('Περιοχή','ak'),...getOpts('Περιοχή','zi').flat()]);
-  const eidi = uniq([...getOpts('Είδος ακινήτου','ak'),...getOpts('Είδος ακινήτου','zi').flat()]);
-  const selPer = Array.isArray(f['Περιοχή']) ? f['Περιοχή'].map(x=>typeof x==='object'?x.name||x:x) : (f['Περιοχή']?[f['Περιοχή']]:[]);
-  const selEi = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'].map(x=>typeof x==='object'?x.name||x:x) : (f['Είδος ακινήτου']?[f['Είδος ακινήτου']]:[]);
-  const selOr = Array.isArray(f['Όροφος']) ? f['Όροφος'].map(x=>typeof x==='object'?x.name||x:x) : (f['Όροφος']?[f['Όροφος']]:[]);
-  const selTr = Array.isArray(f['Τρόπος Πληρωμής']) ? f['Τρόπος Πληρωμής'].map(x=>typeof x==='object'?x.name||x:x) : [];
-  const selXar = Array.isArray(f['Ειδικά Χαρακτηριστικά']) ? f['Ειδικά Χαρακτηριστικά'].map(x=>typeof x==='object'?x.name||x:x) : [];
-  const xarOpts = uniq([...getOpts('Ειδικά Χαρακτηριστικά','zi'),...getOpts('Ειδικά Χαρακτηριστικά','ak')]);
-  const tropoOpts = uniq(['Μετρητά','Δάνειο Στεγαστικό','Home 2','Άλλο',...(getOpts('Τρόπος Πληρωμής','zi'))]);
+  const perioches = uniq([...getOpts('ΠΕΡΙΟΧΗ','ak'),...getOpts('ΠΕΡΙΟΧΗ','zi').flat()]);
+  const eidi = uniq([...getOpts('ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ','ak'),...getOpts('ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ','zi').flat()]);
+  const selPer = Array.isArray(f['ΠΕΡΙΟΧΗ']) ? f['ΠΕΡΙΟΧΗ'].map(x=>typeof x==='object'?x.name||x:x) : (f['ΠΕΡΙΟΧΗ']?[f['ΠΕΡΙΟΧΗ']]:[]);
+  const selEi = Array.isArray(f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']) ? f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'].map(x=>typeof x==='object'?x.name||x:x) : (f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']?[f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']]:[]);
+  const selOr = Array.isArray(f['ΟΡΟΦΟΣ']) ? f['ΟΡΟΦΟΣ'].map(x=>typeof x==='object'?x.name||x:x) : (f['ΟΡΟΦΟΣ']?[f['ΟΡΟΦΟΣ']]:[]);
+  const selTr = Array.isArray(f['ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ']) ? f['ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ'].map(x=>typeof x==='object'?x.name||x:x) : [];
+  const selXar = Array.isArray(f['ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ']) ? f['ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ'].map(x=>typeof x==='object'?x.name||x:x) : [];
+  const xarOpts = uniq([...getOpts('ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ','zi'),...getOpts('ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ','ak')]);
+  const tropoOpts = uniq(['Μετρητά','Δάνειο Στεγαστικό','Home 2','Άλλο',...(getOpts('ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ','zi'))]);
   const orofoi = ['Υπόγειο','Ημιυπόγειο','Ισόγειο','Ημιόροφος','Ανώγειο','1ος','2ος','3ος','4ος','5ος','6ος','7ος','8ος','9ος','Άλλο'];
 
   openModal(id?'✏️ Επεξεργασία Ζήτησης':'+ Νέα Ζήτηση', `
     <div class="fg">
-      <div class="f"><label>Ημερομηνία</label><input type="date" id="z_dt" value="${f['Ημερομηνία']||today}"></div>
-      <div class="f"><label>Agent</label><select id="z_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['Name']||u.fields['Email']}</option>`).join('')}</select></div>
+      <div class="f"><label>Ημερομηνία</label><input type="date" id="z_dt" value="${f['ΗΜΕΡΟΜΗΝΙΑ']||today}"></div>
+      <div class="f"><label>Agent</label><select id="z_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['NAME']||u.fields['EMAIL']}</option>`).join('')}</select></div>
       <div class="f fspan"><label>Περιοχή (πολλαπλή επιλογή)</label>${buildMS('z_per',perioches,selPer,true)}</div>
       <div class="f fspan"><label>Είδος Ακινήτου (πολλαπλή επιλογή)</label>${buildMS('z_ei',eidi,selEi,true)}</div>
-      <div class="f"><label>Από έτος</label><input type="number" id="z_ea" value="${f['Από έτος']||''}" placeholder="π.χ. 2000"></div>
-      <div class="f"><label>Έως έτος</label><input type="number" id="z_ee" value="${f['Έως έτος']||''}" placeholder="π.χ. 2015"></div>
-      <div class="f"><label>Δωμάτια</label><select id="z_do"><option value="">Επιλογή...</option>${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${f['Δωμάτια']===d?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="f"><label>Από έτος</label><input type="number" id="z_ea" value="${f['ΑΠΟ ΕΤΟΣ']||''}" placeholder="π.χ. 2000"></div>
+      <div class="f"><label>Έως έτος</label><input type="number" id="z_ee" value="${f['ΕΩΣ ΕΤΟΣ']||''}" placeholder="π.χ. 2015"></div>
+      <div class="f"><label>Δωμάτια</label><select id="z_do"><option value="">Επιλογή...</option>${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${f['ΔΩΜΑΤΙΑ']===d?'selected':''}>${d}</option>`).join('')}</select></div>
       <div class="f fspan"><label>Όροφος (πολλαπλή)</label>${buildMS('z_or',orofoi,selOr,false)}</div>
-      <div class="f"><label>Εμβαδό Min (τ.μ.)</label><input type="number" id="z_em1" value="${f['Εμβαδό Min']||''}" placeholder="π.χ. 70"></div>
-      <div class="f"><label>Εμβαδό Max (τ.μ.)</label><input type="number" id="z_em2" value="${f['Εμβαδό Max']||''}" placeholder="π.χ. 120"></div>
-      <div class="f"><label>Θέση Στάθμευσης</label><select id="z_sta"><option value="">-</option>${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${f['Θέση Στάθμευσης']===s?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div class="f"><label>Αποθήκη</label><select id="z_ap"><option value="">-</option>${['Όχι','Ναι','Ως Παρακολούθημα'].map(s=>`<option value="${s}" ${f['Αποθήκη']===s?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div class="f"><label>Τιμή Min (€)</label><input type="number" id="z_t1" value="${f['Τιμή Min']||''}" placeholder="π.χ. 100000"></div>
-      <div class="f"><label>Τιμή Max (€)</label><input type="number" id="z_t2" value="${f['Τιμή Max']||''}" placeholder="π.χ. 200000"></div>
+      <div class="f"><label>Εμβαδό Min (τ.μ.)</label><input type="number" id="z_em1" value="${f['ΕΜΒΑΔΟ Min']||''}" placeholder="π.χ. 70"></div>
+      <div class="f"><label>Εμβαδό Max (τ.μ.)</label><input type="number" id="z_em2" value="${f['ΕΜΒΑΔΟ Max']||''}" placeholder="π.χ. 120"></div>
+      <div class="f"><label>Θέση Στάθμευσης</label><select id="z_sta"><option value="">-</option>${['Όχι','Ναί','Ανοιχτή','Κλειστή','Πυλωτή'].map(s=>`<option value="${s}" ${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Αποθήκη</label><select id="z_ap"><option value="">-</option>${['Όχι','Ναι','Ως Παρακολούθημα'].map(s=>`<option value="${s}" ${f['ΑΠΟΘΗΚΗ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Τιμή Min (€)</label><input type="number" id="z_t1" value="${f['ΤΙΜΗ Min']||''}" placeholder="π.χ. 100000"></div>
+      <div class="f"><label>Τιμή Max (€)</label><input type="number" id="z_t2" value="${f['ΤΙΜΗ Max']||''}" placeholder="π.χ. 200000"></div>
       <div class="f fspan"><label>Τρόπος Πληρωμής</label>${buildMS('z_tr',tropoOpts,selTr,true)}</div>
       <div class="f fspan"><label>Ειδικά Χαρακτηριστικά</label>${buildMS('z_xar',xarOpts,selXar,true)}</div>
       <div class="f"><label>Αξιολόγηση</label><select id="z_ax"><option value="">-</option>${['HOT','MEDIUM','COLD'].map(s=>`<option value="${s}" ${f['ΑΞΙΟΛΟΓΗΣΗ']===s?'selected':''}>${s}</option>`).join('')}</select></div>
@@ -1173,21 +1173,21 @@ async function openZiForm(id=null) {
 async function saveZi(id) {
   const uid = document.getElementById('z_us').value;
   const fields = {
-    'Ημερομηνία': document.getElementById('z_dt').value||null,
-    'Περιοχή': getMS('z_per').map(v=>String(v).trim()).filter(Boolean),
-    'Είδος ακινήτου': getMS('z_ei').map(v=>String(v).trim()).filter(Boolean).slice(0,10),
-    'Από έτος': parseInt(document.getElementById('z_ea').value)||null,
-    'Έως έτος': parseInt(document.getElementById('z_ee').value)||null,
-    'Δωμάτια': document.getElementById('z_do').value||null,
-    'Όροφος': getMS('z_or'),
-    'Εμβαδό Min': parseFloat(document.getElementById('z_em1').value)||null,
-    'Εμβαδό Max': parseFloat(document.getElementById('z_em2').value)||null,
-    'Θέση Στάθμευσης': document.getElementById('z_sta').value||null,
-    'Αποθήκη': document.getElementById('z_ap').value||null,
-    'Τιμή Min': parseFloat(document.getElementById('z_t1').value)||null,
-    'Τιμή Max': parseFloat(document.getElementById('z_t2').value)||null,
-    'Τρόπος Πληρωμής': getMS('z_tr').map(v=>String(v).trim()).filter(Boolean),
-    'Ειδικά Χαρακτηριστικά': getMS('z_xar').map(v=>String(v).trim()).filter(Boolean),
+    'ΗΜΕΡΟΜΗΝΙΑ': document.getElementById('z_dt').value||null,
+    'ΠΕΡΙΟΧΗ': getMS('z_per').map(v=>String(v).trim()).filter(Boolean),
+    'ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ': getMS('z_ei').map(v=>String(v).trim()).filter(Boolean).slice(0,10),
+    'ΑΠΟ ΕΤΟΣ': parseInt(document.getElementById('z_ea').value)||null,
+    'ΕΩΣ ΕΤΟΣ': parseInt(document.getElementById('z_ee').value)||null,
+    'ΔΩΜΑΤΙΑ': document.getElementById('z_do').value||null,
+    'ΟΡΟΦΟΣ': getMS('z_or'),
+    'ΕΜΒΑΔΟ Min': parseFloat(document.getElementById('z_em1').value)||null,
+    'ΕΜΒΑΔΟ Max': parseFloat(document.getElementById('z_em2').value)||null,
+    'ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ': document.getElementById('z_sta').value||null,
+    'ΑΠΟΘΗΚΗ': document.getElementById('z_ap').value||null,
+    'ΤΙΜΗ Min': parseFloat(document.getElementById('z_t1').value)||null,
+    'ΤΙΜΗ Max': parseFloat(document.getElementById('z_t2').value)||null,
+    'ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ': getMS('z_tr').map(v=>String(v).trim()).filter(Boolean),
+    'ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ': getMS('z_xar').map(v=>String(v).trim()).filter(Boolean),
     'ΑΞΙΟΛΟΓΗΣΗ': document.getElementById('z_ax').value||null,
     'ΠΕΛΑΤΗΣ': document.getElementById('z_pe').value||null,
     'ΤΗΛΕΦΩΝΟ': document.getElementById('z_te').value||null,
@@ -1236,23 +1236,23 @@ function printZi(id) {
   </head><body>
   <h1>Ζήτηση</h1>
   <table>
-    <tr><td>Α/Α Ζήτησης</td><td>${f['Α/A Ζήτησης']||f['Α/A']||'-'}</td></tr>
+    <tr><td>Α/Α Ζήτησης</td><td>${f['Α/A ΖΗΤΗΣΗΣ']||f['Α/A ΖΗΤΗΣΗΣ']||'-'}</td></tr>
     <tr><td>Agent</td><td>${agentName}</td></tr>
-    <tr><td>Είδος Ακινήτου</td><td>${arrVal(f['Είδος ακινήτου'])}</td></tr>
-    <tr><td>Περιοχή</td><td>${arrVal(f['Περιοχή'])}</td></tr>
-    <tr><td>Δωμάτια</td><td>${f['Δωμάτια']||'-'}</td></tr>
-    <tr><td>Όροφος</td><td>${arrVal(f['Όροφος'])}</td></tr>
-    <tr><td>Από Έτος</td><td>${f['Από έτος']||'-'}</td></tr>
-    <tr><td>Έως Έτος</td><td>${f['Έως έτος']||'-'}</td></tr>
-    <tr><td>Εμβαδό Min</td><td>${f['Εμβαδό Min']?f['Εμβαδό Min']+' τ.μ.':'-'}</td></tr>
-    <tr><td>Εμβαδό Max</td><td>${f['Εμβαδό Max']?f['Εμβαδό Max']+' τ.μ.':'-'}</td></tr>
-    <tr><td>Τιμή Min</td><td>${fmtEuro(f['Τιμή Min'])}</td></tr>
-    <tr><td>Τιμή Max</td><td>${fmtEuro(f['Τιμή Max'])}</td></tr>
-    <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'-'}</td></tr>
-    <tr><td>Αποθήκη</td><td>${f['Αποθήκη']||'-'}</td></tr>
-    <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['Τρόπος Πληρωμής'])}</td></tr>
-    <tr><td>Ειδικά Χαρακτηριστικά</td><td>${arrVal(f['Ειδικά Χαρακτηριστικά'])}</td></tr>
-    <tr><td>Ημερομηνία</td><td>${fmtDate(f['Ημερομηνία'])}</td></tr>
+    <tr><td>Είδος Ακινήτου</td><td>${arrVal(f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'])}</td></tr>
+    <tr><td>Περιοχή</td><td>${arrVal(f['ΠΕΡΙΟΧΗ'])}</td></tr>
+    <tr><td>Δωμάτια</td><td>${f['ΔΩΜΑΤΙΑ']||'-'}</td></tr>
+    <tr><td>Όροφος</td><td>${arrVal(f['ΟΡΟΦΟΣ'])}</td></tr>
+    <tr><td>Από Έτος</td><td>${f['ΑΠΟ ΕΤΟΣ']||'-'}</td></tr>
+    <tr><td>Έως Έτος</td><td>${f['ΕΩΣ ΕΤΟΣ']||'-'}</td></tr>
+    <tr><td>Εμβαδό Min</td><td>${f['ΕΜΒΑΔΟ Min']?f['ΕΜΒΑΔΟ Min']+' τ.μ.':'-'}</td></tr>
+    <tr><td>Εμβαδό Max</td><td>${f['ΕΜΒΑΔΟ Max']?f['ΕΜΒΑΔΟ Max']+' τ.μ.':'-'}</td></tr>
+    <tr><td>Τιμή Min</td><td>${fmtEuro(f['ΤΙΜΗ Min'])}</td></tr>
+    <tr><td>Τιμή Max</td><td>${fmtEuro(f['ΤΙΜΗ Max'])}</td></tr>
+    <tr><td>Θέση Στάθμευσης</td><td>${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'-'}</td></tr>
+    <tr><td>Αποθήκη</td><td>${f['ΑΠΟΘΗΚΗ']||'-'}</td></tr>
+    <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ'])}</td></tr>
+    <tr><td>Ειδικά Χαρακτηριστικά</td><td>${arrVal(f['ΕΙΔΙΚΑ ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ'])}</td></tr>
+    <tr><td>Ημερομηνία</td><td>${fmtDate(f['ΗΜΕΡΟΜΗΝΙΑ'])}</td></tr>
     <tr><td>Αξιολόγηση</td><td>${f['ΑΞΙΟΛΟΓΗΣΗ']||'-'}</td></tr>
     ${own&&f['ΠΕΛΑΤΗΣ']?`<tr><td>Πελάτης</td><td>${f['ΠΕΛΑΤΗΣ']}</td></tr>`:''}
     ${own&&f['ΤΗΛΕΦΩΝΟ']?`<tr><td>Τηλέφωνο</td><td>${f['ΤΗΛΕΦΩΝΟ']}</td></tr>`:''}
@@ -1267,7 +1267,7 @@ function printZi(id) {
 function viberZi(id) {
   const rec = DB.zi.find(r=>r.id===id); if(!rec) return;
   const f = rec.fields;
-  const t = `Ζήτηση Ακινήτου\nΠεριοχή: ${arrVal(f['Περιοχή'])}\nΕίδος: ${arrVal(f['Είδος ακινήτου'])}\nΤιμή: ${fmtEuro(f['Τιμή Min'])} - ${fmtEuro(f['Τιμή Max'])}\nΔωμάτια: ${f['Δωμάτια']||'-'}`;
+  const t = `Ζήτηση Ακινήτου\nΠεριοχή: ${arrVal(f['ΠΕΡΙΟΧΗ'])}\nΕίδος: ${arrVal(f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ'])}\nΤιμή: ${fmtEuro(f['ΤΙΜΗ Min'])} - ${fmtEuro(f['ΤΙΜΗ Max'])}\nΔωμάτια: ${f['ΔΩΜΑΤΙΑ']||'-'}`;
   window.open(`viber://forward?text=${encodeURIComponent(t)}`);
 }
 
@@ -1383,16 +1383,16 @@ function renderMaCards(recs) {
     const cls = sc>=90?'s90':sc>=80?'s80':sc>=70?'s70':'s60';
     return `<div class="sc" onclick="viewMa('${r.id}')">
       <div class="sc-head">
-        <div class="sc-info"><div class="sc-per">${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||'-'}</div><div class="sc-eid">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||'-'}</div></div>
+        <div class="sc-info"><div class="sc-per">${f['ΠΕΡΙΟΧΗ']||f['ΠΕΡΙΟΧΗ']||'-'}</div><div class="sc-eid">${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}</div></div>
         <div class="sc-circle ${cls}"><span>${sc}%</span><span class="sc-lbl">match</span></div>
       </div>
       <div class="sc-body">
-        <div class="sc-timi">${fmtEuro(f['Τιμή'])}</div>
+        <div class="sc-timi">${fmtEuro(f['ΤΙΜΗ'])}</div>
         <div class="sc-dets">
-          <div><div class="sc-dl">Εμβαδό</div><div class="sc-dv">${f['Εμβαδό']||f['Εμβ. Μεικτό']||'-'} τ.μ.</div></div>
-          <div><div class="sc-dl">Δωμάτια</div><div class="sc-dv">${f['ΔΩΜΑΤΙΑ']||f['Δωμάτια']||'-'}</div></div>
-          <div><div class="sc-dl">Έτος</div><div class="sc-dv">${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||f['Έτος κατασκευής']||'-'}</div></div>
-          <div><div class="sc-dl">Στάθμευση</div><div class="sc-dv">${f['Θέση Στάθμευσης']||'-'}</div></div>
+          <div><div class="sc-dl">Εμβαδό</div><div class="sc-dv">${f['Εμβαδό']||f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']||'-'} τ.μ.</div></div>
+          <div><div class="sc-dl">Δωμάτια</div><div class="sc-dv">${f['ΔΩΜΑΤΙΑ']||f['ΔΩΜΑΤΙΑ']||'-'}</div></div>
+          <div><div class="sc-dl">Έτος</div><div class="sc-dv">${f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']||'-'}</div></div>
+          <div><div class="sc-dl">Στάθμευση</div><div class="sc-dv">${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'-'}</div></div>
         </div>
         <div class="prog"><div class="prog-fill" style="width:${sc}%"></div></div>
         <div style="font-size:11px;color:var(--text3);margin-top:6px">${fmtDate(f['Ημερομηνία Matching'])}</div>
@@ -1425,19 +1425,19 @@ function viewMa(id) {
 
   openModal('🏢 Matching Ακίνητο', `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <div><div style="font-size:18px;font-weight:700">${g('Περιοχή')||f['ΠΕΡΙΟΧΗ']||'-'}</div><div style="color:var(--text2)">${g('Είδος ακινήτου')||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}</div></div>
-      <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:var(--gold)">${fmtEuro(g('Τιμή')||f['Τιμή'])}</div></div>
+      <div><div style="font-size:18px;font-weight:700">${g('ΠΕΡΙΟΧΗ')||f['ΠΕΡΙΟΧΗ']||'-'}</div><div style="color:var(--text2)">${g('ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ')||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}</div></div>
+      <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:var(--gold)">${fmtEuro(g('ΤΙΜΗ')||f['ΤΙΜΗ'])}</div></div>
     </div>
     <div class="dg">
-      ${[['Εμβαδό Μεικτό',(g('Εμβ. Μεικτό')||f['Εμβαδό'])&&((g('Εμβ. Μεικτό')||f['Εμβαδό'])+' τ.μ.')],
-         ['Δωμάτια',g('Δωμάτια')||f['ΔΩΜΑΤΙΑ']],
-         ['Έτος Κατ/σης',g('Έτος κατασκευής')||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']],
-         ['Όροφος',g('Όροφος')],
-         ['Θέση Στάθμευσης',g('Θέση Στάθμευσης')||f['Θέση Στάθμευσης']],
-         ['Ασανσέρ',(g('Ασανσέρ'))!=null?(g('Ασανσέρ')?'✅':'❌'):null],
-         ['Αποθήκη',(g('Αποθήκη'))!=null?(g('Αποθήκη')?'✅':'❌'):null],
-         ['Διεύθυνση',g('Διεύθυνση')],
-         ['Status',g('Status')],
+      ${[['Εμβαδό Μεικτό',(g('ΕΜΒΑΔΟ ΜΕΙΚΤΟ')||f['Εμβαδό'])&&((g('ΕΜΒΑΔΟ ΜΕΙΚΤΟ')||f['Εμβαδό'])+' τ.μ.')],
+         ['ΔΩΜΑΤΙΑ',g('ΔΩΜΑΤΙΑ')||f['ΔΩΜΑΤΙΑ']],
+         ['Έτος Κατ/σης',g('ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ')||f['ΕΤΟΣ ΚΑΤΑΣΚΕΥΗΣ']],
+         ['ΟΡΟΦΟΣ',g('ΟΡΟΦΟΣ')],
+         ['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ',g('ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ')||f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']],
+         ['ΑΣΑΝΣΕΡ',(g('ΑΣΑΝΣΕΡ'))!=null?(g('ΑΣΑΝΣΕΡ')?'✅':'❌'):null],
+         ['ΑΠΟΘΗΚΗ',(g('ΑΠΟΘΗΚΗ'))!=null?(g('ΑΠΟΘΗΚΗ')?'✅':'❌'):null],
+         ['ΔΙΕΥΘΥΝΣΗ',g('ΔΙΕΥΘΥΝΣΗ')],
+         ['STATUS',g('STATUS')],
       ].filter(([,v])=>v).map(([k,v])=>`<div class="di"><div class="di-lbl">${k}</div><div class="di-val">${v}</div></div>`).join('')}
     </div>
     <div style="margin-top:14px;padding:12px;background:var(--bg2);border-radius:var(--r2)">
@@ -1460,12 +1460,12 @@ function printMa(id) {
   </head><body>
   <h1>Matching Ακίνητο <span class="score">${f['Σκορ %']||0}%</span></h1>
   <table>
-    <tr><td>Περιοχή</td><td>${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||'-'}</td></tr>
-    <tr><td>Είδος</td><td>${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||'-'}</td></tr>
-    <tr><td>Τιμή</td><td>${fmtEuro(f['Τιμή'])}</td></tr>
-    <tr><td>Εμβαδό</td><td>${f['Εμβαδό']||f['Εμβ. Μεικτό']||'-'} τ.μ.</td></tr>
-    <tr><td>Δωμάτια</td><td>${f['ΔΩΜΑΤΙΑ']||f['Δωμάτια']||'-'}</td></tr>
-    <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'-'}</td></tr>
+    <tr><td>Περιοχή</td><td>${f['ΠΕΡΙΟΧΗ']||f['ΠΕΡΙΟΧΗ']||'-'}</td></tr>
+    <tr><td>Είδος</td><td>${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||'-'}</td></tr>
+    <tr><td>Τιμή</td><td>${fmtEuro(f['ΤΙΜΗ'])}</td></tr>
+    <tr><td>Εμβαδό</td><td>${f['Εμβαδό']||f['ΕΜΒΑΔΟ ΜΕΙΚΤΟ']||'-'} τ.μ.</td></tr>
+    <tr><td>Δωμάτια</td><td>${f['ΔΩΜΑΤΙΑ']||f['ΔΩΜΑΤΙΑ']||'-'}</td></tr>
+    <tr><td>Θέση Στάθμευσης</td><td>${f['ΘΕΣΗ ΣΤΑΘΜΕΥΣΗΣ']||'-'}</td></tr>
     <tr><td>Ημερομηνία Matching</td><td>${fmtDate(f['Ημερομηνία Matching'])}</td></tr>
   </table>
   <div style="margin-top:16px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:10px">Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</div>
@@ -1477,7 +1477,7 @@ function printMa(id) {
 function viberMa(id) {
   const ma=DB.ma.find(r=>r.id===id); if(!ma) return;
   const f=ma.fields;
-  window.open(`viber://forward?text=${encodeURIComponent(`Matching Ακίνητο\n${f['ΠΕΡΙΟΧΗ']||f['Περιοχή']||''} · ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['Είδος ακινήτου']||''}\n${fmtEuro(f['Τιμή'])}\nScore: ${f['Σκορ %']}%`)}`);
+  window.open(`viber://forward?text=${encodeURIComponent(`Matching Ακίνητο\n${f['ΠΕΡΙΟΧΗ']||f['ΠΕΡΙΟΧΗ']||''} · ${f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||f['ΕΙΔΟΣ ΑΚΙΝΗΤΟΥ']||''}\n${fmtEuro(f['ΤΙΜΗ'])}\nScore: ${f['Σκορ %']}%`)}`);
 }
 
 // ── ΚΑΤΑΣΚΕΥΑΣΤΕΣ ─────────────────────────────────────────────
@@ -1494,7 +1494,7 @@ function pgKa(C2, A) {
 function renderKaRows(recs) {
   const tb=document.getElementById('kaBody'); if(!tb) return;
   if(!recs.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="empty-ic">🔧</div><div class="empty-tx">Δεν βρέθηκαν</div></div></td></tr>`;return;}
-  tb.innerHTML=recs.map(r=>{const f=r.fields;return`<tr onclick="viewKa('${r.id}')"><td><strong>${f['Name']||'-'}</strong></td><td>${f['Phone']||f['Τηλέφωνο']||'-'}</td><td>${f['Email']||'-'}</td><td>${f['Περιοχή']||'-'}</td><td>${f['Ειδικότητα']||'-'}</td></tr>`;}).join('');
+  tb.innerHTML=recs.map(r=>{const f=r.fields;return`<tr onclick="viewKa('${r.id}')"><td><strong>${f['Name']||'-'}</strong></td><td>${f['Phone']||f['Τηλέφωνο']||'-'}</td><td>${f['Email']||'-'}</td><td>${f['ΠΕΡΙΟΧΗ']||'-'}</td><td>${f['Ειδικότητα']||'-'}</td></tr>`;}).join('');
 }
 function filterKa(){const s=(document.getElementById('kaSrch')?.value||'').toLowerCase();renderKaRows(s?DB.ka.filter(x=>JSON.stringify(x.fields).toLowerCase().includes(s)):DB.ka);}
 function viewKa(id){
@@ -1507,16 +1507,16 @@ function viewKa(id){
 async function openKaForm(id=null){
   const rec=id?DB.ka.find(r=>r.id===id):null,f=rec?.fields||{};
   openModal(id?'✏️ Επεξεργασία':'+ Νέος Κατασκευαστής',`<div class="fg">
-    <div class="f fspan"><label>Όνομα</label><input type="text" id="k_n" value="${f['Name']||''}"></div>
-    <div class="f"><label>Τηλέφωνο</label><input type="tel" id="k_p" value="${f['Phone']||f['Τηλέφωνο']||''}"></div>
+    <div class="f fspan"><label>Όνομα</label><input type="text" id="k_n" value="${f['ΟΝΟΜΑΤΕΠΩΝΥΜΟ']||''}""></div>
+    <div class="f"><label>Τηλέφωνο</label><input type="tel" id="k_p" value="${f['KINHTO']||''}""></div>
     <div class="f"><label>Email</label><input type="email" id="k_e" value="${f['Email']||''}"></div>
-    <div class="f"><label>Περιοχή</label><input type="text" id="k_pe" value="${f['Περιοχή']||''}"></div>
-    <div class="f"><label>Ειδικότητα</label><input type="text" id="k_ei" value="${f['Ειδικότητα']||''}"></div>
-    <div class="f fspan"><label>Σημειώσεις</label><textarea id="k_no" rows="2">${f['Σημειώσεις']||''}</textarea></div>
+    <div class="f"><label>Περιοχή</label><input type="text" id="k_pe" value="${f['ΠΕΡΙΟΧΗ']||''}"></div>
+    <div class="f"><label>Ειδικότητα</label><input type="text" id="k_ei" value="${f['ΚΑΤΗΓΟΡΙΑ']||''}""></div>
+    <div class="f fspan"><label>Σημειώσεις</label><textarea id="k_no" rows="2">${f['ΣΗΜΕΙΩΣΕΙΣ']||''}</textarea></div>
   </div>`,`<button class="btn btn-out" onclick="CM()">Ακύρωση</button><button class="btn btn-dark" onclick="saveKa('${id||''}')">💾</button>`);
 }
 async function saveKa(id){
-  const f={'Name':document.getElementById('k_n').value,'Phone':document.getElementById('k_p').value,'Email':document.getElementById('k_e').value,'Περιοχή':document.getElementById('k_pe').value,'Ειδικότητα':document.getElementById('k_ei').value,'Σημειώσεις':document.getElementById('k_no').value};
+  const f={'Name':document.getElementById('k_n').value,'Phone':document.getElementById('k_p').value,'Email':document.getElementById('k_e').value,'ΠΕΡΙΟΧΗ':document.getElementById('k_pe').value,'Ειδικότητα':document.getElementById('k_ei').value,'ΣΗΜΕΙΩΣΕΙΣ':document.getElementById('k_no').value};
   Object.keys(f).forEach(k=>!f[k]&&delete f[k]);
   load(true);
   try{if(id){await updateR(C.T.KA,id,f);toast('Αποθηκεύτηκε!','s');}else{await createR(C.T.KA,f);toast('Δημιουργήθηκε!','s');}CM();await loadAll();pgKa(document.getElementById('pgContent'),document.getElementById('tbRight'));}
@@ -1549,7 +1549,7 @@ async function openUsForm(id=null){
 async function saveUs(id){
   const p=document.getElementById('u_p').value;
   const f={'Name':document.getElementById('u_n').value,'Email':document.getElementById('u_e').value,'Phone':document.getElementById('u_ph').value,'Role':document.getElementById('u_r').value};
-  if(p) f['Password']=p;
+  if(p) f['PASSWORD']=p;
   Object.keys(f).forEach(k=>!f[k]&&delete f[k]);
   load(true);
   try{if(id){await updateR(C.T.US,id,f);toast('Αποθηκεύτηκε!','s');}else{await createR(C.T.US,f);toast('Δημιουργήθηκε!','s');}CM();await loadAll();pgUs(document.getElementById('pgContent'),document.getElementById('tbRight'));}
