@@ -651,12 +651,15 @@ function renderAkRows(recs) {
   const cnt = document.getElementById('akCnt');
   if (!tb) return;
   if (cnt) cnt.textContent = ` (${recs.length})`;
-  if (!recs.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-ic">🏢</div><div class="empty-tx">Δεν βρέθηκαν ακίνητα</div></div></td></tr>`; return; }
+  if (!recs.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="empty-ic">🏢</div><div class="empty-tx">Δεν βρέθηκαν ακίνητα</div></div></td></tr>`; return; }
   const sc = { 'Διαθέσιμο':'b-green','Off Market':'b-gold','Πωλήθηκε':'b-gray','Αποσύρθηκε':'b-red' };
   tb.innerHTML = recs.map(r => {
     const f = r.fields;
+    const agentName = getAgentName(f);
+    const dt = fmtDate(f['Ημερομηνία']);
     return `<tr onclick="viewAk('${r.id}')">
       <td><strong>${f['Α/A']||'-'}</strong></td>
+      <td style="font-size:12px;color:var(--text3)">${dt}</td>
       <td>${f['Περιοχή']||'-'}</td>
       <td>${f['Είδος ακινήτου']||'-'}</td>
       <td><span class="badge ${sc[f['Status']]||'b-gray'}">${f['Status']||'-'}</span></td>
@@ -677,7 +680,7 @@ function filterAk() {
   if(st) r=r.filter(x=>x.fields['Status']===st);
   if(ei) r=r.filter(x=>x.fields['Είδος ακινήτου']===ei);
   if(pe) r=r.filter(x=>x.fields['Περιοχή']===pe);
-  renderAkRows(r);
+  r.sort((a,b)=>{ const da=parseDate(a.fields['Ημερομηνία'])||new Date(0); const db=parseDate(b.fields['Ημερομηνία'])||new Date(0); return db-da; }); renderAkRows(r);
 }
 
 function viewAk(id) {
@@ -715,8 +718,8 @@ function viewAk(id) {
       <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${f['Όροφος']||'-'}</div></div>
       <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['Δωμάτια']||'-'}</div></div>
       <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${f['Θέση Στάθμευσης']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Ασανσέρ</div><div class="di-val">${f['Ασανσέρ']?'✅ Ναί':'❌ Όχι'}</div></div>
-      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['Αποθήκη']?'✅ Ναί':'❌ Όχι'}</div></div>
+      <div class="di"><div class="di-lbl">Ασανσέρ</div><div class="di-val">${f['Ασανσέρ']==='Ναι'?'✅ Ναι':f['Ασανσέρ']==='Οχι'?'❌ Οχι':'—'}</div></div>
+      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${f['Αποθήκη']==='Ναι'?'✅ Ναι':f['Αποθήκη']==='Οχι'?'❌ Οχι':f['Αποθήκη']||'—'}</div></div>
       <div class="di"><div class="di-lbl">Διεύθυνση</div><div class="di-val">${f['Διεύθυνση']||'-'}</div></div>
       <div class="di"><div class="di-lbl">Συνεργασίες</div><div class="di-val">${f['Συνεργασίες']||'-'}</div></div>
     </div>
@@ -741,8 +744,9 @@ async function openAkForm(id=null) {
   const today = new Date().toISOString().split('T')[0];
   const timi = f['Τιμή']||'', emv = f['Εμβ. Μεικτό']||'';
   const tm = timi&&emv ? (timi/emv).toFixed(2)+' €/τ.μ.' : '';
-  const perioches = getOpts('Περιοχή');
-  const eidi = getOpts('Είδος ακινήτου');
+  // Get options from both ΑΚΙΝΗΤΑ and ΖΗΤΗΣΕΙΣ to ensure all options show
+  const perioches = uniq([...getOpts('Περιοχή','ak'),...getOpts('Περιοχή','zi').flat()]);
+  const eidi = uniq([...getOpts('Είδος ακινήτου','ak'),...getOpts('Είδος ακινήτου','zi').flat()]);
   const statuses = uniq(['Διαθέσιμο','Off Market','Πωλήθηκε','Αποσύρθηκε',...getOpts('Status')]);
 
   openModal(id?'✏️ Επεξεργασία Ακινήτου':'+ Νέο Ακίνητο', `
@@ -763,9 +767,19 @@ async function openAkForm(id=null) {
       <div class="f"><label>Έτος Κατασκευής</label><input type="number" id="a_et" value="${f['Έτος κατασκευής']||''}" placeholder="π.χ. 2010"></div>
       <div class="f"><label>Διεύθυνση</label><input type="text" id="a_di" value="${f['Διεύθυνση']||''}" placeholder="Οδός αριθμός"></div>
       <div class="f"><label>Συνεργασίες</label><input type="text" id="a_si" value="${f['Συνεργασίες']||''}" placeholder="π.χ. Αποκλειστική"></div>
-      <div class="f" style="display:flex;gap:10px">
-        ${mkCk('a_as', 'Ασανσέρ', !!f['Ασανσέρ'])}
-        ${mkCk('a_ap', 'Αποθήκη', !!f['Αποθήκη'])}
+      <div class="f"><label>Ασανσέρ</label>
+        <select id="a_as">
+          <option value="">—</option>
+          <option value="Ναι" ${f['Ασανσέρ']==='Ναι'?'selected':''}>Ναι</option>
+          <option value="Οχι" ${f['Ασανσέρ']==='Οχι'?'selected':''}>Οχι</option>
+        </select>
+      </div>
+      <div class="f"><label>Αποθήκη</label>
+        <select id="a_ap">
+          <option value="">—</option>
+          <option value="Ναι" ${f['Αποθήκη']==='Ναι'?'selected':''}>Ναι</option>
+          <option value="Οχι" ${f['Αποθήκη']==='Οχι'?'selected':''}>Οχι</option>
+        </select>
       </div>
       <div class="f"><label>Φωτογραφίες</label><input type="file" id="a_ph" multiple accept="image/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)"></div>
       <div class="f"><label>Video</label><input type="file" id="a_vi" accept="video/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)"></div>
@@ -831,8 +845,8 @@ async function saveAk(id) {
     'Έτος κατασκευής': parseInt(document.getElementById('a_et').value)||null,
     'Διεύθυνση': document.getElementById('a_di').value||null,
     'Συνεργασίες': document.getElementById('a_si').value||null,
-    'Ασανσέρ': document.getElementById('a_as').checked,
-    'Αποθήκη': document.getElementById('a_ap').checked,
+    'Ασανσέρ': document.getElementById('a_as').value||null,
+    'Αποθήκη': document.getElementById('a_ap').value||null,
     'Σημειώσεις': document.getElementById('a_no').value||null,
   };
   if (uid) fields['User'] = [uid];
@@ -901,8 +915,8 @@ function printAk(id) {
     <tr><td>Δωμάτια</td><td>${f['Δωμάτια']||'-'}</td></tr>
     <tr><td>Εμβαδό Καθαρό</td><td>${f['Εμβαδό Καθαρό']?f['Εμβαδό Καθαρό']+' τ.μ.':'-'}</td></tr>
     <tr><td>Θέση Στάθμευσης</td><td>${f['Θέση Στάθμευσης']||'-'}</td></tr>
-    <tr><td>Ασανσέρ</td><td>${f['Ασανσέρ']?'Ναί':'Όχι'}</td></tr>
-    <tr><td>Αποθήκη</td><td>${f['Αποθήκη']?'Ναί':'Όχι'}</td></tr>
+    <tr><td>Ασανσέρ</td><td>${f['Ασανσέρ']||'—'}</td></tr>
+    <tr><td>Αποθήκη</td><td>${f['Αποθήκη']||'—'}</td></tr>
     <tr><td>Εκτίμηση</td><td>${fmtEuro(f['Εκτίμηση'])}</td></tr>
     <tr><td>Τρόπος Πληρωμής</td><td>${arrVal(f['Τρόπος Πληρωμής'])}</td></tr>
     <tr><td>Συνεργασίες</td><td>${f['Συνεργασίες']||'-'}</td></tr>
@@ -965,7 +979,7 @@ function renderZiRows(recs) {
 function filterZi() {
   const s=(document.getElementById('ziSrch')?.value||'').toLowerCase();
   let r=myZi(); if(s) r=r.filter(x=>JSON.stringify(x.fields).toLowerCase().includes(s));
-  renderZiRows(r);
+  r.sort((a,b)=>{ const da=parseDate(a.fields['Ημερομηνία'])||new Date(0); const db=parseDate(b.fields['Ημερομηνία'])||new Date(0); return db-da; }); renderZiRows(r);
 }
 
 function viewZi(id) {
@@ -984,8 +998,8 @@ function viewZi(id) {
       <div class="di"><div class="di-lbl">Agent</div><div class="di-val">${getAgentName(f)}</div></div>
       <div class="di"><div class="di-lbl">Περιοχή</div><div class="di-val">${arrVal(f['Περιοχή'])}</div></div>
       <div class="di"><div class="di-lbl">Είδος Ακινήτου</div><div class="di-val">${arrVal(f['Είδος ακινήτου'])}</div></div>
-      <div class="di"><div class="di-lbl">Από Έτος</div><div class="di-val">${f['Από Έτος']||'-'}</div></div>
-      <div class="di"><div class="di-lbl">Έως Έτος</div><div class="di-val">${f['Έως Έτος']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Από έτος</div><div class="di-val">${f['Από έτος']||'-'}</div></div>
+      <div class="di"><div class="di-lbl">Έως έτος</div><div class="di-val">${f['Έως έτος']||'-'}</div></div>
       <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${f['Δωμάτια']||'-'}</div></div>
       <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${arrVal(f['Όροφος'])}</div></div>
       <div class="di"><div class="di-lbl">Εμβαδό Min</div><div class="di-val">${f['Εμβαδό Min']?f['Εμβαδό Min']+' τ.μ.':'-'}</div></div>
@@ -1047,8 +1061,8 @@ function findMatchingAk(zf) {
   const emvMin = parseFloat(zf['Εμβαδό Min'])||0;
   const emvMax = parseFloat(zf['Εμβαδό Max'])||999999;
   const zDom = zf['Δωμάτια']||'';
-  const zEtosApo = parseInt(zf['Από Έτος'])||0;
-  const zEtosEos = parseInt(zf['Έως Έτος'])||9999;
+  const zEtosApo = parseInt(zf['Από έτος'])||0;
+  const zEtosEos = parseInt(zf['Έως έτος'])||9999;
   const zStath = zf['Θέση Στάθμευσης']||'';
   const zApothiki = zf['Αποθήκη']||'';
 
@@ -1116,8 +1130,9 @@ async function openZiForm(id=null) {
   load(false);
   const uid = Array.isArray(f['USER']||f['User']) ? (f['USER']||f['User'])[0] : '';
   const today = new Date().toISOString().split('T')[0];
-  const perioches = getOpts('Περιοχή');
-  const eidi = getOpts('Είδος ακινήτου');
+  // Get options from both ΑΚΙΝΗΤΑ and ΖΗΤΗΣΕΙΣ to ensure all options show
+  const perioches = uniq([...getOpts('Περιοχή','ak'),...getOpts('Περιοχή','zi').flat()]);
+  const eidi = uniq([...getOpts('Είδος ακινήτου','ak'),...getOpts('Είδος ακινήτου','zi').flat()]);
   const selPer = Array.isArray(f['Περιοχή']) ? f['Περιοχή'].map(x=>typeof x==='object'?x.name||x:x) : (f['Περιοχή']?[f['Περιοχή']]:[]);
   const selEi = Array.isArray(f['Είδος ακινήτου']) ? f['Είδος ακινήτου'].map(x=>typeof x==='object'?x.name||x:x) : (f['Είδος ακινήτου']?[f['Είδος ακινήτου']]:[]);
   const selOr = Array.isArray(f['Όροφος']) ? f['Όροφος'].map(x=>typeof x==='object'?x.name||x:x) : (f['Όροφος']?[f['Όροφος']]:[]);
@@ -1133,8 +1148,8 @@ async function openZiForm(id=null) {
       <div class="f"><label>Agent</label><select id="z_us"><option value="">-</option>${DB.us.map(u=>`<option value="${u.id}" ${u.id===uid?'selected':''}>${u.fields['Name']||u.fields['Email']}</option>`).join('')}</select></div>
       <div class="f fspan"><label>Περιοχή (πολλαπλή επιλογή)</label>${buildMS('z_per',perioches,selPer,true)}</div>
       <div class="f fspan"><label>Είδος Ακινήτου (πολλαπλή επιλογή)</label>${buildMS('z_ei',eidi,selEi,true)}</div>
-      <div class="f"><label>Από Έτος</label><input type="number" id="z_ea" value="${f['Από Έτος']||''}" placeholder="π.χ. 2000"></div>
-      <div class="f"><label>Έως Έτος</label><input type="number" id="z_ee" value="${f['Έως Έτος']||''}" placeholder="π.χ. 2015"></div>
+      <div class="f"><label>Από έτος</label><input type="number" id="z_ea" value="${f['Από έτος']||''}" placeholder="π.χ. 2000"></div>
+      <div class="f"><label>Έως έτος</label><input type="number" id="z_ee" value="${f['Έως έτος']||''}" placeholder="π.χ. 2015"></div>
       <div class="f"><label>Δωμάτια</label><select id="z_do"><option value="">Επιλογή...</option>${['Μονόχωρο','1','2','3','4+'].map(d=>`<option value="${d}" ${f['Δωμάτια']===d?'selected':''}>${d}</option>`).join('')}</select></div>
       <div class="f fspan"><label>Όροφος (πολλαπλή)</label>${buildMS('z_or',orofoi,selOr,false)}</div>
       <div class="f"><label>Εμβαδό Min (τ.μ.)</label><input type="number" id="z_em1" value="${f['Εμβαδό Min']||''}" placeholder="π.χ. 70"></div>
@@ -1160,9 +1175,9 @@ async function saveZi(id) {
   const fields = {
     'Ημερομηνία': document.getElementById('z_dt').value||null,
     'Περιοχή': getMS('z_per').map(v=>String(v).trim()).filter(Boolean),
-    'Είδος ακινήτου': getMS('z_ei').map(v=>String(v).trim()).filter(Boolean),
-    'Από Έτος': parseInt(document.getElementById('z_ea').value)||null,
-    'Έως Έτος': parseInt(document.getElementById('z_ee').value)||null,
+    'Είδος ακινήτου': getMS('z_ei').map(v=>String(v).trim()).filter(Boolean).slice(0,10),
+    'Από έτος': parseInt(document.getElementById('z_ea').value)||null,
+    'Έως έτος': parseInt(document.getElementById('z_ee').value)||null,
     'Δωμάτια': document.getElementById('z_do').value||null,
     'Όροφος': getMS('z_or'),
     'Εμβαδό Min': parseFloat(document.getElementById('z_em1').value)||null,
@@ -1186,7 +1201,12 @@ async function saveZi(id) {
     if (id) { await updateR(C.T.ZI,id,fields); toast('Αποθηκεύτηκε!','s'); }
     else { await createR(C.T.ZI,fields); toast('Δημιουργήθηκε!','s'); }
     CM(); await loadAll(); pgZi(document.getElementById('pgContent'),document.getElementById('tbRight'));
-  } catch(e) { console.error(e); toast('Σφάλμα: '+(JSON.parse(e.message||'{}')?.message||e.message),'e'); }
+  } catch(e) {
+    console.error(e);
+    let msg = 'Σφάλμα αποθήκευσης';
+    try { const err = JSON.parse(e.message); msg = err.message || msg; } catch(_) {}
+    toast(msg,'e');
+  }
   load(false);
 }
 
@@ -1222,8 +1242,8 @@ function printZi(id) {
     <tr><td>Περιοχή</td><td>${arrVal(f['Περιοχή'])}</td></tr>
     <tr><td>Δωμάτια</td><td>${f['Δωμάτια']||'-'}</td></tr>
     <tr><td>Όροφος</td><td>${arrVal(f['Όροφος'])}</td></tr>
-    <tr><td>Από Έτος</td><td>${f['Από Έτος']||'-'}</td></tr>
-    <tr><td>Έως Έτος</td><td>${f['Έως Έτος']||'-'}</td></tr>
+    <tr><td>Από Έτος</td><td>${f['Από έτος']||'-'}</td></tr>
+    <tr><td>Έως Έτος</td><td>${f['Έως έτος']||'-'}</td></tr>
     <tr><td>Εμβαδό Min</td><td>${f['Εμβαδό Min']?f['Εμβαδό Min']+' τ.μ.':'-'}</td></tr>
     <tr><td>Εμβαδό Max</td><td>${f['Εμβαδό Max']?f['Εμβαδό Max']+' τ.μ.':'-'}</td></tr>
     <tr><td>Τιμή Min</td><td>${fmtEuro(f['Τιμή Min'])}</td></tr>
