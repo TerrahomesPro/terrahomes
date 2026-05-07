@@ -529,10 +529,23 @@ function pgHome(C2, A) {
   const now = new Date();
   const days30 = new Date(now - 30*24*60*60*1000);
   const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const newAk30 = ak.filter(r => { const d=r.fields['Ημερομηνία']||r.fields['Created Time']; return d&&new Date(d)>=days30; }).length;
-  const newZi30 = DB.zi.filter(r => { const d=r.fields['Ημερομηνία']||r.fields['Created Time']; return d&&new Date(d)>=days30; }).length;
-  const poulimenа = DB.ak.filter(r => { if(r.fields['Status']!=='Πουλήθηκε') return false; const d=r.fields['Ημερομηνία']||r.fields['Created Time']; return d&&new Date(d)>=startOfYear; }).length;
-  const maktika = ak.filter(r => { if(r.fields['Status']!=='Διαθέσιμο'&&r.fields['Status']!=='Off Market') return false; const d=r.fields['Ημερομηνία']||r.fields['Created Time']; if(!d) return false; return (now-new Date(d))/(24*60*60*1000)>90; });
+  // Parse date handling DD/MM/YYYY and ISO formats
+  function parseDate(d) {
+    if (!d) return null;
+    if (typeof d === 'string' && d.includes('/')) {
+      const parts = d.split('/');
+      if (parts.length === 3) {
+        // DD/MM/YYYY
+        return new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+      }
+    }
+    const dt = new Date(d);
+    return isNaN(dt) ? null : dt;
+  }
+  const newAk30 = ak.filter(r => { const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=days30; }).length;
+  const newZi30 = DB.zi.filter(r => { const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=days30; }).length;
+  const poulimenа = DB.ak.filter(r => { if(r.fields['Status']!=='Πουλήθηκε') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); return d&&d>=startOfYear; }).length;
+  const maktika = ak.filter(r => { if(r.fields['Status']!=='Διαθέσιμο'&&r.fields['Status']!=='Off Market') return false; const d=parseDate(r.fields['Ημερομηνία']||r.fields['Created Time']); if(!d) return false; return (now-d)/(24*60*60*1000)>90; });
 
   const agentsH = ME.role==='admin' ? DB.us.map(u => {
     const cnt = DB.ak.filter(r => Array.isArray(r.fields['User']) && r.fields['User'].includes(u.id)).length;
