@@ -811,6 +811,7 @@ function viewAk(id) {
     ${extraPhotos?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Φωτογραφίες</div><div style="display:flex;flex-wrap:wrap;gap:6px">${extraPhotos}</div></div>`:''}
   `,`
     <button class="btn btn-out btn-sm" onclick="printAk('${id}')">📄 PDF</button>
+    <button class="btn btn-out btn-sm" onclick="CM();openIpodiksiQR('${id}')">📲 QR Υπόδειξης</button>
     <button class="btn btn-out btn-sm" onclick="viberAk('${id}')">💬 Viber</button>
     ${own?`<button class="btn btn-err btn-sm" onclick="delAk('${id}')">🗑️</button><button class="btn btn-dark btn-sm" onclick="CM();openAkForm('${id}')">✏️ Επεξεργασία</button>`:''}
   `);
@@ -2015,4 +2016,158 @@ window.addEventListener('load', async()=>{
 });
 </script>
 </body>
+  <!--
+════════════════════════════════════════════════════════
+ΟΔΗΓΙΕΣ ΕΓΚΑΤΑΣΤΑΣΗΣ
+
+Βήμα 1: Βρες στο terrahomes.html αυτή τη γραμμή:
+    <button class="btn btn-out btn-sm" onclick="printAk('${id}')">📄 PDF</button>
+
+Και αντικατέστησέ την με:
+    <button class="btn btn-out btn-sm" onclick="printAk('${id}')">📄 PDF</button>
+    <button class="btn btn-out btn-sm" onclick="CM();openIpodiksiQR('${id}')">📲 QR Υπόδειξης</button>
+
+Βήμα 2: Πρόσθεσε αυτό το <script> πριν το </body> του terrahomes.html
+════════════════════════════════════════════════════════
+-->
+
+<script>
+// ════════════════════════════════════════════
+// ΡΥΘΜΙΣΗ — Αλλάξτε το URL με το δικό σας Netlify
+// ════════════════════════════════════════════
+const IPODIKSI_FORM_URL = 'https://soft-mermaid-9d5952.netlify.app/ipodiksi-form-v2';
+
+// ════════════════════════════════════════════
+// Φόρτωση QR Library
+// ════════════════════════════════════════════
+(function(){
+  if(window.QRCode) return;
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  document.head.appendChild(s);
+})();
+
+// ════════════════════════════════════════════
+// Άνοιγμα modal QR για συγκεκριμένο ακίνητο
+// ════════════════════════════════════════════
+function openIpodiksiQR(akId) {
+  const r = DB.ak.find(x => x.id === akId);
+  if (!r) return;
+
+  // Βρες τα στοιχεία του agent
+  const agentObj = DB.users ? DB.users.find(u => u.id === r.user_id) : null;
+  const agentName  = agentObj ? (agentObj.full_name || agentObj.email) : (ME?.full_name || '');
+  const agentEmail = agentObj ? agentObj.email : (ME?.email || 'ksaris1@hotmail.com');
+
+  // Δόμησε το URL με παραμέτρους ακινήτου
+  const params = new URLSearchParams();
+  if (r.aa || r.id)        params.set('pid',   r.aa || r.id);
+  if (r.periochi)          params.set('addr',  r.periochi + (r.diefthinsi ? ', ' + r.diefthinsi : ''));
+  if (r.eidos)             params.set('type',  r.eidos);
+  if (r.timi)              params.set('price', fmtEuro(r.timi));
+  if (r.emvado_meikto)     params.set('area',  r.emvado_meikto);
+  if (r.domatia)           params.set('rooms', r.domatia + ' δωμ.');
+  if (r.orofos)            params.set('floor', r.orofos);
+  if (agentName)           params.set('agent', agentName);
+  if (agentEmail)          params.set('aemail',agentEmail);
+  params.set('date',  new Date().toLocaleDateString('el-GR'));
+  params.set('office','TERRA HOMES O.E.');
+  params.set('sid',   Date.now().toString(36));
+
+  const fullUrl = IPODIKSI_FORM_URL + '?' + params.toString();
+
+  // Άνοιξε το modal
+  openModal('📲 QR Υπόδειξης Ακινήτου', `
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
+        Δείξτε το QR στον υποψήφιο πελάτη να το σκανάρει με το κινητό του
+      </div>
+
+      <!-- QR Code -->
+      <div style="display:inline-block;padding:10px;background:#fff;border:2px solid var(--gold);border-radius:10px;margin-bottom:14px" id="qrCodeBox"></div>
+
+      <!-- Στοιχεία ακινήτου -->
+      <div style="background:var(--bg2);border-radius:var(--r2);padding:10px 14px;text-align:left;font-size:12px;margin-bottom:14px">
+        <div style="font-weight:700;margin-bottom:6px;font-size:13px">${r.periochi||'—'} ${r.diefthinsi?'· '+r.diefthinsi:''}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;color:var(--text2)">
+          <div>📋 Κωδ: <strong>${r.aa||r.id||'—'}</strong></div>
+          <div>🏠 ${r.eidos||'—'}</div>
+          <div>💶 <strong style="color:var(--gold)">${fmtEuro(r.timi)}</strong></div>
+          <div>📐 ${r.emvado_meikto?r.emvado_meikto+' τ.μ.':'—'}</div>
+          <div>👤 ${agentName||'—'}</div>
+          <div>📅 ${new Date().toLocaleDateString('el-GR')}</div>
+        </div>
+      </div>
+
+      <!-- Κουμπιά -->
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-out btn-sm" onclick="downloadIpodiksiQR()" style="flex:1;min-width:120px">⬇️ Download QR</button>
+        <button class="btn btn-out btn-sm" onclick="copyIpodiksiUrl('${fullUrl.replace(/'/g,"\\'")}');" style="flex:1;min-width:120px">📋 Αντιγραφή URL</button>
+        <button class="btn btn-out btn-sm" onclick="shareIpodiksi('${fullUrl.replace(/'/g,"\\'")}');" style="flex:1;min-width:120px">📤 Κοινοποίηση</button>
+      </div>
+    </div>
+  `, `<button class="btn btn-out btn-sm" onclick="CM()">Κλείσιμο</button>`);
+
+  // Παράγε το QR μετά το render
+  setTimeout(() => {
+    const box = document.getElementById('qrCodeBox');
+    if (!box) return;
+    box.innerHTML = '';
+    window._lastIpodiksiUrl = fullUrl;
+
+    function makeQR() {
+      if (!window.QRCode) { setTimeout(makeQR, 300); return; }
+      try {
+        new QRCode(box, {
+          text: fullUrl,
+          width: 200,
+          height: 200,
+          colorDark: '#1a1a1a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M,
+        });
+      } catch(e) {
+        box.innerHTML = '<div style="color:red;font-size:12px">Σφάλμα QR</div>';
+      }
+    }
+    makeQR();
+  }, 200);
+}
+
+// ════════════════════════════════════════════
+// QR Actions
+// ════════════════════════════════════════════
+function downloadIpodiksiQR() {
+  const canvas = document.querySelector('#qrCodeBox canvas');
+  if (!canvas) { alert('QR δεν βρέθηκε'); return; }
+  const a = document.createElement('a');
+  a.download = 'ipodiksi-qr.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+function copyIpodiksiUrl(url) {
+  const u = url || window._lastIpodiksiUrl;
+  if (!u) return;
+  navigator.clipboard.writeText(u).then(() => {
+    alert('✅ URL αντιγράφηκε!');
+  });
+}
+
+function shareIpodiksi(url) {
+  const u = url || window._lastIpodiksiUrl;
+  if (!u) return;
+  if (navigator.share) {
+    navigator.share({
+      title: 'Έντυπο Υπόδειξης Ακινήτου - TERRA HOMES',
+      text: 'Παρακαλώ συμπληρώστε το έντυπο υπόδειξης:',
+      url: u,
+    });
+  } else {
+    navigator.clipboard.writeText(u);
+    alert('✅ URL αντιγράφηκε! Μπορείτε να το στείλετε μέσω Viber/WhatsApp.');
+  }
+}
+</script>
+
 </html>
