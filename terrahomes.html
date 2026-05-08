@@ -867,20 +867,67 @@ async function openAkForm(id=null) {
         ${(r.video||[]).length?`<div style="font-size:11px;color:var(--ok);margin-top:4px">✅ ${(r.video||[]).length} video αποθηκευμένα</div>`:''}
         <input type="hidden" id="a_vi_existing" value="${(r.video||[]).join('||')}">
       </div>
-      <div class="f fspan"><label>Σημειώσεις</label><textarea id="a_no" rows="3" placeholder="Περιγραφή...">${r.simeiosis||''}</textarea></div>
+      <div class="f fspan"><label>Σημειώσεις</label><textarea id="a_no" rows="3" placeholder="Περιγραφή...">${r.simeiosis||''}</textarea></div><div class="f fspan" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px">
+  <label style="color:var(--gold);font-weight:700">🔒 ΕΜΠΙΣΤΕΥΤΙΚΑ ΣΤΟΙΧΕΙΑ (ορατά μόνο σε εσάς)</label>
+</div>
+
+<div class="f">
+  <label>Ιδιοκτήτης</label>
+  <input type="text" id="a_idio" value="${r.idioktitis||''}" placeholder="Ονοματεπώνυμο ιδιοκτήτη">
+</div>
+
+<div class="f">
+  <label>Εμφάνιση Ιδιοκτήτη σε:</label>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+      <input type="checkbox" id="a_idio_pdf" ${r.idioktitis_show_pdf?'checked':''} style="width:16px;height:16px;accent-color:var(--gold)">
+      📄 PDF/Εκτύπωση
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+      <input type="checkbox" id="a_idio_viber" ${r.idioktitis_show_viber?'checked':''} style="width:16px;height:16px;accent-color:var(--gold)">
+      💬 Viber
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+      <input type="checkbox" id="a_idio_ipodiksi" ${r.idioktitis_show_ipodiksi?'checked':''} style="width:16px;height:16px;accent-color:var(--gold)">
+      📲 Υπόδειξη
+    </label>
+  </div>
+</div>
+
+<div class="f">
+  <label>Αμοιβή % <span style="color:var(--text3);font-weight:400">(default 2%)</span></label>
+  <div style="display:flex;align-items:center;gap:8px">
+    <input type="number" id="a_amoivi_pct" value="${r.amoivi_pct||2}" min="0" max="10" step="0.1" style="width:100px" oninput="calcAmoivi()">
+    <span style="font-size:12px;color:var(--text2)">%</span>
+    <span style="font-size:13px;font-weight:700;color:var(--gold)" id="a_amoivi_result">—</span>
+    <span style="font-size:11px;color:var(--text3)">+ΦΠΑ 24%</span>
+  </div>
+</div>
     </div>
   `,`
     <button class="btn btn-out" onclick="CM()">Ακύρωση</button>
     <button class="btn btn-dark" onclick="saveAk('${id||''}')">💾 ${id?'Αποθήκευση':'Δημιουργία'}</button>
   `);
-  calcTM(r.timi, r.emvado_meikto);
+  calcTM(r.timi, r.emvado_meikto); setTimeout(calcAmoivi, 100);
 }
-
+function calcAmoivi() {
+  const timi = parseFloat(document.getElementById('a_ti')?.value)||0;
+  const pct  = parseFloat(document.getElementById('a_amoivi_pct')?.value)||2;
+  const el   = document.getElementById('a_amoivi_result');
+  if (!el) return;
+  if (timi > 0) {
+    const amoivi = Math.round(timi * pct / 100);
+    el.textContent = amoivi.toLocaleString('el-GR') + ' €';
+  } else {
+    el.textContent = '—';
+  }
+}
 function calcTM(t, e) {
   if (!t) t = parseFloat(document.getElementById('a_ti')?.value)||0;
   if (!e) e = parseFloat(document.getElementById('a_em')?.value)||0;
   const el = document.getElementById('a_tm');
   if (el) el.value = (t>0&&e>0) ? (t/e).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €/τ.μ.' : '';
+calcAmoivi();
 }
 
 async function saveAk(id) {
@@ -906,7 +953,7 @@ async function saveAk(id) {
     kwd_akinitou: document.getElementById('a_kwd').value||null,
     synergasies: document.getElementById('a_si').value||null,
     tropos_pliromis: getMS('a_tr'),
-    simeiosis: document.getElementById('a_no').value||null,
+    simeiosis: document.getElementById('a_no').value||null, idioktitis: document.getElementById('a_idio')?.value||null, idioktitis_show_pdf: document.getElementById('a_idio_pdf')?.checked||false, idioktitis_show_viber: document.getElementById('a_idio_viber')?.checked||false, idioktitis_show_ipodiksi: document.getElementById('a_idio_ipodiksi')?.checked||false, amoivi_pct: parseFloat(document.getElementById('a_amoivi_pct')?.value)||2,
     // photos and video set after upload
     user_id: uid||ME.id,
     user_email: ME.email,
@@ -2054,81 +2101,76 @@ function openIpodiksiQR(akId) {
   const r = DB.ak.find(x => x.id === akId);
   if (!r) return;
 
-  // Βρες τα στοιχεία του agent
-  const agentObj = DB.users ? DB.users.find(u => u.id === r.user_id) : null;
-  const agentName  = agentObj ? (agentObj.full_name || agentObj.email) : (ME?.full_name || '');
+  const agentObj   = DB.users ? DB.users.find(u => u.id === r.user_id) : null;
+  const agentName  = agentObj ? (agentObj.full_name || agentObj.name || agentObj.email) : (ME?.full_name || ME?.name || '');
   const agentEmail = agentObj ? agentObj.email : (ME?.email || 'ksaris1@hotmail.com');
 
-  // Δόμησε το URL με παραμέτρους ακινήτου
+  const amoiviPct  = r.amoivi_pct || 2;
+  const amoiviEuro = r.timi ? Math.round(r.timi * amoiviPct / 100) : 0;
+  const amoiviStr  = amoiviEuro > 0 ? amoiviEuro.toLocaleString('el-GR') + '€' : '—';
+  const amoiviOlog = amoiviEuro > 0 ? euroToWordsGR(amoiviEuro) : '—';
+
+  const showIdio   = r.idioktitis && r.idioktitis_show_ipodiksi && r.user_id === ME.id;
+  const idioktitis = showIdio ? r.idioktitis : '';
+
   const params = new URLSearchParams();
-  if (r.aa || r.id)        params.set('pid',   r.aa || r.id);
-  if (r.periochi)          params.set('addr',  r.periochi + (r.diefthinsi ? ', ' + r.diefthinsi : ''));
-  if (r.eidos)             params.set('type',  r.eidos);
-  if (r.timi)              params.set('price', fmtEuro(r.timi));
-  if (r.emvado_meikto)     params.set('area',  r.emvado_meikto);
-  if (r.domatia)           params.set('rooms', r.domatia + ' δωμ.');
-  if (r.orofos)            params.set('floor', r.orofos);
-  if (agentName)           params.set('agent', agentName);
-  if (agentEmail)          params.set('aemail',agentEmail);
-  params.set('date',  new Date().toLocaleDateString('el-GR'));
-  params.set('office','TERRA HOMES O.E.');
-  params.set('sid',   Date.now().toString(36));
+  if (r.aa || r.id)       params.set('pid',   r.aa || r.id);
+  if (r.kwd_akinitou)     params.set('kwd',   r.kwd_akinitou);
+  if (r.periochi)         params.set('addr',  r.periochi + (r.diefthinsi ? ', ' + r.diefthinsi : ''));
+  if (r.eidos)            params.set('type',  r.eidos);
+  if (r.orofos)           params.set('floor', r.orofos);
+  if (r.domatia)          params.set('rooms', r.domatia);
+  if (r.timi)             params.set('price', fmtEuro(r.timi));
+  if (amoiviEuro > 0)     params.set('amoivi', amoiviStr);
+  if (amoiviOlog !== '—') params.set('amoivi_olog', amoiviOlog.toUpperCase());
+  if (idioktitis)         params.set('idioktitis', idioktitis);
+  if (agentName)          params.set('agent', agentName);
+  if (agentEmail)         params.set('aemail', agentEmail);
+  params.set('date',   new Date().toLocaleDateString('el-GR'));
+  params.set('office', 'TERRA HOMES O.E.');
+  params.set('sid',    Date.now().toString(36));
 
   const fullUrl = IPODIKSI_FORM_URL + '?' + params.toString();
+  window._lastIpodiksiUrl = fullUrl;
 
-  // Άνοιξε το modal
   openModal('📲 QR Υπόδειξης Ακινήτου', `
     <div style="text-align:center;padding:10px 0">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
-        Δείξτε το QR στον υποψήφιο πελάτη να το σκανάρει με το κινητό του
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;padding:8px 12px;background:var(--gold2);border-radius:var(--r2)">
+        📱 Δείξτε το QR στον υποψήφιο πελάτη να το σκανάρει
       </div>
-
-      <!-- QR Code -->
       <div style="display:inline-block;padding:10px;background:#fff;border:2px solid var(--gold);border-radius:10px;margin-bottom:14px" id="qrCodeBox"></div>
-
-      <!-- Στοιχεία ακινήτου -->
       <div style="background:var(--bg2);border-radius:var(--r2);padding:10px 14px;text-align:left;font-size:12px;margin-bottom:14px">
-        <div style="font-weight:700;margin-bottom:6px;font-size:13px">${r.periochi||'—'} ${r.diefthinsi?'· '+r.diefthinsi:''}</div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:13px">${r.periochi||'—'}${r.diefthinsi?' · '+r.diefthinsi:''}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;color:var(--text2)">
-          <div>📋 Κωδ: <strong>${r.aa||r.id||'—'}</strong></div>
-          <div>🏠 ${r.eidos||'—'}</div>
+          <div>📋 Κωδ: <strong>${r.kwd_akinitou||r.aa||'—'}</strong></div>
+          <div>🏠 ${r.eidos||'—'}${r.orofos?' · '+r.orofos:''}</div>
           <div>💶 <strong style="color:var(--gold)">${fmtEuro(r.timi)}</strong></div>
           <div>📐 ${r.emvado_meikto?r.emvado_meikto+' τ.μ.':'—'}</div>
+          <div>🏦 Αμοιβή: <strong>${amoiviStr}</strong> (${amoiviPct}%)</div>
           <div>👤 ${agentName||'—'}</div>
-          <div>📅 ${new Date().toLocaleDateString('el-GR')}</div>
         </div>
       </div>
-
-      <!-- Κουμπιά -->
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-out btn-sm" onclick="downloadIpodiksiQR()" style="flex:1;min-width:120px">⬇️ Download QR</button>
-        <button class="btn btn-out btn-sm" onclick="copyIpodiksiUrl('${fullUrl.replace(/'/g,"\\'")}');" style="flex:1;min-width:120px">📋 Αντιγραφή URL</button>
-        <button class="btn btn-out btn-sm" onclick="shareIpodiksi('${fullUrl.replace(/'/g,"\\'")}');" style="flex:1;min-width:120px">📤 Κοινοποίηση</button>
+        <button class="btn btn-out btn-sm" onclick="downloadIpodiksiQR()" style="flex:1;min-width:100px">⬇️ Download</button>
+        <button class="btn btn-out btn-sm" onclick="copyIpodiksiUrl()" style="flex:1;min-width:100px">📋 Αντιγραφή</button>
+        <button class="btn btn-out btn-sm" onclick="shareIpodiksi()" style="flex:1;min-width:100px">📤 Κοινοποίηση</button>
       </div>
     </div>
   `, `<button class="btn btn-out btn-sm" onclick="CM()">Κλείσιμο</button>`);
 
-  // Παράγε το QR μετά το render
   setTimeout(() => {
     const box = document.getElementById('qrCodeBox');
     if (!box) return;
     box.innerHTML = '';
-    window._lastIpodiksiUrl = fullUrl;
-
     function makeQR() {
       if (!window.QRCode) { setTimeout(makeQR, 300); return; }
       try {
         new QRCode(box, {
-          text: fullUrl,
-          width: 200,
-          height: 200,
-          colorDark: '#1a1a1a',
-          colorLight: '#ffffff',
+          text: fullUrl, width: 200, height: 200,
+          colorDark: '#1a1a1a', colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M,
         });
-      } catch(e) {
-        box.innerHTML = '<div style="color:red;font-size:12px">Σφάλμα QR</div>';
-      }
+      } catch(e) { box.innerHTML = '<div style="color:red;font-size:12px">Σφάλμα QR</div>'; }
     }
     makeQR();
   }, 200);
@@ -2137,7 +2179,26 @@ function openIpodiksiQR(akId) {
 // ════════════════════════════════════════════
 // QR Actions
 // ════════════════════════════════════════════
-function downloadIpodiksiQR() {
+function euroToWordsGR(n) {
+  const ones = ['','ΕΝΑ','ΔΥΟ','ΤΡΙΑ','ΤΕΣΣΕΡΑ','ΠΕΝΤΕ','ΕΞΙ','ΕΠΤΑ','ΟΚΤΩ','ΕΝΝΕΑ',
+    'ΔΕΚΑ','ΕΝΤΕΚΑ','ΔΩΔΕΚΑ','ΔΕΚΑΤΡΙΑ','ΔΕΚΑΤΕΣΣΕΡΑ','ΔΕΚΑΠΕΝΤΕ','ΔΕΚΑΕΞΙ',
+    'ΔΕΚΑΕΠΤΑ','ΔΕΚΑΟΚΤΩ','ΔΕΚΑΕΝΝΕΑ'];
+  const tens = ['','','ΕΙΚΟΣΙ','ΤΡΙΑΝΤΑ','ΣΑΡΑΝΤΑ','ΠΕΝΗΝΤΑ','ΕΞΗΝΤΑ','ΕΒΔΟΜΗΝΤΑ','ΟΓΔΟΝΤΑ','ΕΝΕΝΗΝΤΑ'];
+  const hundreds = ['','ΕΚΑΤΟ','ΔΙΑΚΟΣΙΑ','ΤΡΙΑΚΟΣΙΑ','ΤΕΤΡΑΚΟΣΙΑ','ΠΕΝΤΑΚΟΣΙΑ','ΕΞΑΚΟΣΙΑ','ΕΠΤΑΚΟΣΙΑ','ΟΚΤΑΚΟΣΙΑ','ΕΝΝΙΑΚΟΣΙΑ'];
+  if (n === 0) return 'ΜΗΔΕΝ';
+  let r = '';
+  if (n >= 1000) {
+    const th = Math.floor(n / 1000);
+    if (th === 1) r += 'ΧΙΛΙΑ ';
+    else r += (hundreds[Math.floor(th/100)]||'') + ' ' + (tens[Math.floor((th%100)/10)]||'') + ' ' + (ones[th%100<20?th%100:th%10]||'') + ' ΧΙΛΙΑΔΕΣ ';
+    n %= 1000;
+  }
+  if (n >= 100) { r += hundreds[Math.floor(n/100)] + ' '; n %= 100; }
+  if (n >= 20)  { r += tens[Math.floor(n/10)] + ' '; n %= 10; }
+  if (n > 0)    { r += ones[n] + ' '; }
+  return r.trim() + ' ΕΥΡΩ';
+}
+  function downloadIpodiksiQR() {
   const canvas = document.querySelector('#qrCodeBox canvas');
   if (!canvas) { alert('QR δεν βρέθηκε'); return; }
   const a = document.createElement('a');
