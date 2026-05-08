@@ -1620,8 +1620,8 @@ function pgSettings(C, A, activeTab='options') {
   ];
 
   const tabsHTML = '<div class="l-tabs" style="margin-bottom:20px;max-width:400px">'
-    + '<button class="l-tab ' + (activeTab==='options'?'active':'') + '" onclick="pgSettings(document.getElementById('pgContent'),document.getElementById('tbRight'),'options')">📋 Επιλογές</button>'
-    + '<button class="l-tab ' + (activeTab==='weights'?'active':'') + '" onclick="pgSettings(document.getElementById('pgContent'),document.getElementById('tbRight'),'weights')">⚖️ Βάρη Matching</button>'
+    + '<button class="l-tab ' + (activeTab==='options'?'active':'') + '" onclick="goP('settings',null,'options')">📋 Επιλογές</button>'
+    + '<button class="l-tab ' + (activeTab==='weights'?'active':'') + '" onclick="goP('settings',null,'weights')">⚖️ Βάρη Matching</button>'
     + '</div>';
 
   let bodyHTML = '';
