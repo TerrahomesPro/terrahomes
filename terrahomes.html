@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TerraHomes CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#fff; --bg2:#f8f8f8; --bg3:#f0f0f0;
+  --surface:#fff; --border:#e5e5e5; --border2:#ccc;
+  --text:#111; --text2:#555; --text3:#999;
+  --gold:#c9a96e; --gold2:#f0e4cc;
+  --ok:#16a34a; --warn:#d97706; --err:#dc2626; --inf:#2563eb;
+  --r:10px; --r2:6px;
+  --sh:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --sh2:0 4px 12px rgba(0,0,0,.1),0 12px 40px rgba(0,0,0,.08);
+  --sb:240px; --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --t:.18s ease;
+}
+[data-theme=dark]{
+  --bg:#0f0f0f; --bg2:#181818; --bg3:#222;
+  --surface:#1a1a1a; --border:#2a2a2a; --border2:#3a3a3a;
+  --text:#f0f0f0; --text2:#aaa; --text3:#666;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:14px}
+body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── LOGIN ── */
+#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg2);padding:20px}
+.lbox{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px;box-shadow:var(--sh2)}
+.l-logo{text-align:center;margin-bottom:28px}
+.l-logo img{max-height:56px;max-width:200px;object-fit:contain}
+.l-title{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.l-title span{color:var(--gold)}
+.l-sub{font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.l-err{color:var(--err);font-size:12px;text-align:center;margin-top:10px;display:none;padding:8px;background:rgba(220,38,38,.08);border-radius:var(--r2)}
+.l-tabs{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.l-tab{flex:1;padding:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;font-family:var(--f);transition:all var(--t)}
+.l-tab.active{background:var(--text);color:var(--bg)}
+
+/* ── FIELDS ── */
+.f{margin-bottom:14px}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.f input,.f select,.f textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r2);font-family:var(--f);font-size:13px;color:var(--text);background:var(--bg);outline:none;transition:border-color var(--t);-webkit-appearance:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--gold)}
+.btn-login{width:100%;padding:12px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r2);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;transition:opacity var(--t)}
+.btn-login:hover{opacity:.85}
+
+/* ── LAYOUT ── */
+#app{display:none}
+.layout{display:flex;min-height:100vh}
+.sb{width:var(--sb);background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:200;transition:transform var(--t);overflow-y:auto}
+.sb-logo{padding:16px;border-bottom:1px solid var(--border);cursor:pointer;text-align:center}
+.sb-logo img{max-height:44px;max-width:180px;object-fit:contain}
+.sb-logo-txt{font-size:17px;font-weight:700;color:var(--text)}
+.sb-logo-txt span{color:var(--gold)}
+.sb-logo-hint{font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:1px;text-transform:uppercase}
+.sb-user{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;overflow:hidden;background:var(--gold)}
+.sb-av img{width:100%;height:100%;object-fit:cover}
+.sb-uname{font-size:13px;font-weight:600}
+.sb-urole{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.sb-nav{flex:1;padding:6px 0}
+.sb-sec{padding:8px 14px 2px;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 14px;color:var(--text2);cursor:pointer;transition:all var(--t);font-size:13px;font-weight:500;margin:1px 6px;border-radius:var(--r2);position:relative}
+.sb-item:hover{background:var(--bg2);color:var(--text)}
+.sb-item.active{background:var(--bg2);color:var(--text);font-weight:600}
+.sb-item.active::before{content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:14px;background:var(--gold);border-radius:2px}
+.sb-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
+.sb-foot{padding:10px;border-top:1px solid var(--border);display:flex;gap:6px}
+.sb-btn{flex:1;padding:7px;background:none;border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:4px;transition:all var(--t)}
+.sb-btn:hover{background:var(--bg2);color:var(--text)}
+.main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tb-title{font-size:16px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:8px}
+.content{padding:20px}
+.hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);padding:4px;margin-right:4px}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:var(--r2);font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all var(--t);white-space:nowrap}
+.btn-dark{background:var(--text);color:var(--bg)}
+.btn-dark:hover{opacity:.8}
+.btn-out{background:none;border:1.5px solid var(--border);color:var(--text2)}
+.btn-out:hover{border-color:var(--border2);color:var(--text);background:var(--bg2)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{opacity:.9}
+.btn-err{background:rgba(220,38,38,.1);color:var(--err);border:1px solid rgba(220,38,38,.2)}
+.btn-err:hover{background:rgba(220,38,38,.2)}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--sh);cursor:pointer;transition:all var(--t)}
+.stat:hover{border-color:var(--gold);transform:translateY(-2px)}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-val{font-size:30px;font-weight:700;line-height:1}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* ── CHARTS ── */
+.charts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+.chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.chart-ttl{font-size:13px;font-weight:700;margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;cursor:pointer}
+.bar-lbl{font-size:12px;color:var(--text2);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-trk{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .8s ease}
+.bar-cnt{font-size:12px;font-weight:600;color:var(--text2);width:20px;text-align:right}
+.agents-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.agent-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:all var(--t)}
+.agent-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.agent-cnt{font-size:26px;font-weight:700;color:var(--gold)}
+.agent-name{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* ── LIST ── */
+.list-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.list-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.list-ttl{font-size:15px;font-weight:700}
+.list-cnt{font-size:13px;color:var(--text3)}
+.srch{position:relative}
+.srch input{padding:7px 10px 7px 30px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;background:var(--bg2);color:var(--text);outline:none;width:200px;font-family:var(--f)}
+.srch input:focus{border-color:var(--gold)}
+.srch-ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none}
+.fltrs{padding:8px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:var(--bg2)}
+.fsel{padding:5px 10px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:12px;background:var(--surface);color:var(--text);outline:none;cursor:pointer;font-family:var(--f)}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;background:var(--bg2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg2);cursor:pointer}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block;white-space:nowrap}
+.b-green{background:rgba(22,163,74,.1);color:#16a34a}
+.b-gold{background:rgba(201,169,110,.15);color:#a07840}
+.b-gray{background:var(--bg3);color:var(--text3)}
+.b-red{background:rgba(220,38,38,.1);color:var(--err)}
+.b-blue{background:rgba(37,99,235,.1);color:var(--inf)}
+.b-orange{background:rgba(217,119,6,.1);color:var(--warn)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:16px;width:100%;max-width:700px;box-shadow:var(--sh2);animation:mIn .22s ease;margin:auto}
+@keyframes mIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.m-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);border-radius:16px 16px 0 0;z-index:1}
+.m-ttl{font-size:16px;font-weight:700}
+.m-close{width:26px;height:26px;border-radius:50%;border:none;background:var(--bg2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+.m-close:hover{background:var(--bg3)}
+.m-body{padding:18px 22px;max-height:72vh;overflow-y:auto}
+.m-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--surface);border-radius:0 0 16px 16px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fspan{grid-column:1/-1}
+.modal .f input,.modal .f select,.modal .f textarea{background:var(--bg2);border:1.5px solid var(--border);color:var(--text)}
+.modal .f input:focus,.modal .f select:focus,.modal .f textarea:focus{border-color:var(--gold);background:var(--bg)}
+
+/* ── CUSTOM CHECKBOX ── */
+.ck-wrap{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);cursor:pointer;user-select:none;transition:all var(--t)}
+.ck-wrap:hover{border-color:var(--gold)}
+.ck-wrap.on{border-color:var(--gold);background:rgba(201,169,110,.08)}
+.ck-box{width:18px;height:18px;border:2px solid var(--border2);border-radius:3px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--t);font-size:11px;font-weight:700}
+.ck-wrap.on .ck-box{background:var(--gold);border-color:var(--gold);color:#fff}
+
+/* ── MULTISELECT ── */
+.ms{position:relative}
+.ms-display{border:1.5px solid var(--border);border-radius:var(--r2);background:var(--bg2);padding:6px 10px;min-height:38px;cursor:pointer;display:flex;flex-wrap:wrap;gap:4px;align-items:center;transition:border-color var(--t)}
+.ms-display:hover,.ms-display.open{border-color:var(--gold)}
+.ms-tag{background:var(--gold2);color:#8a6030;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:3px}
+.ms-tag button{background:none;border:none;cursor:pointer;color:#8a6030;font-size:12px;padding:0;line-height:1}
+.ms-placeholder{font-size:12px;color:var(--text3)}
+.ms-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);box-shadow:var(--sh2);z-index:500;max-height:220px;overflow-y:auto}
+.ms-dropdown.open{display:block}
+.ms-search{padding:6px 8px;border-bottom:1px solid var(--border)}
+.ms-search input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:var(--f)}
+.ms-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px;transition:background var(--t)}
+.ms-opt:hover{background:var(--bg2)}
+.ms-opt.sel{background:rgba(201,169,110,.08);font-weight:500}
+.ms-opt input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);flex-shrink:0}
+.ms-add-row{padding:6px 10px;border-top:1px solid var(--border);display:flex;gap:6px}
+.ms-add-row input{flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:var(--f)}
+.ms-add-row button{padding:4px 10px;background:var(--gold);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600}
+
+/* ── DETAIL ── */
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.di{padding:9px 12px;background:var(--bg2);border-radius:var(--r2)}
+.di-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.di-val{font-size:13px;font-weight:500}
+
+/* ── SCORE CARDS ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);cursor:pointer;transition:all var(--t)}
+.sc:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--border2)}
+.sc-head{padding:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.sc-circle{width:50px;height:50px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;border:2px solid}
+.s-green{border-color:#16a34a;color:#16a34a;background:rgba(22,163,74,.08)}
+.s-blue{border-color:var(--inf);color:var(--inf);background:rgba(37,99,235,.06)}
+.s-warn{border-color:var(--warn);color:var(--warn);background:rgba(217,119,6,.06)}
+.s-err{border-color:var(--err);color:var(--err);background:rgba(220,38,38,.06)}
+.prog{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 1s ease}
+
+/* ── AK CARDS ── */
+.ak-list{display:flex;flex-direction:column;gap:0}
+.ak-card{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--t)}
+.ak-card:hover{background:var(--bg2)}
+.ak-card:last-child{border-bottom:none}
+.ak-thumb{width:64px;height:64px;object-fit:cover;border-radius:var(--r2);flex-shrink:0;border:1px solid var(--border)}
+.ak-no-photo{width:64px;height:64px;border-radius:var(--r2);flex-shrink:0;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text3)}
+.ak-info{flex:1;min-width:0}
+.ak-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.ak-aa{font-size:11px;font-weight:700;color:var(--text3)}
+.ak-per{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ak-agent{font-size:11px;color:var(--text3);margin-top:2px}
+.ak-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.ak-timi{font-size:15px;font-weight:700;color:var(--gold)}
+.ak-emv{font-size:11px;color:var(--text3)}
+@media(max-width:480px){
+  .ak-thumb,.ak-no-photo{width:52px;height:52px}
+  .ak-per{font-size:13px}
+  .ak-timi{font-size:14px}
+}
+
+/* ── SETTINGS ── */
+.set-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.set-ttl{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.opt-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.opt-chip{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;font-size:12px}
+.opt-chip button{background:none;border:none;cursor:pointer;color:var(--err);font-size:14px;padding:0;line-height:1;font-weight:700}
+.opt-chip button:hover{color:var(--err)}
+.opt-add{display:flex;gap:8px;margin-top:8px}
+.opt-add input{flex:1;padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;background:var(--bg2);color:var(--text);outline:none;font-family:var(--f)}
+.opt-add input:focus{border-color:var(--gold)}
+
+/* ── TOAST ── */
+.toasts{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{padding:10px 14px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--sh2);animation:tIn .25s ease;display:flex;align-items:center;gap:8px;max-width:280px}
+.t-s{background:#16a34a;color:#fff}
+.t-e{background:var(--err);color:#fff}
+.t-i{background:var(--text);color:var(--bg)}
+@keyframes tIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+
+/* ── LOADER ── */
+.loader{position:fixed;inset:0;background:rgba(255,255,255,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998}
+[data-theme=dark] .loader{background:rgba(0,0,0,.88)}
+.spin{width:30px;height:30px;border:2.5px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:50px 20px;color:var(--text3)}
+.empty-ic{font-size:36px;margin-bottom:10px;opacity:.4}
+.empty-tx{font-size:14px;font-weight:500;margin-bottom:3px}
+.sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199}
+.sb-ov.open{display:block}
+
+@media(max-width:768px){
+  .sb{transform:translateX(-100%)}
+  .sb.open{transform:translateX(0);box-shadow:var(--sh2)}
+  .main{margin-left:0}
+  .hamburger{display:flex}
+  .content{padding:14px}
+  .stats{grid-template-columns:1fr 1fr;gap:10px}
+  .charts{grid-template-columns:1fr}
+  .fg{grid-template-columns:1fr}
+  .dg{grid-template-columns:1fr}
+  .sg{grid-template-columns:1fr}
+  .topbar{padding:0 14px}
+  .srch input{width:150px}
+}
+@media(max-width:480px){.stat-val{font-size:24px}.lbox{padding:24px 18px}}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <p style="margin-top:10px;font-size:12px;color:var(--text3)">Φόρτωση...</p>
+</div>
+<div class="toasts" id="toasts"></div>
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="m-head"><div class="m-ttl" id="mTtl"></div><button class="m-close" onclick="CM()">✕</button></div>
+    <div class="m-body" id="mBody"></div>
+    <div class="m-foot" id="mFoot"></div>
+  </div>
+</div>
+<div class="sb-ov" id="sbOv" onclick="closeSB()"></div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="lbox">
+    <div class="l-logo">
+      <div id="loginLogo">
+        <div class="l-title">Terra<span>Homes</span></div>
+        <div class="l-sub">CRM Platform</div>
+      </div>
+    </div>
+    <div class="l-tabs">
+      <button class="l-tab active" id="tabLogin" onclick="switchTab('login')">Σύνδεση</button>
+      <button class="l-tab" id="tabSignup" onclick="switchTab('signup')">Εγγραφή</button>
+      <button class="l-tab" id="tabReset" onclick="switchTab('reset')">Κωδικός</button>
+    </div>
+    <div id="loginForm">
+      <div class="f"><label>Email</label><input type="email" id="lEmail" placeholder="email@example.com"></div>
+      <div class="f"><label>Κωδικός</label><input type="password" id="lPass" placeholder="••••••••"></div>
+      <button class="btn-login" onclick="doLogin()">Σύνδεση →</button>
+    </div>
+    <div id="signupForm" style="display:none">
+      <div style="background:rgba(201,169,110,0.1);border:1px solid var(--gold2);border-radius:var(--r2);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
+        ℹ️ Μετά την εγγραφή ο admin πρέπει να ενεργοποιήσει τον λογαριασμό σου.
+      </div>
+      <div class="f"><label>Ονοματεπώνυμο *</label><input type="text" id="sName" placeholder="Όνομα Επώνυμο"></div>
+      <div class="f"><label>Email *</label><input type="email" id="sEmail" placeholder="email@example.com"></div>
+      <div class="f"><label>Κινητό</label><input type="tel" id="sPhone" placeholder="69xxxxxxxx"></div>
+      <div class="f"><label>Κωδικός * (min 6 χαρακτήρες)</label><input type="password" id="sPass" placeholder="••••••••"></div>
+      <div class="f"><label>Επιβεβαίωση Κωδικού *</label><input type="password" id="sPass2" placeholder="••••••••"></div>
+      <button class="btn-login" onclick="doSignup()">Εγγραφή →</button>
+    </div>
+    <div id="resetForm" style="display:none">
+      <div class="f"><label>Email</label><input type="email" id="rEmail" placeholder="email@example.com"></div>
+      <button class="btn-login" onclick="doReset()">Αποστολή link →</button>
+    </div>
+    <div class="l-err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="layout">
+    <nav class="sb" id="sb">
+      <div class="sb-logo" onclick="triggerLogo()" title="Κλικ για αλλαγή logo">
+        <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogo(this)">
+        <div id="sbLogo">
+          <div class="sb-logo-txt">Terra<span>Homes</span></div>
+          <div class="sb-logo-hint">κλικ για logo</div>
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-av" id="sbAv">K</div>
+        <div>
+          <div class="sb-uname" id="sbName">Χρήστης</div>
+          <div class="sb-urole" id="sbRole">Agent</div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="sb-sec">Κύριο</div>
+        <div class="sb-item active" data-p="home" onclick="goP('home',this)"><span class="sb-icon">⬜</span>Αρχική</div>
+        <div class="sb-item" data-p="ak" onclick="goP('ak',this)"><span class="sb-icon">🏢</span>Ακίνητα</div>
+        <div class="sb-item" data-p="zi" onclick="goP('zi',this)"><span class="sb-icon">🔍</span>Ζητήσεις</div>
+        <div class="sb-item" data-p="matching" onclick="goP('matching',this)"><span class="sb-icon">⭐</span>Matching</div>
+        <div class="sb-sec" style="margin-top:6px">Διαχείριση</div>
+        <div class="sb-item" data-p="kat" onclick="goP('kat',this)"><span class="sb-icon">🔧</span>Κατασκευαστές</div>
+        <div class="sb-item admin-only" data-p="users" onclick="goP('users',this)"><span class="sb-icon">👥</span>Χρήστες</div>
+        <div class="sb-item admin-only" data-p="settings" onclick="goP('settings',this)"><span class="sb-icon">⚙️</span>Ρυθμίσεις</div>
+      </div>
+      <div class="sb-foot">
+        <button class="sb-btn" id="themeBtn" onclick="toggleTheme()" title="Dark/Light">🌙</button>
+        <button class="sb-btn" onclick="doRefresh()" title="Ανανέωση">↻</button>
+        <button class="sb-btn" onclick="doLogout()" title="Αποσύνδεση" style="color:var(--err)">⬅</button>
+      </div>
+    </nav>
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="hamburger" onclick="toggleSB()">☰</button>
+          <div class="tb-title" id="pgTitle">Αρχική</div>
+        </div>
+        <div class="tb-right" id="tbRight"></div>
+      </div>
+      <div class="content" id="pgContent"></div>
+    </main>
+  </div>
+</div>
+
+<script charset="utf-8">
+// ── SUPABASE CONFIG ──────────────────────────────────────────
+const SUPA_URL = 'https://svwnfttwlswwvlksized.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2d25mdHR3bHN3d3Zsa3NpemVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzA1NTcsImV4cCI6MjA5Mzc0NjU1N30.7sH32KIKCY9PYZiwMb_i5Nww-5xl5ukhRFNU5zx3c_Q';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── STATE ────────────────────────────────────────────────────
+let ME = null;
+let PAGE = 'home';
+let DB = { ak:[], zi:[], kat:[], users:[], opts:{} };
+
+// Cloudinary config
+const CLOUDINARY = {
+  cloud: 'dfkcv5paq',
+  preset: 'terrahomes',
+  uploadUrl: 'https://api.cloudinary.com/v1_1/dfkcv5paq/upload'
+};
+
+async function uploadToCloudinary(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CLOUDINARY.preset);
+  const res = await fetch(CLOUDINARY.uploadUrl, { method: 'POST', body: fd });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.secure_url;
+}
+
+async function uploadFiles(inputId, progressId) {
+  const input = document.getElementById(inputId);
+  if (!input || !input.files.length) return [];
+  const urls = [];
+  const prog = document.getElementById(progressId);
+  for (let i = 0; i < input.files.length; i++) {
+    const file = input.files[i];
+    if (prog) prog.textContent = `Ανέβασμα ${i+1}/${input.files.length}...`;
+    try {
+      const url = await uploadToCloudinary(file);
+      urls.push(url);
+    } catch(e) { console.error('Upload error:', e); toast('Σφάλμα ανεβάσματος: '+file.name,'e'); }
+  }
+  if (prog) prog.textContent = '';
+  return urls;
+}
+
+// Default matching weights (stored in Supabase options table)
+const DEFAULT_WEIGHTS = {
+  base:     { label:'Περιοχή + Είδος + Τιμή (βάση)', value:50, locked:true },
+  emvado:   { label:'Εμβαδό εντός εύρους', value:10 },
+  domatia:  { label:'Δωμάτια', value:10 },
+  etos:     { label:'Έτος κατασκευής', value:10 },
+  stathm:   { label:'Θέση Στάθμευσης', value:15 },
+  apothiki: { label:'Αποθήκη', value:5 },
+};
+let WEIGHTS = {...DEFAULT_WEIGHTS};
+
+// ── AUTH ─────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['login','signup','reset'].forEach(t=>{
+    const btn=document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn) btn.classList.toggle('active', t===tab);
+    const form=document.getElementById(t+'Form');
+    if(form) form.style.display = t===tab?'block':'none';
+  });
+  document.getElementById('lErr').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('lEmail').value.trim();
+  const pass = document.getElementById('lPass').value;
+  if (!email||!pass) { showErr('Συμπλήρωσε email και κωδικό'); return; }
+  load(true);
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { showErr('Λάθος email ή κωδικός'); load(false); return; }
+  await boot(data.user);
+  load(false);
+}
+
+async function doReset() {
+  const email = document.getElementById('rEmail').value.trim();
+  if (!email) { showErr('Βάλε το email σου'); return; }
+  load(true);
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href
+  });
+  load(false);
+  if (error) { showErr('Σφάλμα αποστολής'); return; }
+  showErr('✅ Στάλθηκε link επαναφοράς στο email σου!');
+  document.getElementById('lErr').style.color = 'var(--ok)';
+}
+
+async function doSignup() {
+  const name = document.getElementById('sName').value.trim();
+  const email = document.getElementById('sEmail').value.trim();
+  const phone = document.getElementById('sPhone').value.trim();
+  const pass = document.getElementById('sPass').value;
+  const pass2 = document.getElementById('sPass2').value;
+
+  if (!name) { showErr('Συμπλήρωσε το ονοματεπώνυμό σου'); return; }
+  if (!email) { showErr('Συμπλήρωσε το email σου'); return; }
+  if (!pass || pass.length < 6) { showErr('Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες'); return; }
+  if (pass !== pass2) { showErr('Οι κωδικοί δεν ταιριάζουν'); return; }
+
+  load(true);
+  try {
+    // Create auth user
+    const { data, error } = await sb.auth.signUp({ email, password: pass });
+    if (error) { showErr('Σφάλμα: ' + error.message); load(false); return; }
+
+    // Create user profile (inactive, role=agent by default)
+    const { error: profileErr } = await sb.from('users').insert({
+      auth_id: data.user?.id,
+      name,
+      email,
+      phone: phone||null,
+      role: 'agent',
+      active: false  // Needs admin activation
+    });
+
+    if (profileErr) { showErr('Σφάλμα δημιουργίας προφίλ'); load(false); return; }
+
+    // Show success
+    const errEl = document.getElementById('lErr');
+    errEl.textContent = '✅ Η εγγραφή ολοκληρώθηκε! Περίμενε να ενεργοποιηθεί ο λογαριασμός σου από τον admin.';
+    errEl.style.display = 'block';
+    errEl.style.color = 'var(--ok)';
+    errEl.style.background = 'rgba(22,163,74,0.08)';
+
+    // Clear form
+    ['sName','sEmail','sPhone','sPass','sPass2'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+  } catch(e) {
+    showErr('Σφάλμα εγγραφής: ' + e.message);
+  }
+  load(false);
+}
+
+function showErr(m) {
+  const e = document.getElementById('lErr');
+  e.textContent = m;
+  e.style.display = 'block';
+  e.style.color = 'var(--err)';
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  ME = null;
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ── BOOT ─────────────────────────────────────────────────────
+async function boot(authUser) {
+  // Get user profile
+  console.log('Auth user ID:', authUser.id);
+  const { data: profile, error: profileErr } = await sb.from('users').select('*').eq('auth_id', authUser.id).single();
+  console.log('Profile:', profile, 'Error:', profileErr);
+  if (!profile) {
+    // Try by email as fallback
+    const { data: profileByEmail } = await sb.from('users').select('*').eq('email', authUser.email).single();
+    if (!profileByEmail) { showErr('Δεν βρέθηκε προφίλ χρήστη. Επικοινώνησε με admin.'); return; }
+    // Update auth_id
+    await sb.from('users').update({auth_id: authUser.id}).eq('email', authUser.email);
+    Object.assign(profileByEmail, {auth_id: authUser.id});
+    arguments[0] = profileByEmail;
+  }
+  const finalProfile = profile || (await sb.from('users').select('*').eq('email', authUser.email).single()).data;
+  if (!finalProfile) { showErr('Δεν βρέθηκε προφίλ χρήστη.'); return; }
+  if (!finalProfile.active) { showErr('Ο λογαριασμός σας είναι ανενεργός.'); await sb.auth.signOut(); return; }
+
+  ME = { ...finalProfile, auth_id: authUser.id };
+
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('sbName').textContent = ME.name;
+  document.getElementById('sbRole').textContent = ME.role.toUpperCase();
+
+  // Avatar
+  const av = document.getElementById('sbAv');
+  if (ME.photo_url) av.innerHTML = `<img src="${ME.photo_url}" alt="${ME.name}">`;
+  else av.textContent = ME.name.charAt(0).toUpperCase();
+
+  // Hide admin items
+  if (ME.role !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(e => e.style.display='none');
+  }
+
+  loadTheme(); loadLogo();
+  load(true);
+  await loadAll();
+  load(false);
+  goP('home', document.querySelector('.sb-item[data-p="home"]'));
+}
+
+async function loadAll() {
+  try {
+    const [akRes, ziRes, katRes, usRes, optsRes] = await Promise.all([
+      sb.from('akinita').select('*').order('imerominia', {ascending:false}),
+      sb.from('zitiseis').select('*').order('imerominia', {ascending:false}),
+      sb.from('kataskevastes').select('*').order('created_at', {ascending:false}),
+      ME?.role==='admin' ? sb.from('users').select('*').order('active', {ascending:false}).order('name') : sb.from('users').select('*').eq('active', true).order('name'),
+      sb.from('options').select('*').eq('active', true).order('field_name').order('value')
+    ]);
+    DB.ak = akRes.data || [];
+    DB.zi = ziRes.data || [];
+    DB.kat = katRes.data || [];
+    DB.users = usRes.data || [];
+
+    // Group options by field_name
+    DB.opts = {};
+    (optsRes.data||[]).forEach(o => {
+      if (o.field_name === '__WEIGHTS__') {
+        // Load custom weights
+        try { const w=JSON.parse(o.value); if(w) Object.assign(WEIGHTS, w); } catch(e){}
+        return;
+      }
+      if (!DB.opts[o.field_name]) DB.opts[o.field_name] = [];
+      DB.opts[o.field_name].push(o.value);
+    });
+  } catch(e) { toast('Σφάλμα φόρτωσης','e'); console.error(e); }
+}
+
+async function doRefresh() {
+  load(true); await loadAll(); load(false);
+  goP(PAGE, document.querySelector(`.sb-item[data-p="${PAGE}"]`));
+  toast('Ανανεώθηκε!');
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+const opts = (field) => DB.opts[field] || [];
+const fmtDate = d => d ? new Date(d).toLocaleDateString('el-GR') : '—';
+const fmtEuro = v => v ? '€' + Number(v).toLocaleString('el-GR') : '—';
+const arrStr = v => Array.isArray(v) ? v.join(', ') : (v||'—');
+const getUser = id => DB.users.find(u => u.id === id);
+const getAgentName = id => getUser(id)?.name || '—';
+
+function myAk() { return ME.role==='admin' ? DB.ak : DB.ak.filter(r=>r.user_id===ME.id); }
+function myZi() { return ME.role==='admin' ? DB.zi : DB.zi.filter(r=>r.user_id===ME.id); }
+function isOwnerAk(r) { return ME.role==='admin' || r.user_id===ME.id; }
+function isOwnerZi(r) { return ME.role==='admin' || r.user_id===ME.id; }
+
+const statusColors = {
+  'Διαθέσιμο':'b-green','Off Market':'b-gold','Πωλήθηκε':'b-gray','Αποσύρθηκε':'b-red'
+};
+const axColors = {'HOT':'b-red','MEDIUM':'b-orange','COLD':'b-blue'};
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function goP(p, el, extra) {
+  PAGE = p;
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else { const sbEl=document.querySelector('.sb-item[data-p="'+p+'"]'); if(sbEl) sbEl.classList.add('active'); }
+  const titles={home:'Αρχική',ak:'Ακίνητα',zi:'Ζητήσεις',matching:'Matching',kat:'Κατασκευαστές',users:'Χρήστες',settings:'Ρυθμίσεις'};
+  document.getElementById('pgTitle').textContent = titles[p]||p;
+  const C=document.getElementById('pgContent'), A=document.getElementById('tbRight');
+  if (p==='settings') pgSettings(C, A, extra||'options');
+  else ({home:pgHome,ak:pgAk,zi:pgZi,matching:pgMatching,kat:pgKat,users:pgUsers})[p]?.(C,A);
+  closeSB();
+}
+
+// ── HOME ─────────────────────────────────────────────────────
+function pgHome(C, A) {
+  A.innerHTML = `<button class="btn btn-out btn-sm" onclick="doRefresh()">↻ Ανανέωση</button>`;
+  const ak = myAk();
+  const now = new Date();
+  const days30 = new Date(now - 30*24*60*60*1000);
+  const startYear = new Date(now.getFullYear(), 0, 1);
+
+  const diath = ak.filter(r=>r.status==='Διαθέσιμο').length;
+  const offm = ak.filter(r=>r.status==='Off Market').length;
+  const newAk = ak.filter(r=>r.imerominia && new Date(r.imerominia)>=days30).length;
+  const newZi = DB.zi.filter(r=>r.imerominia && new Date(r.imerominia)>=days30).length;
+  const pwlimenа = ak.filter(r=>r.status==='Πωλήθηκε' && r.imerominia && new Date(r.imerominia)>=startYear).length;
+  const makro = ak.filter(r=>['Διαθέσιμο','Off Market'].includes(r.status) && r.imerominia && (now-new Date(r.imerominia))/(86400000)>90);
+
+  const byEidos={}, byPer={};
+  ak.forEach(r=>{byEidos[r.eidos||'—']=(byEidos[r.eidos||'—']||0)+1; byPer[r.periochi||'—']=(byPer[r.periochi||'—']||0)+1;});
+  const mE=Math.max(...Object.values(byEidos),1), mP=Math.max(...Object.values(byPer),1);
+
+  const agentsH = ME.role==='admin' ? DB.users.map(u=>{
+    const cnt = DB.ak.filter(r=>r.user_id===u.id).length;
+    return `<div class="agent-card" onclick="filterAkAgent('${u.id}','${u.name.replace(/'/g,"\\'")}')">
+      <div class="agent-cnt">${cnt}</div>
+      <div class="agent-name">${u.name}</div>
+    </div>`;
+  }).join('') : '';
+
+  C.innerHTML = `
+    <div class="stats">
+      <div class="stat"><div class="stat-lbl">Συνολικά Ακίνητα</div><div class="stat-val">${ak.length}</div><div class="stat-sub">Χαρτοφυλάκιο</div></div>
+      <div class="stat" style="cursor:pointer" onclick="filterAkStatus('Διαθέσιμο')"><div class="stat-lbl">Διαθέσιμα</div><div class="stat-val" style="color:var(--ok)">${diath}</div><div class="stat-sub">Κλικ για προβολή</div></div>
+      <div class="stat" style="cursor:pointer" onclick="filterAkStatus('Off Market')"><div class="stat-lbl">Off Market</div><div class="stat-val" style="color:var(--gold)">${offm}</div><div class="stat-sub">Κλικ για προβολή</div></div>
+      <div class="stat"><div class="stat-lbl">Matching</div><div class="stat-val" style="color:var(--inf)">—</div><div class="stat-sub">Live matching</div></div>
+    </div>
+    <div class="stats" style="margin-top:0">
+      <div class="stat"><div class="stat-lbl">Νέα Ακίνητα</div><div class="stat-val" style="color:var(--ok)">${newAk}</div><div class="stat-sub">Τελευταίες 30 μέρες</div></div>
+      <div class="stat"><div class="stat-lbl">Νέες Ζητήσεις</div><div class="stat-val" style="color:var(--inf)">${newZi}</div><div class="stat-sub">Τελευταίες 30 μέρες</div></div>
+      <div class="stat" style="cursor:pointer" onclick="filterAkStatus('Πωλήθηκε')"><div class="stat-lbl">Πωλήσεις Φέτος</div><div class="stat-val" style="color:var(--gold)">${pwlimenа}</div><div class="stat-sub">Κλικ για προβολή</div></div>
+      <div class="stat"><div class="stat-lbl" style="${makro.length>0?'color:var(--err)':''}">Μακρόχρονα</div><div class="stat-val" style="color:${makro.length>0?'var(--err)':'var(--text3)'}">${makro.length}</div><div class="stat-sub">Πάνω από 90 μέρες</div></div>
+    </div>
+    <div class="charts">
+      <div class="chart"><div class="chart-ttl">Ανά Είδος</div>
+        ${Object.entries(byEidos).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`
+          <div class="bar-row"><div class="bar-lbl">${k}</div>
+          <div class="bar-trk"><div class="bar-fill" style="width:${(v/mE)*100}%"></div></div>
+          <div class="bar-cnt">${v}</div></div>`).join('')}
+      </div>
+      <div class="chart"><div class="chart-ttl">Ανά Περιοχή</div>
+        ${Object.entries(byPer).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`
+          <div class="bar-row"><div class="bar-lbl">${k}</div>
+          <div class="bar-trk"><div class="bar-fill" style="width:${(v/mP)*100}%"></div></div>
+          <div class="bar-cnt">${v}</div></div>`).join('')}
+      </div>
+    </div>
+    ${makro.length>0?`<div class="chart" style="margin-bottom:16px">
+      <div class="chart-ttl" style="color:var(--err)">⏰ Ακίνητα πάνω από 90 μέρες στην αγορά</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${makro.slice(0,5).map(r=>{const days=Math.floor((now-new Date(r.imerominia))/86400000);return`<div onclick="viewAk('${r.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border-radius:var(--r2);cursor:pointer;font-size:13px"><div><strong>${r.periochi||''}</strong> - ${r.eidos||''}<div style="font-size:11px;color:var(--text3)">${fmtEuro(r.timi)}</div></div><div style="font-size:12px;font-weight:700;color:var(--err)">${days} μέρες</div></div>`;}).join('')}
+      </div>
+    </div>`:''}
+    ${ME.role==='admin'?`<div class="chart"><div class="chart-ttl">Ακίνητα ανά Agent <span style="font-size:11px;color:var(--text3);font-weight:400">(κλικ για φιλτράρισμα)</span></div><div class="agents-g">${agentsH}</div></div>`:''}`;
+}
+
+function filterAkStatus(status) {
+  goP('ak', document.querySelector('.sb-item[data-p="ak"]'));
+  setTimeout(()=>{renderAkRows(DB.ak.filter(r=>r.status===status));},80);
+}
+
+function filterAkAgent(uid, name) {
+  goP('ak', document.querySelector('.sb-item[data-p="ak"]'));
+  setTimeout(()=>{renderAkRows(DB.ak.filter(r=>r.user_id===uid));},80);
+}
+
+// ── ΑΚΙΝΗΤΑ ──────────────────────────────────────────────────
+function pgAk(C, A) {
+  const canEdit = ['admin','agent'].includes(ME.role);
+  A.innerHTML = canEdit ? `
+    <button class="btn btn-out btn-sm" onclick="window.open('https://airtable.com/app3fUC1uIoQsX2DP/pagOVyfyG7vVZNbaY/form','_blank')">📋 Airtable Form</button>
+    <button class="btn btn-dark" onclick="openAkForm()">+ Νέο Ακίνητο</button>` : '';
+
+  const statuses = [...new Set(DB.ak.map(r=>r.status).filter(Boolean))];
+  const eidi = [...new Set(DB.ak.map(r=>r.eidos).filter(Boolean))];
+  const perioches = [...new Set(DB.ak.map(r=>r.periochi).filter(Boolean))];
+
+  C.innerHTML = `
+    <div class="list-box">
+      <div class="list-head">
+        <span class="list-ttl">Ακίνητα</span><span class="list-cnt" id="akCnt"></span>
+        <div style="margin-left:auto"><div class="srch"><span class="srch-ic">🔍</span><input placeholder="Αναζήτηση..." id="akSrch" oninput="filterAk()"></div></div>
+      </div>
+      <div class="fltrs">
+        <select class="fsel" id="fSt" onchange="filterAk()"><option value="">Όλα Status</option>${statuses.map(s=>`<option>${s}</option>`).join('')}</select>
+        <select class="fsel" id="fEi" onchange="filterAk()"><option value="">Όλα Είδη</option>${eidi.map(e=>`<option>${e}</option>`).join('')}</select>
+        <select class="fsel" id="fPe" onchange="filterAk()"><option value="">Όλες Περιοχές</option>${perioches.map(p=>`<option>${p}</option>`).join('')}</select>
+      </div>
+      <div id="akBody" class="ak-list"></div>
+    </div>`;
+  renderAkRows(myAk());
+}
+
+function renderAkRows(recs) {
+  const tb=document.getElementById('akBody'); if(!tb) return;
+  const cnt=document.getElementById('akCnt'); if(cnt) cnt.textContent=` (${recs.length})`;
+  if(!recs.length){tb.innerHTML=`<div class="empty"><div class="empty-ic">🏢</div><div class="empty-tx">Δεν βρέθηκαν ακίνητα</div></div>`;return;}
+  tb.innerHTML=recs.map(r=>{
+    const photo=r.photos&&r.photos[0]?r.photos[0]:null;
+    return`<div class="ak-card" onclick="viewAk('${r.id}')">
+      ${photo?`<img src="${photo}" class="ak-thumb" onerror="this.style.display='none'">`:`<div class="ak-thumb ak-no-photo">🏢</div>`}
+      <div class="ak-info">
+        <div class="ak-top">
+          <span class="ak-aa">#${r.aa||'—'}</span>
+          <span class="badge ${statusColors[r.status]||'b-gray'}">${r.status||'—'}</span>
+        </div>
+        <div class="ak-per">${r.periochi||'—'}</div>
+        <div class="ak-per" style="font-size:13px">${r.eidos||'—'}${r.emvado_meikto?' · <strong>'+r.emvado_meikto+' τ.μ.</strong>':''}</div>
+        <div class="ak-agent">${getAgentName(r.user_id)} · ${fmtDate(r.imerominia)}</div>
+        <div class="ak-bottom">
+          <span class="ak-timi">${fmtEuro(r.timi)}</span>
+          <span class="ak-emv">${r.emvado_meikto?r.emvado_meikto+' τ.μ.':''}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterAk() {
+  const s=(document.getElementById('akSrch')?.value||'').toLowerCase();
+  const st=document.getElementById('fSt')?.value||'';
+  const ei=document.getElementById('fEi')?.value||'';
+  const pe=document.getElementById('fPe')?.value||'';
+  let r=myAk();
+  if(s) r=r.filter(x=>JSON.stringify(x).toLowerCase().includes(s));
+  if(st) r=r.filter(x=>x.status===st);
+  if(ei) r=r.filter(x=>x.eidos===ei);
+  if(pe) r=r.filter(x=>x.periochi===pe);
+  renderAkRows(r);
+}
+
+function viewAk(id) {
+  const r=DB.ak.find(x=>x.id===id); if(!r) return;
+  const own=isOwnerAk(r);
+  const photos=r.photos||[];
+  const mainPhoto=photos[0]?`<img src="${photos[0]}" style="width:80px;height:80px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);flex-shrink:0;cursor:pointer" onclick="window.open('${photos[0]}','_blank')">`:'';
+  const extraPhotos=photos.slice(1).map(p=>`<img src="${p}" style="width:60px;height:60px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border);cursor:pointer" onclick="window.open('${p}','_blank')">`).join('');
+
+  openModal(`🏢 Ακίνητο #${r.aa||''}`,`
+    <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;flex-wrap:wrap">
+      ${mainPhoto}
+      <div style="flex:1;min-width:160px">
+        <div style="font-size:19px;font-weight:700;margin-bottom:2px">${r.periochi||'—'}</div>
+        <div style="color:var(--text2);margin-bottom:6px">${r.eidos||'—'}${r.domatia?' · '+r.domatia+' δωμ.':''}</div>
+        <span class="badge ${statusColors[r.status]||'b-gray'}">${r.status||''}</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:21px;font-weight:700;color:var(--gold)">${fmtEuro(r.timi)}</div>
+        ${r.timi_ana_metro?`<div style="font-size:12px;color:var(--text3)">${fmtEuro(r.timi_ana_metro)}/τ.μ.</div>`:''}
+      </div>
+    </div>
+    <div class="dg">
+      <div class="di"><div class="di-lbl">Agent</div><div class="di-val">${getAgentName(r.user_id)}</div></div>
+      <div class="di"><div class="di-lbl">Ημερομηνία</div><div class="di-val">${fmtDate(r.imerominia)}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Μεικτό</div><div class="di-val">${r.emvado_meikto?r.emvado_meikto+' τ.μ.':'—'}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Καθαρό</div><div class="di-val">${r.emvado_katharo?r.emvado_katharo+' τ.μ.':'—'}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή</div><div class="di-val" style="color:var(--gold);font-weight:700">${fmtEuro(r.timi)}</div></div>
+      <div class="di"><div class="di-lbl">Εκτίμηση</div><div class="di-val">${fmtEuro(r.ektimisi)}</div></div>
+      <div class="di"><div class="di-lbl">Έτος Κατασκευής</div><div class="di-val">${r.etos_kataskeyis||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${r.orofos||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${r.domatia||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${r.thesi_stathmeysis||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Ασανσέρ</div><div class="di-val">${r.asanser||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${r.apothiki||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Διεύθυνση</div><div class="di-val">${r.diefthinsi||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Κωδ. Ακινήτου</div><div class="di-val">${r.kwd_akinitou||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Συνεργασίες</div><div class="di-val">${r.synergasies||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Τρόπος Πληρωμής</div><div class="di-val">${arrStr(r.tropos_pliromis)}</div></div>
+    </div>
+    ${r.simeiosis?`<div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:var(--r2)"><div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Σημειώσεις</div><div style="font-size:13px;line-height:1.5">${r.simeiosis}</div></div>`:''}
+    ${extraPhotos?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Φωτογραφίες</div><div style="display:flex;flex-wrap:wrap;gap:6px">${extraPhotos}</div></div>`:''}
+  `,`
+    <button class="btn btn-out btn-sm" onclick="printAk('${id}')">📄 PDF</button>
+    <button class="btn btn-out btn-sm" onclick="viberAk('${id}')">💬 Viber</button>
+    ${own?`<button class="btn btn-err btn-sm" onclick="delAk('${id}')">🗑️</button><button class="btn btn-dark btn-sm" onclick="CM();openAkForm('${id}')">✏️ Επεξεργασία</button>`:''}
+  `);
+}
+
+async function openAkForm(id=null) {
+  let r = {};
+  if (id) { const res=await sb.from('akinita').select('*').eq('id',id).single(); r=res.data||{}; }
+
+  const selOpts = (field, dbField, placeholder='Επιλογή...') =>
+    `<div style="display:flex;gap:6px;align-items:center">
+      <select id="${field}" style="flex:1">
+        <option value="">${placeholder}</option>
+        ${opts(field).map(o=>`<option value="${o}" ${r[dbField]===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <button type="button" onclick="openQuickOpts('${field}')" title="Προσθήκη νέας επιλογής"
+        style="width:28px;height:28px;border-radius:var(--r2);border:1.5px solid var(--gold);background:none;cursor:pointer;color:var(--gold);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
+    </div>`;
+
+  openModal(id?'✏️ Επεξεργασία Ακινήτου':'+ Νέο Ακίνητο',`
+    <div class="fg">
+      <div class="f"><label>Ημερομηνία</label><input type="date" id="a_dt" value="${r.imerominia||new Date().toISOString().split('T')[0]}"></div>
+      <div class="f"><label>Agent</label><select id="a_us"><option value="">— Επιλογή —</option>${DB.users.map(u=>`<option value="${u.id}" ${r.user_id===u.id?'selected':''}>${u.name}</option>`).join('')}</select></div>
+      <div class="f"><label>Περιοχή *</label>${selOpts('ΠΕΡΙΟΧΗ', 'periochi')}</div>
+      <div class="f"><label>Είδος Ακινήτου *</label>${selOpts('ΕΙΔΟΣ', 'eidos')}</div>
+      <div class="f"><label>Status</label>${selOpts('STATUS', 'status')}</div>
+      <div class="f"><label>Όροφος</label>${selOpts('ΟΡΟΦΟΣ', 'orofos')}</div>
+      <div class="f"><label>Δωμάτια</label>${selOpts('ΔΩΜΑΤΙΑ', 'domatia')}</div>
+      <div class="f"><label>Θέση Στάθμευσης</label>${selOpts('ΘΕΣΗ_ΣΤΑΘΜΕΥΣΗΣ', 'thesi_stathmeysis')}</div>
+      <div class="f"><label>Ασανσέρ</label>${selOpts('ΑΣΑΝΣΕΡ', 'asanser')}</div>
+      <div class="f"><label>Αποθήκη</label>${selOpts('ΑΠΟΘΗΚΗ', 'apothiki')}</div>
+      <div class="f"><label>Τιμή (€)</label><input type="number" id="a_ti" value="${r.timi||''}" placeholder="π.χ. 150000" oninput="calcTM()"></div>
+      <div class="f"><label>Εκτίμηση (€)</label><input type="number" id="a_ek" value="${r.ektimisi||''}" placeholder="π.χ. 160000"></div>
+      <div class="f"><label>Εμβαδό Μεικτό (τ.μ.)</label><input type="number" id="a_em" value="${r.emvado_meikto||''}" placeholder="π.χ. 85" oninput="calcTM()"></div>
+      <div class="f"><label>Εμβαδό Καθαρό (τ.μ.)</label><input type="number" id="a_ek2" value="${r.emvado_katharo||''}" placeholder="π.χ. 78"></div>
+      <div class="f"><label>Τιμή/τ.μ. (αυτόματο)</label><input type="text" id="a_tm" value="" readonly style="background:var(--bg3);color:var(--text3)"></div>
+      <div class="f"><label>Έτος Κατασκευής</label><input type="number" id="a_et" value="${r.etos_kataskeyis||''}" placeholder="π.χ. 2010"></div>
+      <div class="f"><label>Διεύθυνση</label><input type="text" id="a_di" value="${r.diefthinsi||''}" placeholder="Οδός αριθμός"></div>
+      <div class="f"><label>Κωδ. Ακινήτου</label><input type="text" id="a_kwd" value="${r.kwd_akinhтou||r.kwd_akinitou||''}" placeholder="π.χ. ΑΚ-2024-001"></div>
+      <div class="f"><label>Συνεργασίες</label><input type="text" id="a_si" value="${r.synergasies||''}" placeholder="π.χ. Αποκλειστική"></div>
+      <div class="f fspan"><label>Τρόπος Πληρωμής</label>${buildMS('a_tr', opts('ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ'), r.tropos_pliromis||[], false)}</div>
+      <div class="f fspan">
+        <label>Φωτογραφίες</label>
+        <input type="file" id="a_ph" multiple accept="image/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)">
+        <div id="a_ph_prog" style="font-size:11px;color:var(--gold);margin-top:4px"></div>
+        ${(r.photos||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${(r.photos||[]).map(p=>`<div style="position:relative"><img src="${p}" style="width:60px;height:60px;object-fit:cover;border-radius:var(--r2);border:1px solid var(--border)"><button type="button" onclick="removeExistingPhoto('${p}')" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--err);color:#fff;border:none;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center">×</button></div>`).join('')}</div>`:''}
+        <input type="hidden" id="a_ph_existing" value="${(r.photos||[]).join('||')}">
+      </div>
+      <div class="f fspan">
+        <label>Video</label>
+        <input type="file" id="a_vi" multiple accept="video/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)">
+        <div id="a_vi_prog" style="font-size:11px;color:var(--gold);margin-top:4px"></div>
+        ${(r.video||[]).length?`<div style="font-size:11px;color:var(--ok);margin-top:4px">✅ ${(r.video||[]).length} video αποθηκευμένα</div>`:''}
+        <input type="hidden" id="a_vi_existing" value="${(r.video||[]).join('||')}">
+      </div>
+      <div class="f fspan"><label>Σημειώσεις</label><textarea id="a_no" rows="3" placeholder="Περιγραφή...">${r.simeiosis||''}</textarea></div>
+    </div>
+  `,`
+    <button class="btn btn-out" onclick="CM()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveAk('${id||''}')">💾 ${id?'Αποθήκευση':'Δημιουργία'}</button>
+  `);
+  calcTM(r.timi, r.emvado_meikto);
+}
+
+function calcTM(t, e) {
+  if (!t) t = parseFloat(document.getElementById('a_ti')?.value)||0;
+  if (!e) e = parseFloat(document.getElementById('a_em')?.value)||0;
+  const el = document.getElementById('a_tm');
+  if (el) el.value = (t>0&&e>0) ? (t/e).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €/τ.μ.' : '';
+}
+
+async function saveAk(id) {
+  const uid = document.getElementById('a_us').value;
+  const timi = parseFloat(document.getElementById('a_ti').value)||null;
+  const emv = parseFloat(document.getElementById('a_em').value)||null;
+  const data = {
+    imerominia: document.getElementById('a_dt').value||null,
+    periochi: document.getElementById('ΠΕΡΙΟΧΗ').value||null,
+    eidos: document.getElementById('ΕΙΔΟΣ').value||null,
+    status: document.getElementById('STATUS').value||null,
+    orofos: document.getElementById('ΟΡΟΦΟΣ').value||null,
+    domatia: document.getElementById('ΔΩΜΑΤΙΑ').value||null,
+    thesi_stathmeysis: document.getElementById('ΘΕΣΗ_ΣΤΑΘΜΕΥΣΗΣ').value||null,
+    asanser: document.getElementById('ΑΣΑΝΣΕΡ').value||null,
+    apothiki: document.getElementById('ΑΠΟΘΗΚΗ').value||null,
+    timi,
+    ektimisi: parseFloat(document.getElementById('a_ek').value)||null,
+    emvado_meikto: emv,
+    emvado_katharo: parseFloat(document.getElementById('a_ek2').value)||null,
+    etos_kataskeyis: parseInt(document.getElementById('a_et').value)||null,
+    diefthinsi: document.getElementById('a_di').value||null,
+    kwd_akinitou: document.getElementById('a_kwd').value||null,
+    synergasies: document.getElementById('a_si').value||null,
+    tropos_pliromis: getMS('a_tr'),
+    simeiosis: document.getElementById('a_no').value||null,
+    // photos and video set after upload
+    user_id: uid||ME.id,
+    user_email: ME.email,
+  };
+  Object.keys(data).forEach(k=>{if(data[k]===null||data[k]==='') delete data[k];});
+  load(true);
+  try {
+    // Upload new photos
+    const existingPhotos = (document.getElementById('a_ph_existing')?.value||'').split('||').filter(Boolean);
+    const newPhotos = await uploadFiles('a_ph','a_ph_prog');
+    data.photos = [...existingPhotos, ...newPhotos];
+
+    // Upload new videos
+    const existingVideo = (document.getElementById('a_vi_existing')?.value||'').split('||').filter(Boolean);
+    const newVideo = await uploadFiles('a_vi','a_vi_prog');
+    data.video = [...existingVideo, ...newVideo];
+
+    if(id) { await sb.from('akinita').update(data).eq('id',id); toast('Αποθηκεύτηκε!','s'); }
+    else { await sb.from('akinita').insert(data); toast('Δημιουργήθηκε!','s'); }
+    CM(); await loadAll(); pgAk(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  } catch(e) { console.error(e); toast('Σφάλμα: '+e.message,'e'); }
+  load(false);
+}
+
+function removeExistingPhoto(url) {
+  const hid = document.getElementById('a_ph_existing');
+  if (!hid) return;
+  const photos = hid.value.split('||').filter(p=>p&&p!==url);
+  hid.value = photos.join('||');
+  // Remove thumbnail
+  document.querySelectorAll('#mBody img').forEach(img=>{
+    if(img.src===url) img.parentElement.remove();
+  });
+}
+
+async function delAk(id) {
+  if(!confirm('Διαγραφή ακινήτου;')) return;
+  load(true);
+  await sb.from('akinita').delete().eq('id',id);
+  toast('Διαγράφηκε','s'); CM(); await loadAll();
+  pgAk(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  load(false);
+}
+
+// ── ΖΗΤΗΣΕΙΣ ─────────────────────────────────────────────────
+function pgZi(C, A) {
+  const canEdit=['admin','agent'].includes(ME.role);
+  A.innerHTML=canEdit?`
+    <button class="btn btn-out btn-sm" onclick="window.open('https://airtable.com/app3fUC1uIoQsX2DP/pagLAIVoN5SLTdbyE/form','_blank')">📋 Airtable Form</button>
+    <button class="btn btn-dark" onclick="openZiForm()">+ Νέα Ζήτηση</button>`:'';
+  C.innerHTML=`
+    <div class="list-box">
+      <div class="list-head">
+        <span class="list-ttl">Ζητήσεις</span><span class="list-cnt" id="ziCnt"></span>
+        <div style="margin-left:auto"><div class="srch"><span class="srch-ic">🔍</span><input placeholder="Αναζήτηση..." id="ziSrch" oninput="filterZi()"></div></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table><thead><tr><th>Α/Α</th><th>Ημερομηνία</th><th>Agent</th><th>Περιοχή</th><th>Είδος</th><th>Τιμή</th><th>Δωμ.</th><th>Αξιολόγηση</th></tr></thead>
+        <tbody id="ziBody"></tbody></table>
+      </div>
+    </div>`;
+  renderZiRows(myZi());
+}
+
+function renderZiRows(recs) {
+  const tb=document.getElementById('ziBody'); if(!tb) return;
+  const cnt=document.getElementById('ziCnt'); if(cnt) cnt.textContent=` (${recs.length})`;
+  if(!recs.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ic">🔍</div><div class="empty-tx">Δεν βρέθηκαν ζητήσεις</div></div></td></tr>`;return;}
+  tb.innerHTML=recs.map(r=>{
+    const ax=r.aksiologisi||'';
+    return`<tr onclick="viewZi('${r.id}')">
+      <td><strong>${r.aa||'—'}</strong></td>
+      <td style="font-size:11px;color:var(--text3)">${fmtDate(r.imerominia)}</td>
+      <td style="font-size:12px;color:var(--text2)">${getAgentName(r.user_id)}</td>
+      <td style="font-size:12px">${arrStr(r.periochi)}</td>
+      <td style="font-size:12px">${arrStr(r.eidos)}</td>
+      <td style="font-size:11px">${r.timi_min?fmtEuro(r.timi_min):''}${r.timi_max?'–'+fmtEuro(r.timi_max):''}</td>
+      <td>${r.domatia||'—'}</td>
+      <td>${ax?`<span class="badge ${axColors[ax]||'b-gray'}">${ax}</span>`:''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterZi() {
+  const s=(document.getElementById('ziSrch')?.value||'').toLowerCase();
+  let r=myZi(); if(s) r=r.filter(x=>JSON.stringify(x).toLowerCase().includes(s));
+  renderZiRows(r);
+}
+
+function viewZi(id) {
+  const r=DB.zi.find(x=>x.id===id); if(!r) return;
+  const own=isOwnerZi(r);
+  const matching=findMatching(r);
+
+  openModal(`🔍 Ζήτηση #${r.aa||''}`,`
+    <div class="dg">
+      <div class="di"><div class="di-lbl">Α/Α</div><div class="di-val">${r.aa||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Agent</div><div class="di-val">${getAgentName(r.user_id)}</div></div>
+      <div class="di"><div class="di-lbl">Περιοχή</div><div class="di-val">${arrStr(r.periochi)}</div></div>
+      <div class="di"><div class="di-lbl">Είδος</div><div class="di-val">${arrStr(r.eidos)}</div></div>
+      <div class="di"><div class="di-lbl">Από Έτος</div><div class="di-val">${r.apo_etos||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Έως Έτος</div><div class="di-val">${r.eos_etos||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Δωμάτια</div><div class="di-val">${r.domatia||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Όροφος</div><div class="di-val">${arrStr(r.orofos)}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Min</div><div class="di-val">${r.emvado_min?r.emvado_min+' τ.μ.':'—'}</div></div>
+      <div class="di"><div class="di-lbl">Εμβαδό Max</div><div class="di-val">${r.emvado_max?r.emvado_max+' τ.μ.':'—'}</div></div>
+      <div class="di"><div class="di-lbl">Θέση Στάθμευσης</div><div class="di-val">${r.thesi_stathmeysis||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Αποθήκη</div><div class="di-val">${r.apothiki||'—'}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή Min</div><div class="di-val">${fmtEuro(r.timi_min)}</div></div>
+      <div class="di"><div class="di-lbl">Τιμή Max</div><div class="di-val">${fmtEuro(r.timi_max)}</div></div>
+      <div class="di"><div class="di-lbl">Τρόπος Πληρωμής</div><div class="di-val">${arrStr(r.tropos_pliromis)}</div></div>
+      <div class="di"><div class="di-lbl">Αξιολόγηση</div><div class="di-val">${r.aksiologisi?`<span class="badge ${axColors[r.aksiologisi]||'b-gray'}">${r.aksiologisi}</span>`:''}</div></div>
+      ${r.eidika_xaraktiristika?.length?`<div class="di fspan"><div class="di-lbl">Ειδικά Χαρακτηριστικά</div><div class="di-val">${arrStr(r.eidika_xaraktiristika)}</div></div>`:''}
+      ${own&&r.pelatis?`<div class="di"><div class="di-lbl">Πελάτης</div><div class="di-val">${r.pelatis}</div></div>`:''}
+      ${own&&r.tilefono?`<div class="di"><div class="di-lbl">Τηλέφωνο</div><div class="di-val">${r.tilefono}</div></div>`:''}
+    </div>
+    ${matching.length?`
+    <div style="margin-top:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏠 Matching Ακίνητα (${matching.length})</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${matching.map(m=>`
+          <div style="border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:2px">
+            <div onclick="CM();viewAk('${m.id}')" style="padding:10px 14px;background:var(--bg2);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all var(--t)"
+              onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'">
+              <div>
+                <div style="font-size:13px;font-weight:600">${m.periochi||''} · ${m.eidos||''}</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">
+                  ${m.emvado_meikto?m.emvado_meikto+' τ.μ. · ':''}
+                  ${m.thesi_stathmeysis?'🅿️ '+m.thesi_stathmeysis+' · ':''}
+                  <span class="badge ${statusColors[m.status]||'b-gray'}">${m.status||''}</span>
+                </div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;margin-left:12px">
+                <div style="font-size:14px;font-weight:700;color:var(--gold)">${fmtEuro(m.timi)}</div>
+                <div style="font-size:13px;font-weight:700;color:${m.score>=80?'var(--ok)':m.score>=60?'var(--inf)':'var(--warn)'}">${m.score}% match</div>
+              </div>
+            </div>
+            ${scoreBreakdownHTML(m.breakdown)}
+          </div>`).join('')}
+      </div>
+    </div>`:''}
+  `,`
+    <button class="btn btn-out btn-sm" onclick="printZi('${id}')">📄 PDF</button>
+    <button class="btn btn-out btn-sm" onclick="viberZi('${id}')">💬 Viber</button>
+    ${own?`<button class="btn btn-err btn-sm" onclick="delZi('${id}')">🗑️</button><button class="btn btn-dark btn-sm" onclick="CM();openZiForm('${id}')">✏️ Επεξεργασία</button>`:''}
+  `);
+}
+
+// ── LIVE MATCHING ─────────────────────────────────────────────
+function calcScore(z, r) {
+  const stathScore={'Κλειστή':15,'Πυλωτή':10,'Ανοιχτή':5,'Ναι':5,'Όχι':0};
+  const W = WEIGHTS;
+  const breakdown = [];
+
+  // Base (always 50 if passed primary check)
+  breakdown.push({
+    label: 'Περιοχή + Είδος + Τιμή',
+    max: W.base.value,
+    got: W.base.value,
+    ok: true
+  });
+
+  // Εμβαδό
+  const emv=parseFloat(r.emvado_meikto)||0;
+  const emvMin=parseFloat(z.emvado_min)||0, emvMax=parseFloat(z.emvado_max)||999999;
+  const emvOk = emvMin===0&&emvMax===999999 ? true : (emv>=emvMin&&emv<=emvMax);
+  breakdown.push({label:'Εμβαδό', max:W.emvado.value, got:emvOk?W.emvado.value:0, ok:emvOk});
+
+  // Δωμάτια
+  const domOk = !z.domatia || r.domatia===z.domatia;
+  breakdown.push({label:'Δωμάτια', max:W.domatia.value, got:domOk?W.domatia.value:0, ok:domOk});
+
+  // Έτος
+  const etos=parseInt(r.etos_kataskeyis)||0;
+  const eMin=parseInt(z.apo_etos)||0, eMax=parseInt(z.eos_etos)||9999;
+  const etosOk = eMin===0&&eMax===9999 ? true : (etos>=eMin&&etos<=eMax);
+  breakdown.push({label:'Έτος κατασκευής', max:W.etos.value, got:etosOk?W.etos.value:0, ok:etosOk});
+
+  // Στάθμευση
+  const aStath=r.thesi_stathmeysis||'Όχι';
+  const zStath=z.thesi_stathmeysis||'';
+  let stathGot=0;
+  if(!zStath){stathGot=Math.min(stathScore[aStath]||0,W.stathm.value);}
+  else{const zSc=stathScore[zStath]||0,aSc=stathScore[aStath]||0;stathGot=aSc>=zSc?W.stathm.value:aSc>0?Math.round(W.stathm.value/2):0;}
+  breakdown.push({label:'Θέση Στάθμευσης', max:W.stathm.value, got:stathGot, ok:stathGot>=W.stathm.value, val:aStath});
+
+  // Αποθήκη
+  const apOk = !z.apothiki||z.apothiki==='Όχι'||r.apothiki==='Ναι';
+  breakdown.push({label:'Αποθήκη', max:W.apothiki.value, got:apOk?W.apothiki.value:0, ok:apOk});
+
+  const total = Math.min(breakdown.reduce((s,b)=>s+b.got,0), 100);
+  return {score:total, breakdown};
+}
+
+function findMatching(z) {
+  const zPer = Array.isArray(z.periochi)?z.periochi:(z.periochi?[z.periochi]:[]);
+  const zEi = Array.isArray(z.eidos)?z.eidos:(z.eidos?[z.eidos]:[]);
+  const tMin=parseFloat(z.timi_min)||0, tMax=parseFloat(z.timi_max)||999999999;
+
+  return DB.ak.filter(r=>['Διαθέσιμο','Off Market'].includes(r.status)).map(r=>{
+    const perOk=zPer.length===0||zPer.includes(r.periochi);
+    const eiOk=zEi.length===0||zEi.includes(r.eidos);
+    const timi=parseFloat(r.timi)||0;
+    const timiOk=timi>=tMin&&timi<=tMax;
+    if(!perOk||!eiOk||!timiOk) return null;
+    const {score,breakdown}=calcScore(z,r);
+    return {...r, score, breakdown};
+  }).filter(Boolean).sort((a,b)=>b.score-a.score);
+}
+
+let _bdCounter = 0;
+function scoreBreakdownHTML(breakdown) {
+  const uid = 'bd_' + (++_bdCounter);
+  const total = breakdown.reduce((s,b)=>s+b.got,0);
+  return `
+    <div style="padding:4px 14px 8px">
+      <button onclick="toggleBD('${uid}')" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--gold);font-weight:600;padding:4px 0;display:flex;align-items:center;gap:4px;font-family:var(--f)">
+        <span id="${uid}_ico">▶</span> Ανάλυση βαθμολογίας
+      </button>
+      <div id="${uid}" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-top:4px">
+        ${breakdown.map(b=>{
+          const color=b.got>=b.max?'var(--ok)':b.got>0?'var(--warn)':'var(--err)';
+          return`<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px">${b.got>=b.max?'✅':b.got>0?'🟡':'❌'}</span>
+            <span style="flex:1;font-size:11px">${b.label}${b.val?' ('+b.val+')':''}</span>
+            <span style="font-size:11px;font-weight:700;color:${color}">${b.got}/${b.max}</span>
+          </div>`;
+        }).join('')}
+        <div style="padding:6px 10px;display:flex;justify-content:space-between;background:var(--bg2)">
+          <span style="font-size:11px;font-weight:700">Σύνολο</span>
+          <span style="font-size:12px;font-weight:700;color:var(--gold)">${total}%</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Quick options mini-modal
+function openQuickOpts(fieldName) {
+  const currentOpts = opts(fieldName) || [];
+  const labels = {
+    'ΠΕΡΙΟΧΗ':'Περιοχές','ΕΙΔΟΣ':'Είδος Ακινήτου','ΔΩΜΑΤΙΑ':'Δωμάτια',
+    'ΟΡΟΦΟΣ':'Όροφος','ΑΣΑΝΣΕΡ':'Ασανσέρ','ΘΕΣΗ_ΣΤΑΘΜΕΥΣΗΣ':'Θέση Στάθμευσης',
+    'ΑΠΟΘΗΚΗ':'Αποθήκη','STATUS':'Status','ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ':'Τρόπος Πληρωμής',
+    'ΕΙΔΙΚΑ_ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ':'Ειδικά Χαρακτηριστικά'
+  };
+
+  // Create overlay
+  const ov = document.createElement('div');
+  ov.id = 'quickOptsOv';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML = `
+    <div style="background:var(--surface);border-radius:16px;width:100%;max-width:420px;box-shadow:var(--sh2);animation:mIn .2s ease">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:15px;font-weight:700">Επιλογές: ${labels[fieldName]||fieldName}</div>
+        <button onclick="closeQuickOpts('${fieldName}')" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--bg2);cursor:pointer;font-size:13px;color:var(--text2)">✕</button>
+      </div>
+      <div style="padding:16px 20px;max-height:300px;overflow-y:auto">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="qoList">
+          ${currentOpts.map(v=>`<div class="opt-chip"><span>${v}</span><button onclick="qoDelete('${fieldName}','${v.replace(/'/g,"\'")}')">×</button></div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="qoInput" placeholder="Νέα επιλογή..." 
+            style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;background:var(--bg2);color:var(--text);outline:none;font-family:var(--f)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();qoAdd('${fieldName}')}"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+          <button onclick="qoAdd('${fieldName}')" class="btn btn-gold btn-sm">+ Προσθήκη</button>
+        </div>
+      </div>
+      <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+        <button onclick="closeQuickOpts('${fieldName}')" class="btn btn-dark btn-sm">✓ Τέλος</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>document.getElementById('qoInput')?.focus(), 100);
+}
+
+async function qoAdd(fieldName) {
+  const inp = document.getElementById('qoInput');
+  if (!inp || !inp.value.trim()) return;
+  const val = inp.value.trim();
+  try {
+    await sb.from('options').upsert({field_name:fieldName, value:val, active:true},{onConflict:'field_name,value'});
+    await loadAll();
+    // Update list
+    const list = document.getElementById('qoList');
+    if (list) {
+      const chip = document.createElement('div');
+      chip.className = 'opt-chip';
+      chip.innerHTML = `<span>${val}</span><button onclick="qoDelete('${fieldName}','${val.replace(/'/g,"\'")}')">×</button>`;
+      list.appendChild(chip);
+    }
+    inp.value = '';
+    toast(`"${val}" προστέθηκε!`,'s');
+  } catch(e) { toast('Σφάλμα','e'); }
+}
+
+async function qoDelete(fieldName, val) {
+  try {
+    await sb.from('options').delete().eq('field_name',fieldName).eq('value',val);
+    await loadAll();
+    toast('Διαγράφηκε','s');
+    // Remove chip
+    document.querySelectorAll('#qoList .opt-chip').forEach(chip=>{
+      if(chip.querySelector('span')?.textContent===val) chip.remove();
+    });
+  } catch(e) { toast('Σφάλμα','e'); }
+}
+
+async function closeQuickOpts(fieldName) {
+  const ov = document.getElementById('quickOptsOv');
+  if (ov) ov.remove();
+  // Refresh all selects with this field
+  await loadAll();
+  refreshSelectsForField(fieldName);
+}
+
+function refreshSelectsForField(fieldName) {
+  // Refresh single selects
+  const sel = document.getElementById(fieldName);
+  if (sel) {
+    const currentVal = sel.value;
+    const newOpts = opts(fieldName)||[];
+    sel.innerHTML = `<option value="">Επιλογή...</option>` +
+      newOpts.map(o=>`<option value="${o}" ${o===currentVal?'selected':''}>${o}</option>`).join('');
+  }
+  // Refresh multiselects
+  const msMap = {
+    'ΠΕΡΙΟΧΗ':'z_per','ΕΙΔΟΣ':'z_ei','ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ':['a_tr','z_tr'],
+    'ΟΡΟΦΟΣ':'z_or','ΕΙΔΙΚΑ_ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ':'z_xar'
+  };
+  const msIds = msMap[fieldName];
+  if (msIds) {
+    const ids = Array.isArray(msIds)?msIds:[msIds];
+    ids.forEach(msId=>{
+      const dd = document.getElementById('mso_'+msId);
+      if (!dd) return;
+      const list = document.getElementById('msol_'+msId);
+      if (!list) return;
+      const hid = document.getElementById('msv_'+msId);
+      const selVals = hid?.value?.split('||').filter(Boolean)||[];
+      const newOpts = opts(fieldName)||[];
+      list.innerHTML = newOpts.map(o=>`
+        <div class="ms-opt ${selVals.includes(o)?'sel':''}" onclick="event.stopPropagation();tgTag('${msId}','${o.replace(/'/g,"\'")}')">
+          <input type="checkbox" ${selVals.includes(o)?'checked':''} onclick="event.stopPropagation();tgTag('${msId}','${o.replace(/'/g,"\'")}')"> ${o}
+        </div>`).join('');
+    });
+  }
+}
+
+function toggleBD(id) {
+  const el=document.getElementById(id);
+  const ico=document.getElementById(id+'_ico');
+  if(!el) return;
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  if(ico) ico.textContent=open?'▼':'▶';
+}
+
+async function openZiForm(id=null) {
+  let r={};
+  if(id){const res=await sb.from('zitiseis').select('*').eq('id',id).single();r=res.data||{};}
+  const uid=r.user_id||'';
+
+  openModal(id?'✏️ Επεξεργασία Ζήτησης':'+ Νέα Ζήτηση',`
+    <div class="fg">
+      <div class="f"><label>Ημερομηνία</label><input type="date" id="z_dt" value="${r.imerominia||new Date().toISOString().split('T')[0]}"></div>
+      <div class="f"><label>Agent</label><select id="z_us"><option value="">— Επιλογή —</option>${DB.users.map(u=>`<option value="${u.id}" ${r.user_id===u.id?'selected':''}>${u.name}</option>`).join('')}</select></div>
+      <div class="f fspan"><label style="display:flex;justify-content:space-between;align-items:center">Περιοχή (πολλαπλή)<button type="button" onclick="openQuickOpts('ΠΕΡΙΟΧΗ')" style="width:22px;height:22px;border-radius:4px;border:1.5px solid var(--gold);background:none;cursor:pointer;color:var(--gold);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">+</button></label>${buildMS('z_per', opts('ΠΕΡΙΟΧΗ'), r.periochi||[], true)}</div>
+      <div class="f fspan"><label style="display:flex;justify-content:space-between;align-items:center">Είδος Ακινήτου (πολλαπλή)<button type="button" onclick="openQuickOpts('ΕΙΔΟΣ')" style="width:22px;height:22px;border-radius:4px;border:1.5px solid var(--gold);background:none;cursor:pointer;color:var(--gold);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">+</button></label>${buildMS('z_ei', opts('ΕΙΔΟΣ'), r.eidos||[], true)}</div>
+      <div class="f"><label>Από Έτος</label><input type="number" id="z_ea" value="${r.apo_etos||''}" placeholder="π.χ. 2000"></div>
+      <div class="f"><label>Έως Έτος</label><input type="number" id="z_ee" value="${r.eos_etos||''}" placeholder="π.χ. 2015"></div>
+      <div class="f"><label>Δωμάτια</label><select id="z_do"><option value="">Επιλογή...</option>${opts('ΔΩΜΑΤΙΑ').map(d=>`<option value="${d}" ${r.domatia===d?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="f fspan"><label>Όροφος (πολλαπλή)</label>${buildMS('z_or', opts('ΟΡΟΦΟΣ'), r.orofos||[], false)}</div>
+      <div class="f"><label>Εμβαδό Min (τ.μ.)</label><input type="number" id="z_em1" value="${r.emvado_min||''}" placeholder="π.χ. 70"></div>
+      <div class="f"><label>Εμβαδό Max (τ.μ.)</label><input type="number" id="z_em2" value="${r.emvado_max||''}" placeholder="π.χ. 120"></div>
+      <div class="f"><label>Θέση Στάθμευσης</label><select id="z_sta"><option value="">—</option>${opts('ΘΕΣΗ_ΣΤΑΘΜΕΥΣΗΣ').map(s=>`<option value="${s}" ${r.thesi_stathmeysis===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Αποθήκη</label><select id="z_ap"><option value="">—</option>${opts('ΑΠΟΘΗΚΗ').map(s=>`<option value="${s}" ${r.apothiki===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Τιμή Min (€)</label><input type="number" id="z_t1" value="${r.timi_min||''}" placeholder="π.χ. 100000"></div>
+      <div class="f"><label>Τιμή Max (€)</label><input type="number" id="z_t2" value="${r.timi_max||''}" placeholder="π.χ. 200000"></div>
+      <div class="f fspan"><label>Τρόπος Πληρωμής</label>${buildMS('z_tr', opts('ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ'), r.tropos_pliromis||[], false)}</div>
+      <div class="f fspan"><label>Ειδικά Χαρακτηριστικά</label>${buildMS('z_xar', opts('ΕΙΔΙΚΑ_ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ')||[], r.eidika_xaraktiristika||[], true)}</div>
+      <div class="f"><label>Αξιολόγηση</label><select id="z_ax"><option value="">—</option>${['HOT','MEDIUM','COLD'].map(s=>`<option value="${s}" ${r.aksiologisi===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Πελάτης</label><input type="text" id="z_pe" value="${r.pelatis||''}" placeholder="Όνομα πελάτη"></div>
+      <div class="f"><label>Τηλέφωνο</label><input type="tel" id="z_te" value="${r.tilefono||''}" placeholder="69xxxxxxxx"></div>
+    </div>
+  `,`
+    <button class="btn btn-out" onclick="CM()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveZi('${id||''}')">💾 ${id?'Αποθήκευση':'Δημιουργία'}</button>
+  `);
+}
+
+async function saveZi(id) {
+  const data={
+    imerominia: document.getElementById('z_dt').value||null,
+    user_id: document.getElementById('z_us').value||ME.id,
+    periochi: getMS('z_per'),
+    eidos: getMS('z_ei'),
+    apo_etos: parseInt(document.getElementById('z_ea').value)||null,
+    eos_etos: parseInt(document.getElementById('z_ee').value)||null,
+    domatia: document.getElementById('z_do').value||null,
+    orofos: getMS('z_or'),
+    emvado_min: parseFloat(document.getElementById('z_em1').value)||null,
+    emvado_max: parseFloat(document.getElementById('z_em2').value)||null,
+    thesi_stathmeysis: document.getElementById('z_sta').value||null,
+    apothiki: document.getElementById('z_ap').value||null,
+    timi_min: parseFloat(document.getElementById('z_t1').value)||null,
+    timi_max: parseFloat(document.getElementById('z_t2').value)||null,
+    tropos_pliromis: getMS('z_tr'),
+    eidika_xaraktiristika: getMS('z_xar'),
+    aksiologisi: document.getElementById('z_ax').value||null,
+    pelatis: document.getElementById('z_pe').value||null,
+    tilefono: document.getElementById('z_te').value||null,
+    user_email: ME.email,
+  };
+  Object.keys(data).forEach(k=>{if(data[k]===null||data[k]==='') delete data[k]; else if(Array.isArray(data[k])&&!data[k].length) delete data[k];});
+  load(true);
+  try {
+    if(id){await sb.from('zitiseis').update(data).eq('id',id);toast('Αποθηκεύτηκε!','s');}
+    else{await sb.from('zitiseis').insert(data);toast('Δημιουργήθηκε!','s');}
+    CM(); await loadAll(); pgZi(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  } catch(e){console.error(e);toast('Σφάλμα: '+e.message,'e');}
+  load(false);
+}
+
+async function delZi(id) {
+  if(!confirm('Διαγραφή;')) return;
+  load(true);
+  await sb.from('zitiseis').delete().eq('id',id);
+  toast('Διαγράφηκε','s'); CM(); await loadAll();
+  pgZi(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  load(false);
+}
+
+// ── MATCHING PAGE ─────────────────────────────────────────────
+function pgMatching(C, A) {
+  A.innerHTML=`<button class="btn btn-out btn-sm" onclick="doRefresh()">↻</button>`;
+  const zi=myZi();
+  const allMatches=[];
+  zi.forEach(z=>{
+    const m=findMatching(z);
+    m.forEach(ak=>allMatches.push({zi:z,ak,score:ak.score}));
+  });
+  allMatches.sort((a,b)=>b.score-a.score);
+
+  if(!allMatches.length){C.innerHTML=`<div class="empty"><div class="empty-ic">⭐</div><div class="empty-tx">Δεν βρέθηκαν αποτελέσματα</div><div style="font-size:12px;color:var(--text3);margin-top:8px">Προσθέστε ζητήσεις για να δείτε matching ακίνητα</div></div>`;return;}
+
+  C.innerHTML=`
+    <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <div class="srch"><span class="srch-ic">🔍</span><input placeholder="Αναζήτηση..." id="maSrch" oninput="filterMa()" style="width:200px"></div>
+      <select class="fsel" id="maMin" onchange="filterMa()"><option value="0">Όλα τα σκορ</option><option value="90">90%+</option><option value="80">80%+</option><option value="70">70%+</option><option value="60">60%+</option></select>
+    </div>
+    <div class="sg" id="maGrid"></div>`;
+  renderMaCards(allMatches);
+}
+
+function renderMaCards(matches) {
+  const g=document.getElementById('maGrid'); if(!g) return;
+  if(!matches.length){g.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-ic">⭐</div><div class="empty-tx">Δεν βρέθηκαν αποτελέσματα</div></div>`;return;}
+  g.innerHTML=matches.slice(0,50).map(({zi,ak,score})=>{
+    const cls=score>=90?'s-green':score>=80?'s-blue':score>=70?'s-warn':'s-err';
+    return`<div class="sc" onclick="viewAk('${ak.id}')">
+      <div class="sc-head">
+        <div style="flex:1;padding-right:10px">
+          <div style="font-size:15px;font-weight:700">${ak.periochi||'—'}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${ak.eidos||'—'}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Ζήτηση #${zi.aa||''} · ${getAgentName(zi.user_id)}</div>
+        </div>
+        <div class="sc-circle ${cls}"><span>${score}%</span><span style="font-size:8px;text-transform:uppercase">match</span></div>
+      </div>
+      <div style="padding:12px 14px">
+        <div style="font-size:18px;font-weight:700;color:var(--gold);margin-bottom:8px">${fmtEuro(ak.timi)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Εμβαδό</div><div style="font-size:12px;font-weight:600">${ak.emvado_meikto?ak.emvado_meikto+' τ.μ.':'—'}</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Δωμάτια</div><div style="font-size:12px;font-weight:600">${ak.domatia||'—'}</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Στάθμευση</div><div style="font-size:12px;font-weight:600">${ak.thesi_stathmeysis||'—'}</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Status</div><div><span class="badge ${statusColors[ak.status]||'b-gray'}">${ak.status||'—'}</span></div></div>
+        </div>
+        <div class="prog"><div class="prog-fill" style="width:${score}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterMa() {
+  const s=(document.getElementById('maSrch')?.value||'').toLowerCase();
+  const min=parseInt(document.getElementById('maMin')?.value||'0')||0;
+  const zi=myZi();
+  let all=[];
+  zi.forEach(z=>{findMatching(z).filter(ak=>ak.score>=min).forEach(ak=>all.push({zi:z,ak,score:ak.score}));});
+  all.sort((a,b)=>b.score-a.score);
+  if(s) all=all.filter(m=>JSON.stringify(m.ak).toLowerCase().includes(s)||JSON.stringify(m.zi).toLowerCase().includes(s));
+  renderMaCards(all);
+}
+
+// ── ΚΑΤΑΣΚΕΥΑΣΤΕΣ ────────────────────────────────────────────
+function pgKat(C, A) {
+  const canEdit=['admin','agent'].includes(ME.role);
+  A.innerHTML=canEdit?`<button class="btn btn-dark" onclick="openKatForm()">+ Νέος</button>`:'';
+  C.innerHTML=`<div class="list-box">
+    <div class="list-head"><span class="list-ttl">Κατασκευαστές</span><span class="list-cnt"> (${DB.kat.length})</span>
+    <div style="margin-left:auto"><div class="srch"><span class="srch-ic">🔍</span><input placeholder="Αναζήτηση..." id="katSrch" oninput="filterKat()"></div></div></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Όνομα</th><th>Εταιρεία</th><th>Τηλέφωνο</th><th>Email</th><th>Περιοχές</th><th>Κατηγορία</th></tr></thead>
+    <tbody id="katBody"></tbody></table></div></div>`;
+  renderKatRows(DB.kat);
+}
+
+function renderKatRows(recs) {
+  const tb=document.getElementById('katBody'); if(!tb) return;
+  if(!recs.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="empty-ic">🔧</div><div class="empty-tx">Δεν βρέθηκαν</div></div></td></tr>`;return;}
+  tb.innerHTML=recs.map(r=>`<tr onclick="viewKat('${r.id}')">
+    <td><strong>${r.onomateponymo||'—'}</strong></td>
+    <td>${r.etaireia||'—'}</td>
+    <td>${r.tilefono||'—'}</td>
+    <td>${r.email||'—'}</td>
+    <td>${r.perioches_kalypsis||'—'}</td>
+    <td>${r.kategoria||'—'}</td>
+  </tr>`).join('');
+}
+
+function filterKat(){const s=(document.getElementById('katSrch')?.value||'').toLowerCase();renderKatRows(s?DB.kat.filter(x=>JSON.stringify(x).toLowerCase().includes(s)):DB.kat);}
+
+function viewKat(id){
+  const r=DB.kat.find(x=>x.id===id); if(!r) return;
+  const canEdit=['admin','agent'].includes(ME.role);
+  openModal('🔧 Κατασκευαστής',`<div class="dg">
+    ${Object.entries({Όνομα:r.onomateponymo,Εταιρεία:r.etaireia,Τηλέφωνο:r.tilefono,Email:r.email,'Περιοχές Κάλυψης':r.perioches_kalypsis,Κατηγορία:r.kategoria,Rating:r.rating,Σημειώσεις:r.simeiosis}).map(([k,v])=>v?`<div class="di"><div class="di-lbl">${k}</div><div class="di-val">${v}</div></div>`:'').join('')}
+  </div>`,`
+    ${canEdit?`<button class="btn btn-err btn-sm" onclick="delKat('${id}')">🗑️</button><button class="btn btn-dark btn-sm" onclick="CM();openKatForm('${id}')">✏️</button>`:''}
+    <button class="btn btn-out btn-sm" onclick="CM()">Κλείσιμο</button>`);
+}
+
+async function openKatForm(id=null){
+  let r={};
+  if(id){const res=await sb.from('kataskevastes').select('*').eq('id',id).single();r=res.data||{};}
+  openModal(id?'✏️ Επεξεργασία':'+ Νέος Κατασκευαστής',`<div class="fg">
+    <div class="f fspan"><label>Ονοματεπώνυμο</label><input type="text" id="k_n" value="${r.onomateponymo||''}"></div>
+    <div class="f"><label>Εταιρεία</label><input type="text" id="k_et" value="${r.etaireia||''}"></div>
+    <div class="f"><label>Κατηγορία</label><input type="text" id="k_ka" value="${r.kategoria||''}"></div>
+    <div class="f"><label>Agent</label><select id="k_us"><option value="">— Επιλογή —</option>${DB.users.map(u=>`<option value="${u.id}" ${r.user_id===u.id?'selected':''}>${u.name}</option>`).join('')}</select></div>
+    <div class="f"><label>Τηλέφωνο</label><input type="tel" id="k_ti" value="${r.tilefono||''}"></div>
+    <div class="f"><label>Email</label><input type="email" id="k_em" value="${r.email||''}"></div>
+    <div class="f fspan"><label>Περιοχές Κάλυψης</label>${buildMS('k_pe', opts('ΠΕΡΙΟΧΗ'), Array.isArray(r.perioches_kalypsis)?r.perioches_kalypsis:(r.perioches_kalypsis?r.perioches_kalypsis.split(',').map(s=>s.trim()).filter(Boolean):[]), false)}</div>
+    <div class="f"><label>Rating (1-5)</label><input type="number" id="k_ra" min="1" max="5" value="${r.rating||''}"></div>
+    <div class="f fspan"><label>Σημειώσεις</label><textarea id="k_si" rows="2">${r.simeiosis||''}</textarea></div>
+  </div>`,`<button class="btn btn-out" onclick="CM()">Ακύρωση</button><button class="btn btn-dark" onclick="saveKat('${id||''}')">💾</button>`);
+}
+
+async function saveKat(id){
+  const data={onomateponymo:document.getElementById('k_n').value,etaireia:document.getElementById('k_et').value,kategoria:document.getElementById('k_ka').value,tilefono:document.getElementById('k_ti').value,email:document.getElementById('k_em').value,perioches_kalypsis:getMS('k_pe').join(', '),rating:parseInt(document.getElementById('k_ra').value)||null,simeiosis:document.getElementById('k_si').value,user_id:document.getElementById('k_us').value||ME.id};
+  Object.keys(data).forEach(k=>{if(!data[k]&&data[k]!==0) delete data[k];});
+  load(true);
+  try{if(id){await sb.from('kataskevastes').update(data).eq('id',id);toast('Αποθηκεύτηκε!','s');}else{await sb.from('kataskevastes').insert(data);toast('Δημιουργήθηκε!','s');}CM();await loadAll();pgKat(document.getElementById('pgContent'),document.getElementById('tbRight'));}
+  catch(e){toast('Σφάλμα','e');}load(false);
+}
+
+async function delKat(id){if(!confirm('Διαγραφή;'))return;load(true);await sb.from('kataskevastes').delete().eq('id',id);toast('Διαγράφηκε','s');CM();await loadAll();pgKat(document.getElementById('pgContent'),document.getElementById('tbRight'));load(false);}
+
+// ── USERS ─────────────────────────────────────────────────────
+function pgUsers(C, A) {
+  if(ME.role!=='admin'){C.innerHTML='<div class="empty"><div class="empty-ic">🔒</div><div class="empty-tx">Δεν έχεις πρόσβαση</div></div>';return;}
+  A.innerHTML=`<button class="btn btn-dark" onclick="openUserForm()">+ Νέος Χρήστης</button>`;
+  C.innerHTML=`<div class="list-box">
+    <div class="list-head"><span class="list-ttl">Χρήστες</span><span class="list-cnt"> (${DB.users.length})</span></div>
+    <table><thead><tr><th>Όνομα</th><th>Email</th><th>Κινητό</th><th>Ρόλος</th><th>Ενεργός</th></tr></thead>
+    <tbody>
+      ${DB.users.filter(u=>!u.active).length?`
+        <tr><td colspan="5" style="background:rgba(217,119,6,0.08);padding:6px 14px;font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.5px">
+          ⏳ Εκκρεμεί ενεργοποίηση (${DB.users.filter(u=>!u.active).length})
+        </td></tr>
+        ${DB.users.filter(u=>!u.active).map(u=>`
+          <tr onclick="openUserForm('${u.id}')" style="background:rgba(217,119,6,0.04)">
+            <td><strong>${u.name||'—'}</strong></td>
+            <td>${u.email||'—'}</td>
+            <td>${u.phone||'—'}</td>
+            <td><span class="badge b-gray">agent</span></td>
+            <td>⏳ <button class="btn btn-gold btn-sm" onclick="event.stopPropagation();activateUser('${u.id}')">Ενεργοποίηση</button></td>
+          </tr>`).join('')}
+        <tr><td colspan="5" style="background:var(--bg3);padding:6px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">
+          Ενεργοί χρήστες
+        </td></tr>`:''}
+      ${DB.users.filter(u=>u.active).map(u=>{const rc={admin:'b-red',agent:'b-blue'}[u.role]||'b-gray';
+        return`<tr onclick="openUserForm('${u.id}')"><td><strong>${u.name||'—'}</strong></td><td>${u.email||'—'}</td><td>${u.phone||'—'}</td><td><span class="badge ${rc}">${u.role}</span></td><td>✅</td></tr>`;}).join('')}
+    </tbody></table></div>`;
+}
+
+async function openUserForm(id=null){
+  let u={};
+  if(id){const res=await sb.from('users').select('*').eq('id',id).single();u=res.data||{};}
+  openModal(id?'✏️ Επεξεργασία Χρήστη':'+ Νέος Χρήστης',`<div class="fg">
+    <div class="f fspan"><label>Ονοματεπώνυμο</label><input type="text" id="u_n" value="${u.name||''}"></div>
+    <div class="f"><label>Email ${id?'(δεν αλλάζει)':''}</label><input type="email" id="u_e" value="${u.email||''}" ${id?'readonly style="background:var(--bg3);color:var(--text3)"':''}></div>
+    <div class="f"><label>${id?'Νέος Κωδικός (κενό=χωρίς αλλαγή)':'Κωδικός *'}</label><input type="password" id="u_p"></div>
+    <div class="f"><label>Κινητό</label><input type="tel" id="u_ph" value="${u.phone||''}"></div>
+    <div class="f"><label>Ρόλος</label><select id="u_r">${['admin','agent'].map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select></div>
+    <div class="f fspan">
+      <label>Φωτογραφία (Avatar)</label>
+      <input type="file" id="u_photo" accept="image/*" style="padding:7px;border:1.5px solid var(--border);border-radius:var(--r2);width:100%;background:var(--bg2);color:var(--text)">
+      <div id="u_photo_prog" style="font-size:11px;color:var(--gold);margin-top:4px"></div>
+      ${u.photo_url?`<div style="margin-top:8px;display:flex;align-items:center;gap:10px"><img src="${u.photo_url}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)"><span style="font-size:12px;color:var(--text2)">Τρέχουσα φωτογραφία</span></div>`:''}
+      <input type="hidden" id="u_photo_existing" value="${u.photo_url||''}">
+    </div>
+    <div class="f">${mkCk('u_act','Ενεργός',u.active!==false)}</div>
+  </div>`,`
+    ${id?`<button class="btn btn-err btn-sm" onclick="delUser('${id}')">🗑️</button>`:''}
+    <button class="btn btn-out" onclick="CM()">Ακύρωση</button>
+    <button class="btn btn-dark" onclick="saveUser('${id||''}')">💾</button>`);
+}
+
+async function saveUser(id){
+  const name=document.getElementById('u_n').value;
+  const email=document.getElementById('u_e').value;
+  const pass=document.getElementById('u_p').value;
+  const phone=document.getElementById('u_ph').value;
+  const role=document.getElementById('u_r').value;
+  const active=document.getElementById('u_act').checked;
+
+  if(!id && (!email||!pass)){toast('Email και κωδικός είναι υποχρεωτικά','e');return;}
+
+  load(true);
+  try {
+    // Upload photo if selected
+    let photo_url = document.getElementById('u_photo_existing')?.value||null;
+    const newPhotos = await uploadFiles('u_photo','u_photo_prog');
+    if(newPhotos.length) photo_url = newPhotos[0];
+    if(!id) {
+      // Create auth user
+      const {data:authData, error:authErr} = await sb.auth.admin?.createUser({
+        email, password:pass, email_confirm:true
+      });
+      if(authErr) {
+        // Fallback: user must sign up themselves
+        toast('Ο χρήστης πρέπει να εγγραφεί μόνος του με αυτό το email','i');
+        // Just create profile
+        await sb.from('users').insert({name,email,phone,role,active,photo_url});
+      } else {
+        await sb.from('users').insert({auth_id:authData.user.id,name,email,phone,role,active,photo_url});
+      }
+      toast('Δημιουργήθηκε!','s');
+    } else {
+      await sb.from('users').update({name,phone,role,active,photo_url}).eq('id',id);
+      if(pass) {
+        toast('Για αλλαγή κωδικού ο χρήστης χρησιμοποιεί το "Ξέχασα κωδικό"','i');
+      }
+      toast('Αποθηκεύτηκε!','s');
+    }
+    CM(); await loadAll(); pgUsers(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  } catch(e){console.error(e);toast('Σφάλμα: '+e.message,'e');}
+  load(false);
+}
+
+async function activateUser(id) {
+  load(true);
+  try {
+    await sb.from('users').update({active:true}).eq('id',id);
+    toast('Χρήστης ενεργοποιήθηκε!','s');
+    await loadAll();
+    pgUsers(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  } catch(e) { toast('Σφάλμα','e'); }
+  load(false);
+}
+
+async function delUser(id){
+  if(!confirm('Διαγραφή χρήστη;'))return;
+  load(true);
+  await sb.from('users').delete().eq('id',id);
+  toast('Διαγράφηκε','s');CM();await loadAll();pgUsers(document.getElementById('pgContent'),document.getElementById('tbRight'));
+  load(false);
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function updateWeightTotal() {
+  const editable = Object.keys(WEIGHTS).filter(k=>!WEIGHTS[k].locked);
+  const total = WEIGHTS.base.value + editable.reduce((s,k)=>{
+    const el=document.getElementById('w_'+k);
+    return s+(el?parseInt(el.value)||0:WEIGHTS[k].value);
+  },0);
+  const el=document.getElementById('weightTotal');
+  if(el){el.textContent=total+'%';el.style.color=total===100?'var(--ok)':'var(--err)';}
+}
+
+async function saveWeights() {
+  const editable=Object.keys(WEIGHTS).filter(k=>!WEIGHTS[k].locked);
+  const total=WEIGHTS.base.value+editable.reduce((s,k)=>{const el=document.getElementById('w_'+k);return s+(el?parseInt(el.value)||0:0);},0);
+  if(total!==100){toast('Το σύνολο πρέπει να είναι 100%','e');return;}
+  editable.forEach(k=>{const el=document.getElementById('w_'+k);if(el)WEIGHTS[k].value=parseInt(el.value)||0;});
+  try {
+    await sb.from('options').upsert({field_name:'__WEIGHTS__',value:JSON.stringify(WEIGHTS),active:true},{onConflict:'field_name,value'});
+    toast('Βάρη αποθηκεύτηκαν!','s');
+  } catch(e){toast('Σφάλμα αποθήκευσης','e');}
+}
+
+async function resetWeights() {
+  if(!confirm('Επαναφορά στις προεπιλεγμένες τιμές;')) return;
+  WEIGHTS = {...DEFAULT_WEIGHTS};
+  await sb.from('options').delete().eq('field_name','__WEIGHTS__');
+  toast('Επαναφορά ολοκληρώθηκε!','s');
+  pgSettings(document.getElementById('pgContent'),document.getElementById('tbRight'));
+}
+
+function pgSettings(C, A, activeTab='options') {
+  if(ME.role!=='admin'){C.innerHTML='<div class="empty"><div class="empty-ic">🔒</div><div class="empty-tx">Δεν έχεις πρόσβαση</div></div>';return;}
+
+  const fieldGroups = [
+    {key:'ΠΕΡΙΟΧΗ', label:'Περιοχές'},
+    {key:'ΕΙΔΟΣ', label:'Είδος Ακινήτου'},
+    {key:'ΔΩΜΑΤΙΑ', label:'Δωμάτια'},
+    {key:'ΟΡΟΦΟΣ', label:'Όροφος'},
+    {key:'ΑΣΑΝΣΕΡ', label:'Ασανσέρ'},
+    {key:'ΘΕΣΗ_ΣΤΑΘΜΕΥΣΗΣ', label:'Θέση Στάθμευσης'},
+    {key:'ΑΠΟΘΗΚΗ', label:'Αποθήκη'},
+    {key:'STATUS', label:'Status Ακινήτου'},
+    {key:'ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ', label:'Τρόπος Πληρωμής'},
+    {key:'ΕΙΔΙΚΑ_ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ', label:'Ειδικά Χαρακτηριστικά'},
+  ];
+
+  const tabsHTML = '<div class="l-tabs" style="margin-bottom:20px;max-width:400px">'
+    + '<button class="l-tab ' + (activeTab==='options'?'active':'') + '" onclick="goP('settings',null,'options')">📋 Επιλογές</button>'
+    + '<button class="l-tab ' + (activeTab==='weights'?'active':'') + '" onclick="goP('settings',null,'weights')">⚖️ Βάρη Matching</button>'
+    + '</div>';
+
+  let bodyHTML = '';
+
+  if (activeTab === 'options') {
+    bodyHTML = '<div style="margin-bottom:16px"><p style="color:var(--text2);font-size:13px">Διαχείριση επιλογών για τα dropdown πεδία.</p></div>';
+    bodyHTML += fieldGroups.map(g => {
+      const chips = (opts(g.key)||[]).map(v =>
+        `<div class="opt-chip"><span>${v}</span><button onclick="delOpt('${g.key}','${v.replace(/'/g,"\'")}')">×</button></div>`
+      ).join('');
+      return `<div class="set-card">
+        <div class="set-ttl"><span>${g.label}</span><span style="font-size:11px;color:var(--text3)">${(opts(g.key)||[]).length} επιλογές</span></div>
+        <div class="opt-list" id="optList_${g.key}">${chips}</div>
+        <div class="opt-add">
+          <input type="text" id="optInp_${g.key}" placeholder="Νέα επιλογή..." onkeydown="if(event.key==='Enter')addOpt('${g.key}')">
+          <button class="btn btn-gold btn-sm" onclick="addOpt('${g.key}')">+ Προσθήκη</button>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    // Weights tab
+    const weightsRows = Object.entries(WEIGHTS).map(([k,w]) => {
+      const inp = w.locked
+        ? `<span style="font-size:13px;font-weight:700;color:var(--gold);width:60px;text-align:right">${w.value}% 🔒</span>`
+        : `<input type="number" id="w_${k}" value="${w.value}" min="0" max="50" style="width:60px;padding:5px 8px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;text-align:center;background:var(--bg2);color:var(--text);outline:none" oninput="updateWeightTotal()"><span style="font-size:11px;color:var(--text3)">%</span>`;
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="flex:1;font-size:13px">${w.label}</span>${inp}
+      </div>`;
+    }).join('');
+
+    bodyHTML = `<div class="set-card">
+      <div class="set-ttl">
+        <span>⚖️ Βάρη Matching Score</span>
+        <button class="btn btn-out btn-sm" onclick="resetWeights()">↺ Επαναφορά</button>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Ορίστε τη βαρύτητα κάθε κριτηρίου. Το σύνολο πρέπει να είναι 100%.</p>
+      <div id="weightsUI">
+        ${weightsRows}
+        <div style="padding:10px 12px;background:var(--bg2);border-radius:var(--r2);display:flex;justify-content:space-between;margin-top:6px">
+          <span style="font-size:13px;font-weight:600">Σύνολο</span>
+          <span id="weightTotal" style="font-size:14px;font-weight:700;color:var(--gold)">100%</span>
+        </div>
+        <button class="btn btn-dark" style="margin-top:12px;width:100%" onclick="saveWeights()">💾 Αποθήκευση Βαρών</button>
+      </div>
+    </div>`;
+  }
+
+  C.innerHTML = tabsHTML + bodyHTML;
+}
+
+function printAk(id){
+  const r=DB.ak.find(x=>x.id===id);if(!r)return;
+  const logo=localStorage.getItem('crm_logo')||'';
+  const photo=r.photos&&r.photos[0]?r.photos[0]:'';
+  const headerImg=photo||logo;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ακίνητο</title>
+  <style>
+    body{font-family:-apple-system,sans-serif;max-width:720px;margin:36px auto;color:#111;font-size:13px}
+    .header{display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #c9a96e}
+    .header-img{width:160px;height:120px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid #eee}
+    .header-logo{width:160px;height:120px;display:flex;align-items:center;justify-content:center;background:#f8f8f8;border-radius:8px;flex-shrink:0;border:1px solid #eee;font-size:22px;font-weight:700;color:#c9a96e}
+    .header-info h1{font-size:22px;margin-bottom:4px;font-weight:700}
+    .header-info .sub{color:#666;font-size:14px;margin-bottom:8px}
+    .header-info .timi{font-size:24px;font-weight:700;color:#c9a96e}
+    .header-info .status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#e8f5e9;color:#2e7d32;margin-top:6px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    tr:nth-child(even){background:#f9f9f9}
+    td{padding:7px 10px;border-bottom:1px solid #eee;font-size:12px}
+    td:first-child{font-weight:600;color:#666;text-transform:uppercase;font-size:11px;width:38%}
+    .footer{margin-top:20px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:10px;display:flex;justify-content:space-between}
+    @media print{.noprint{display:none}}
+  </style>
+  </head><body>
+  <div class="header">
+    ${headerImg
+      ? (photo
+        ? `<img class="header-img" src="${photo}">`
+        : `<img class="header-img" src="${logo}" style="object-fit:contain;padding:10px">`)
+      : `<div class="header-logo">TH</div>`}
+    <div class="header-info">
+      <h1>${r.periochi||'—'}</h1>
+      <div class="sub">${r.eidos||'—'}${r.domatia?' · '+r.domatia+' δωμ.':''}${r.emvado_meikto?' · '+r.emvado_meikto+' τ.μ.':''}</div>
+      <div class="timi">${fmtEuro(r.timi)}</div>
+      <span class="status">${r.status||''}</span>
+    </div>
+  </div>
+  <table>
+    <tr><td>Α/Α</td><td>${r.aa||'—'}</td></tr>
+    <tr><td>Ημερομηνία</td><td>${fmtDate(r.imerominia)}</td></tr>
+    <tr><td>Agent</td><td>${getAgentName(r.user_id)}</td></tr>
+    <tr><td>Είδος Ακινήτου</td><td>${r.eidos||'—'}</td></tr>
+    <tr><td>Περιοχή</td><td>${r.periochi||'—'}</td></tr>
+    <tr><td>Τιμή</td><td>${fmtEuro(r.timi)}</td></tr>
+    <tr><td>Τιμή/τ.μ.</td><td>${r.timi_ana_metro?fmtEuro(r.timi_ana_metro):''}</td></tr>
+    <tr><td>Εμβαδό Μεικτό</td><td>${r.emvado_meikto?r.emvado_meikto+' τ.μ.':'—'}</td></tr>
+    <tr><td>Εμβαδό Καθαρό</td><td>${r.emvado_katharo?r.emvado_katharo+' τ.μ.':'—'}</td></tr>
+    <tr><td>Έτος Κατασκευής</td><td>${r.etos_kataskeyis||'—'}</td></tr>
+    <tr><td>Όροφος</td><td>${r.orofos||'—'}</td></tr>
+    <tr><td>Δωμάτια</td><td>${r.domatia||'—'}</td></tr>
+    <tr><td>Ασανσέρ</td><td>${r.asanser||'—'}</td></tr>
+    <tr><td>Θέση Στάθμευσης</td><td>${r.thesi_stathmeysis||'—'}</td></tr>
+    <tr><td>Αποθήκη</td><td>${r.apothiki||'—'}</td></tr>
+    <tr><td>Εκτίμηση</td><td>${fmtEuro(r.ektimisi)}</td></tr>
+    <tr><td>Τρόπος Πληρωμής</td><td>${arrStr(r.tropos_pliromis)}</td></tr>
+    <tr><td>Συνεργασίες</td><td>${r.synergasies||'—'}</td></tr>
+    ${r.simeiosis?`<tr><td>Σημειώσεις</td><td>${r.simeiosis}</td></tr>`:''}
+  </table>
+  <div class="footer">
+    <span>TerraHomes CRM</span>
+    <span>Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</span>
+  </div>
+  <button class="noprint" onclick="window.print()" style="margin-top:14px;padding:9px 20px;background:#c9a96e;border:none;color:#fff;cursor:pointer;border-radius:6px">🖨️ Εκτύπωση / PDF</button>
+  </body></html>`);
+  w.document.close();
+}
+
+function viberAk(id){
+  const r=DB.ak.find(x=>x.id===id);if(!r)return;
+  const lines=[
+    '🏠 ΑΚΙΝΗΤΟ',
+    '━━━━━━━━━━━━━━━━━━━━',
+    `Α/Α: ${r.aa||'—'}`,
+    `Agent: ${getAgentName(r.user_id)}`,
+    '',
+    `📍 Περιοχή: ${r.periochi||'—'}`,
+    `🏠 Είδος: ${r.eidos||'—'}`,
+    `📊 Status: ${r.status||'—'}`,
+    '',
+    `💰 Τιμή: ${fmtEuro(r.timi)}`,
+    r.timi_ana_metro?`💹 Τιμή/τ.μ.: ${fmtEuro(r.timi_ana_metro)}`:'',
+    r.emvado_meikto?`📐 Εμβαδό Μεικτό: ${r.emvado_meikto} τ.μ.`:'',
+    r.emvado_katharo?`📐 Εμβαδό Καθαρό: ${r.emvado_katharo} τ.μ.`:'',
+    '',
+    r.etos_kataskeyis?`📅 Έτος Κατασκευής: ${r.etos_kataskeyis}`:'',
+    r.orofos?`🏗 Όροφος: ${r.orofos}`:'',
+    r.domatia?`🛏 Δωμάτια: ${r.domatia}`:'',
+    r.asanser?`🛗 Ασανσέρ: ${r.asanser}`:'',
+    r.thesi_stathmeysis?`🅿️ Στάθμευση: ${r.thesi_stathmeysis}`:'',
+    r.apothiki?`📦 Αποθήκη: ${r.apothiki}`:'',
+    '',
+    r.tropos_pliromis&&r.tropos_pliromis.length?`💳 Πληρωμή: ${arrStr(r.tropos_pliromis)}`:'',
+    r.synergasies?`🤝 Συνεργασίες: ${r.synergasies}`:'',
+    r.simeiosis?`\n📝 ${r.simeiosis}`:'',
+  ].filter(Boolean).join('\n');
+  window.open(`viber://forward?text=${encodeURIComponent(lines)}`);
+}
+
+function printZi(id){
+  const r=DB.zi.find(x=>x.id===id);if(!r)return;
+  const own=isOwnerZi(r);
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ζήτηση</title>
+  <style>body{font-family:-apple-system,sans-serif;max-width:680px;margin:36px auto;color:#111;font-size:13px}h1{font-size:20px;margin-bottom:18px}table{width:100%;border-collapse:collapse}tr:nth-child(even){background:#f9f9f9}td{padding:7px 10px;border-bottom:1px solid #eee;font-size:12px}td:first-child{font-weight:600;color:#666;text-transform:uppercase;font-size:11px;width:38%}.footer{margin-top:20px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:10px}@media print{.noprint{display:none}}</style>
+  </head><body><h1>Ζήτηση #${r.aa||''}</h1>
+  <table>
+    <tr><td>Α/Α Ζήτησης</td><td>${r.aa||'—'}</td></tr>
+    <tr><td>Agent</td><td>${getAgentName(r.user_id)}</td></tr>
+    <tr><td>Είδος Ακινήτου</td><td>${arrStr(r.eidos)}</td></tr>
+    <tr><td>Περιοχή</td><td>${arrStr(r.periochi)}</td></tr>
+    <tr><td>Δωμάτια</td><td>${r.domatia||'—'}</td></tr>
+    <tr><td>Όροφος</td><td>${arrStr(r.orofos)}</td></tr>
+    <tr><td>Από Έτος</td><td>${r.apo_etos||'—'}</td></tr>
+    <tr><td>Έως Έτος</td><td>${r.eos_etos||'—'}</td></tr>
+    <tr><td>Εμβαδό Min</td><td>${r.emvado_min?r.emvado_min+' τ.μ.':'—'}</td></tr>
+    <tr><td>Εμβαδό Max</td><td>${r.emvado_max?r.emvado_max+' τ.μ.':'—'}</td></tr>
+    <tr><td>Τιμή Min</td><td>${fmtEuro(r.timi_min)}</td></tr>
+    <tr><td>Τιμή Max</td><td>${fmtEuro(r.timi_max)}</td></tr>
+    <tr><td>Θέση Στάθμευσης</td><td>${r.thesi_stathmeysis||'—'}</td></tr>
+    <tr><td>Αποθήκη</td><td>${r.apothiki||'—'}</td></tr>
+    <tr><td>Τρόπος Πληρωμής</td><td>${arrStr(r.tropos_pliromis)}</td></tr>
+    <tr><td>Ειδικά Χαρακτηριστικά</td><td>${arrStr(r.eidika_xaraktiristika)}</td></tr>
+    <tr><td>Ημερομηνία</td><td>${fmtDate(r.imerominia)}</td></tr>
+    <tr><td>Αξιολόγηση</td><td>${r.aksiologisi||'—'}</td></tr>
+    ${own&&r.pelatis?`<tr><td>Πελάτης</td><td>${r.pelatis}</td></tr>`:''}
+    ${own&&r.tilefono?`<tr><td>Τηλέφωνο</td><td>${r.tilefono}</td></tr>`:''}
+    <tr><td>User Email</td><td>${r.user_email||''}</td></tr>
+  </table>
+  <div class="footer">Εκτυπώθηκε: ${new Date().toLocaleDateString('el-GR')}</div>
+  <button class="noprint" onclick="window.print()" style="margin-top:14px;padding:9px 20px;background:#c9a96e;border:none;color:#fff;cursor:pointer;border-radius:6px">🖨️ Εκτύπωση / PDF</button>
+  </body></html>`);
+  w.document.close();
+}
+
+function viberZi(id){
+  const r=DB.zi.find(x=>x.id===id);if(!r)return;
+  const own=isOwnerZi(r);
+  const lines=[
+    '🔍 ΖΗΤΗΣΗ ΑΚΙΝΗΤΟΥ',
+    '━━━━━━━━━━━━━━━━━━━━',
+    `Α/Α: ${r.aa||'—'}`,
+    `Agent: ${getAgentName(r.user_id)}`,
+    `Ημερομηνία: ${fmtDate(r.imerominia)}`,
+    '',
+    `📍 Περιοχή: ${arrStr(r.periochi)}`,
+    `🏠 Είδος: ${arrStr(r.eidos)}`,
+    r.domatia?`🛏 Δωμάτια: ${r.domatia}`:'',
+    r.orofos&&r.orofos.length?`🏗 Όροφος: ${arrStr(r.orofos)}`:'',
+    '',
+    `💰 Τιμή: ${fmtEuro(r.timi_min)} - ${fmtEuro(r.timi_max)}`,
+    r.emvado_min||r.emvado_max?`📐 Εμβαδό: ${r.emvado_min||'—'} - ${r.emvado_max||'—'} τ.μ.`:'',
+    r.apo_etos||r.eos_etos?`📅 Έτος: ${r.apo_etos||'—'} - ${r.eos_etos||'—'}`:'',
+    '',
+    r.thesi_stathmeysis?`🅿️ Θέση Στάθμευσης: ${r.thesi_stathmeysis}`:'',
+    r.apothiki?`📦 Αποθήκη: ${r.apothiki}`:'',
+    r.tropos_pliromis&&r.tropos_pliromis.length?`💳 Τρόπος Πληρωμής: ${arrStr(r.tropos_pliromis)}`:'',
+    r.eidika_xaraktiristika&&r.eidika_xaraktiristika.length?`⭐ Ειδικά Χαρακτηριστικά: ${arrStr(r.eidika_xaraktiristika)}`:'',
+    r.aksiologisi?`🎯 Αξιολόγηση: ${r.aksiologisi}`:'',
+  ].filter(Boolean).join('\n');
+  window.open(`viber://forward?text=${encodeURIComponent(lines)}`);
+}
+
+// ── MULTISELECT ───────────────────────────────────────────────
+function buildMS(id, options, selected=[], allowNew=false) {
+  const selArr = (Array.isArray(selected)?selected:[]).map(x=>typeof x==='object'?x.name||x:String(x));
+  return `
+    <div class="ms" id="ms_${id}">
+      <div class="ms-display" id="msd_${id}" onclick="toggleMS('${id}')">
+        <div id="mst_${id}" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;flex:1">
+          ${selArr.map(v=>`<span class="ms-tag">${v}<button type="button" onclick="event.stopPropagation();rmTag('${id}','${v.replace(/'/g,"\\'")}')">×</button></span>`).join('')}
+          ${!selArr.length?`<span class="ms-placeholder">Κλικ για επιλογή...</span>`:''}
+        </div>
+        <span style="color:var(--text3);font-size:10px;margin-left:4px">▼</span>
+      </div>
+      <div class="ms-dropdown" id="mso_${id}">
+        <div class="ms-search"><input type="text" placeholder="Αναζήτηση..." oninput="filterMS('${id}',this.value)" onclick="event.stopPropagation()"></div>
+        <div id="msol_${id}">
+          ${options.map(o=>`<div class="ms-opt ${selArr.includes(o)?'sel':''}" onclick="event.stopPropagation();tgTag('${id}','${o.replace(/'/g,"\\'")}')">
+            <input type="checkbox" ${selArr.includes(o)?'checked':''} onclick="event.stopPropagation();tgTag('${id}','${o.replace(/'/g,"\\'")}')"> ${o}
+          </div>`).join('')}
+        </div>
+        ${allowNew?`<div class="ms-add-row"><input type="text" id="msn_${id}" placeholder="+ Νέα επιλογή" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){event.preventDefault();addMSOpt('${id}');}"><button onclick="event.stopPropagation();addMSOpt('${id}')">+</button></div>`:''}
+      </div>
+      <input type="hidden" id="msv_${id}" value="${selArr.join('||')}">
+    </div>`;
+}
+
+function toggleMS(id){
+  const dd=document.getElementById('mso_'+id);
+  const disp=document.getElementById('msd_'+id);
+  if(!dd) return;
+  const isOpen=dd.classList.contains('open');
+  document.querySelectorAll('.ms-dropdown.open').forEach(el=>{el.classList.remove('open');document.getElementById('msd_'+el.id.replace('mso_',''))?.classList.remove('open');});
+  if(!isOpen){dd.classList.add('open');disp.classList.add('open');}
+}
+
+function filterMS(id, q) {
+  const list=document.getElementById('msol_'+id);if(!list) return;
+  const lq=q.toLowerCase();
+  list.querySelectorAll('.ms-opt').forEach(opt=>{opt.style.display=opt.textContent.trim().toLowerCase().includes(lq)?'':'none';});
+}
+
+function tgTag(id, val) {
+  const hid=document.getElementById('msv_'+id);if(!hid) return;
+  let vals=hid.value?hid.value.split('||').filter(Boolean):[];
+  const idx=vals.indexOf(val);
+  if(idx>=0) vals.splice(idx,1); else vals.push(val);
+  hid.value=vals.join('||');
+  refreshMSTags(id,vals);
+  const dd=document.getElementById('mso_'+id);
+  if(dd) dd.querySelectorAll('.ms-opt').forEach(opt=>{
+    const lbl=opt.textContent.trim();
+    opt.classList.toggle('sel',vals.includes(lbl));
+    const cb=opt.querySelector('input[type=checkbox]');
+    if(cb) cb.checked=vals.includes(lbl);
+  });
+}
+
+function rmTag(id,val){tgTag(id,val);}
+
+function refreshMSTags(id,vals){
+  const el=document.getElementById('mst_'+id);if(!el) return;
+  el.innerHTML=vals.map(v=>`<span class="ms-tag">${v}<button type="button" onclick="event.stopPropagation();rmTag('${id}','${v.replace(/'/g,"\\'")}')">×</button></span>`).join('')+(!vals.length?`<span class="ms-placeholder">Κλικ για επιλογή...</span>`:'');
+}
+
+async function addMSOpt(id) {
+  const inp=document.getElementById('msn_'+id);if(!inp||!inp.value.trim()) return;
+  const val=inp.value.trim();
+  // Map MS id to options field
+  const fieldMap={'z_per':'ΠΕΡΙΟΧΗ','z_ei':'ΕΙΔΟΣ','z_xar':'ΕΙΔΙΚΑ_ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ','a_tr':'ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ','z_tr':'ΤΡΟΠΟΣ_ΠΛΗΡΩΜΗΣ','z_or':'ΟΡΟΦΟΣ'};
+  const field=fieldMap[id];
+  if(field) {
+    try { await sb.from('options').upsert({field_name:field,value:val,active:true},{onConflict:'field_name,value'}); await loadAll(); toast(`"${val}" αποθηκεύτηκε!`,'s'); }
+    catch(e){console.warn(e);}
+  }
+  // Add to dropdown
+  const dd=document.getElementById('mso_'+id);
+  const addRow=dd?.querySelector('.ms-add-row');
+  if(dd&&addRow){
+    const newOpt=document.createElement('div');
+    newOpt.className='ms-opt';
+    newOpt.innerHTML=`<input type="checkbox"> ${val}`;
+    newOpt.onclick=(e)=>{e.stopPropagation();tgTag(id,val);};
+    newOpt.querySelector('input').onclick=(e)=>{e.stopPropagation();tgTag(id,val);};
+    dd.querySelector('#msol_'+id)?.appendChild(newOpt);
+  }
+  tgTag(id,val);
+  inp.value='';
+}
+
+function getMS(id){const hid=document.getElementById('msv_'+id);if(!hid||!hid.value)return[];return hid.value.split('||').filter(Boolean);}
+
+// ── CHECKBOX ──────────────────────────────────────────────────
+function mkCk(id,lbl,checked){
+  return`<div class="ck-wrap${checked?' on':''}" id="ck_${id}" onclick="toggleCk('${id}')">
+    <div class="ck-box">${checked?'✓':''}</div>
+    <input type="checkbox" id="${id}" ${checked?'checked':''} style="display:none">
+    <span class="ck-lbl">${lbl}</span>
+  </div>`;
+}
+function toggleCk(id){
+  const w=document.getElementById('ck_'+id);const cb=document.getElementById(id);if(!w||!cb)return;
+  const on=!w.classList.contains('on');
+  w.classList.toggle('on',on);cb.checked=on;
+  w.querySelector('.ck-box').textContent=on?'✓':'';
+}
+
+// ── LOGO ──────────────────────────────────────────────────────
+function triggerLogo(){document.getElementById('logoFile').click();}
+function handleLogo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{localStorage.setItem('crm_logo',e.target.result);applyLogo(e.target.result);toast('Logo ανανεώθηκε!','s');};
+  reader.readAsDataURL(file);
+}
+function applyLogo(src){
+  const sb2=document.getElementById('sbLogo');if(sb2)sb2.innerHTML=`<img src="${src}" style="max-height:44px;max-width:180px;object-fit:contain">`;
+  const ll=document.getElementById('loginLogo');if(ll)ll.innerHTML=`<img src="${src}" style="max-height:56px;max-width:200px;object-fit:contain">`;
+}
+function loadLogo(){const s=localStorage.getItem('crm_logo');if(s)applyLogo(s);}
+
+// ── THEME ─────────────────────────────────────────────────────
+function toggleTheme(){
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  localStorage.setItem('crm_theme',dark?'light':'dark');
+  document.getElementById('themeBtn').textContent=dark?'🌙':'☀️';
+}
+function loadTheme(){
+  const t=localStorage.getItem('crm_theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  const btn=document.getElementById('themeBtn');if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(t,b,ft=''){
+  document.getElementById('mTtl').textContent=t;
+  document.getElementById('mBody').innerHTML=b;
+  document.getElementById('mFoot').innerHTML=ft;
+  document.getElementById('overlay').classList.add('open');
+}
+function CM(){document.getElementById('overlay').classList.remove('open');}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)CM();});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.ms'))document.querySelectorAll('.ms-dropdown.open,.ms-display.open').forEach(el=>el.classList.remove('open'));
+});
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(m,t='i'){
+  const c=document.getElementById('toasts'),el=document.createElement('div');
+  el.className=`toast t-${t}`;el.innerHTML=`<span>${t==='s'?'✓':t==='e'?'✕':'ℹ'}</span> ${m}`;
+  c.appendChild(el);setTimeout(()=>el.remove(),3200);
+}
+
+// ── LOADER ────────────────────────────────────────────────────
+function load(s){document.getElementById('loader').style.display=s?'flex':'none';}
+
+// ── SIDEBAR ───────────────────────────────────────────────────
+function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('sbOv').classList.toggle('open');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('sbOv').classList.remove('open');}
+
+// ── KEYBOARD ──────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')CM();
+  if(e.key==='Enter'&&document.getElementById('loginPage').style.display!=='none'){
+    if(document.getElementById('loginForm').style.display!=='none')doLogin();
+    else doReset();
+  }
+});
+
+// ── AUTO LOGIN ────────────────────────────────────────────────
+window.addEventListener('load', async()=>{
+  load(true);
+  const {data:{session}} = await sb.auth.getSession();
+  if(session?.user) {
+    await boot(session.user);
+  }
+  load(false);
+});
+</script>
+</body>
+</html>
