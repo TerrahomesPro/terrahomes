@@ -1,5 +1,5 @@
 // TerraHomes Service Worker v1.1
-const CACHE_NAME = 'terrahomes-v2';
+const CACHE_NAME = 'terrahomes-v3';
 const APP_SHELL = [
   './terrahomes.html',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
