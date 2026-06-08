@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
+<meta name="theme-color" content="#b8935a">
+<meta name="robots" content="noindex,nofollow">
+<title>Καταχώρηση Ακινήτου · Terra&amp;homes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#efe9df;--paper:#fffdf9;--ink:#1c1813;--ink2:#6f665a;--line:rgba(28,24,19,.10);
+  --gold:#b8935a;--gold-dk:#9a7a47;--gold-lt:rgba(184,147,90,.12);
+  --ok:#1a7f43;--err:#c0392b;--r:16px;--r2:12px;
+  --f:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --disp:'Fraunces',Georgia,serif;
+}
+html,body{overflow-x:hidden}
+body{font-family:var(--f);color:var(--ink);line-height:1.5;min-height:100vh;
+  background:radial-gradient(120% 80% at 50% -10%, #f7f1e6 0%, var(--bg) 55%) fixed;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;padding:28px 18px 44px}
+.brand{text-align:center;margin-bottom:18px}
+.brand-mark{font-family:var(--disp);font-size:30px;font-weight:600;letter-spacing:.3px;color:var(--ink)}
+.brand-mark span{color:var(--gold)}
+.brand-logo{max-height:58px;max-width:80%;object-fit:contain;margin:0 auto 8px;display:block;mix-blend-mode:multiply}
+.intro{background:var(--gold-lt);border:1px solid rgba(184,147,90,.25);border-radius:var(--r2);padding:12px 14px;font-size:13.5px;color:var(--ink2);line-height:1.55;margin:2px 0 16px}
+.agency{margin:22px auto 0;max-width:320px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r2);padding:16px;text-align:center}
+.agency-logo{max-height:44px;max-width:70%;object-fit:contain;margin:0 auto 8px;display:block;mix-blend-mode:multiply}
+.agency-name{font-family:var(--disp);font-size:17px;font-weight:600;margin-bottom:10px}
+.agency-links{display:flex;flex-direction:column;gap:8px}
+.agency-links a{color:var(--gold-dk);font-size:14px;font-weight:600;text-decoration:none}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;margin-top:6px;cursor:pointer}
+.consent input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--gold-dk)}
+.gdpr-link{color:var(--gold-dk);text-decoration:underline;cursor:pointer;font-weight:600}
+.gdpr-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;display:none}
+.gdpr-overlay.open{display:block}
+.gdpr-h{font-family:var(--disp);font-size:22px;font-weight:600;margin:8px 0 14px}
+.gdpr-body{font-size:14px;color:var(--ink2);line-height:1.65}
+.gdpr-body h3{font-size:14px;color:var(--ink);margin:16px 0 5px;font-weight:700}
+.gdpr-body p{margin-bottom:10px}
+.brand-sub{font-size:13px;color:var(--ink2);margin-top:4px;letter-spacing:.2px;text-transform:uppercase;font-weight:600}
+.brand-rule{width:42px;height:3px;background:var(--gold);border-radius:9px;margin:14px auto 0}
+.who{display:none;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;
+  background:var(--gold-lt);border:1px solid rgba(184,147,90,.28);color:var(--gold-dk);
+  padding:10px 14px;border-radius:99px;font-size:13.5px;font-weight:600;margin:0 auto 22px;width:fit-content;max-width:100%}
+.who b{color:var(--ink)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 1px 2px rgba(28,24,19,.04),0 12px 30px -18px rgba(28,24,19,.25);padding:22px 18px}
+.sec-ttl{font-family:var(--disp);font-size:19px;font-weight:600;margin:4px 0 16px}
+.sec-ttl small{display:block;font-family:var(--f);font-size:12.5px;font-weight:500;color:var(--ink2);margin-top:3px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px}
+.field label .opt{color:var(--ink2);font-weight:500}
+.inp,select,textarea{width:100%;font-family:var(--f);font-size:16px;color:var(--ink);background:#fff;
+  border:1.5px solid var(--line);border-radius:var(--r2);padding:13px 14px;
+  transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239a7a47' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:38px}
+textarea{min-height:92px;resize:vertical;line-height:1.5}
+.up{text-transform:uppercase}
+.inp:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-lt)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.suffix{position:relative}
+.suffix .u{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--ink2);pointer-events:none;font-weight:600}
+.suffix .inp{padding-right:42px}
+.seg{display:flex;background:var(--bg);border-radius:var(--r2);padding:4px;gap:4px}
+.seg-b{flex:1;font-family:var(--f);font-size:14.5px;font-weight:600;color:var(--ink2);background:transparent;
+  border:none;border-radius:9px;padding:11px 8px;cursor:pointer;transition:all .15s}
+.seg-b.active{background:#fff;color:var(--gold-dk);box-shadow:0 1px 3px rgba(28,24,19,.12)}
+/* combo (searchable single) */
+.combo{position:relative}
+.combo-dd{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1.5px solid var(--line);
+  border-radius:var(--r2);max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:50;display:none;
+  box-shadow:0 10px 28px -8px rgba(28,24,19,.32)}
+.combo-dd.open{display:block}
+.combo-opt{padding:12px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--line)}
+.combo-opt:last-child{border-bottom:none}
+.combo-opt.hl,.combo-opt:active{background:var(--gold-lt)}
+.combo-add{padding:12px 14px;font-size:14px;color:var(--gold-dk);font-weight:700;cursor:pointer;background:var(--gold-lt);border-bottom:1px solid var(--line)}
+/* oikopedo */
+.oik{display:none;border:1.5px dashed rgba(184,147,90,.45);border-radius:var(--r2);padding:14px;margin-bottom:16px;background:rgba(184,147,90,.05)}
+.oik.show{display:block}
+.oik-ttl{font-size:12px;font-weight:700;color:var(--gold-dk);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px}
+/* photos */
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.photo-grid:empty{display:none}
+.ph{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:99px;border:none;
+  background:rgba(28,24,19,.72);color:#fff;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ph .up2{position:absolute;inset:0;background:rgba(255,255,255,.78);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold-dk)}
+.photo-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  border:1.5px dashed rgba(184,147,90,.5);border-radius:var(--r2);padding:14px;cursor:pointer;
+  font-size:14px;font-weight:600;color:var(--gold-dk);background:var(--gold-lt)}
+.photo-add.full{opacity:.45;pointer-events:none}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0;pointer-events:none}
+.submit{width:100%;font-family:var(--f);font-size:16.5px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dk));border:none;border-radius:var(--r2);
+  padding:16px;margin-top:8px;cursor:pointer;box-shadow:0 8px 22px -10px rgba(154,122,71,.7);transition:transform .1s,opacity .15s}
+.submit:active{transform:scale(.985)}
+.submit:disabled{opacity:.6;cursor:default}
+.note{font-size:11.5px;color:var(--ink2);text-align:center;margin-top:14px;line-height:1.5}
+.state{text-align:center;padding:40px 16px}
+.state .ic{font-size:48px;margin-bottom:14px}
+.state h2{font-family:var(--disp);font-size:23px;font-weight:600;margin-bottom:8px}
+.state p{font-size:14.5px;color:var(--ink2);max-width:340px;margin:0 auto}
+.spin{width:34px;height:34px;border:3px solid var(--gold-lt);border-top-color:var(--gold);border-radius:50%;margin:0 auto 16px;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err-txt{color:var(--err);font-size:13.5px;text-align:center;margin-top:12px;font-weight:600;min-height:18px}
+.hidden{display:none!important}
+@media(max-width:380px){.photo-grid{grid-template-columns:repeat(3,1fr)}.wrap{padding:22px 14px 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <img id="brandLogo" class="brand-logo hidden" alt="Terra&amp;homes">
+    <div class="brand-mark hidden">Terra<span>&amp;</span>homes</div>
+    <div class="brand-sub">Καταχώρηση Ακινήτου</div>
+    <div class="brand-rule"></div>
+  </div>
+
+  <div class="state" id="stLoading"><div class="spin"></div><p>Φόρτωση φόρμας…</p></div>
+
+  <div class="state hidden" id="stInvalid">
+    <div class="ic">🔒</div><h2>Μη έγκυρος σύνδεσμος</h2>
+    <p>Ο σύνδεσμος δεν είναι έγκυρος ή έχει απενεργοποιηθεί. Επικοινωνήστε με το γραφείο Terra&amp;homes για νέο σύνδεσμο.</p>
+  </div>
+
+  <div class="state hidden" id="stDone">
+    <div class="ic">✅</div><h2>Ευχαριστούμε!</h2>
+    <p>Το ακίνητό σας εστάλη με επιτυχία. Ένας έμπειρος συνεργάτης του γραφείου μας θα επικοινωνήσει σύντομα μαζί σας.</p>
+    <div class="agency hidden" id="agencyCard"></div>
+  </div>
+
+  <div id="formWrap" class="hidden">
+    <div class="who" id="who">🤝 <b id="whoPartner"></b><span id="whoAgent"></span></div>
+    <div class="card">
+        <div id="step1">
+      <div class="sec-ttl">Στοιχεία Ακινήτου<small>Συμπληρώστε ό,τι γνωρίζετε — τα κενά τα συμπληρώνουμε εμείς.</small></div>
+      <p class="intro hidden" id="introTxt"></p>
+
+      <div class="field" id="kwdField"><label>Κωδικός ακινήτου συνεργάτη <span class="opt">(για αναγνώριση)</span></label><input class="inp up" id="f_kwd" type="text" autocomplete="off"></div>
+
+      <div class="field">
+        <label>Τύπος</label>
+        <div class="seg" id="segMode">
+          <button type="button" class="seg-b active" data-v="sale">💰 Πώληση</button>
+          <button type="button" class="seg-b" data-v="rent">🏷️ Ενοικίαση</button>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field"><label>Είδος</label><select id="f_eidos" onchange="toggleOikopedo()"><option value="">—</option></select></div>
+        <div class="field">
+          <label>Περιοχή</label>
+          <div class="combo" id="cmb_periochi">
+            <input class="inp up" id="f_periochi" type="text" autocomplete="off" placeholder="Αναζήτηση…" oninput="comboFilter('periochi')" onfocus="comboFilter('periochi')">
+            <div class="combo-dd" id="dd_periochi"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field"><label>Διεύθυνση <span class="opt">(προαιρετικό)</span></label><input class="inp up" id="f_diefthinsi" type="text" autocomplete="off"></div>
+
+      <div class="row2">
+        <div class="field"><label>Όροφος</label><select id="f_orofos"><option value="">—</option></select></div>
+        <div class="field"><label>Δωμάτια</label><select id="f_domatia"><option value="">—</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Ασανσέρ</label><select id="f_asanser"><option value="">—</option></select></div>
+        <div class="field"><label>Θέση στάθμευσης</label><select id="f_thesi"><option value="">—</option></select></div>
+      </div>
+      <div class="field"><label>Αποθήκη</label><select id="f_apothiki"><option value="">—</option></select></div>
+
+      <div class="row2">
+        <div class="field"><label>Εμβαδό μεικτό</label><div class="suffix"><input class="inp" id="f_emv_m" type="number" inputmode="decimal" min="0"><span class="u">τ.μ.</span></div></div>
+        <div class="field"><label>Εμβαδό καθαρό</label><div class="suffix"><input class="inp" id="f_emv_k" type="number" inputmode="decimal" min="0"><span class="u">τ.μ.</span></div></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Έτος κατασκευής</label><input class="inp" id="f_etos" type="number" inputmode="numeric" min="1900" max="2100"></div>
+        <div class="field"><label>Τιμή</label><div class="suffix"><input class="inp" id="f_timi" type="number" inputmode="decimal" min="0"><span class="u">€</span></div></div>
+      </div>
+
+      <!-- Τμήμα οικοπέδου (εμφανίζεται όταν Είδος = Οικόπεδο) -->
+      <div class="oik" id="oikSection">
+        <div class="oik-ttl">🏞️ Στοιχεία Οικοπέδου</div>
+        <div class="row2">
+          <div class="field"><label>Εμβαδό οικοπέδου</label><div class="suffix"><input class="inp" id="f_emoik" type="number" inputmode="decimal" min="0"><span class="u">τ.μ.</span></div></div>
+          <div class="field"><label>Όροι δόμησης</label><select id="f_oroidom"><option value="">—</option><option>Εντός Σχεδίου</option><option>Εκτός Σχεδίου</option></select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Συντελεστής δόμησης</label><input class="inp" id="f_sd" type="text" inputmode="decimal" placeholder="π.χ. 0,8"></div>
+          <div class="field"><label>Κάλυψη %</label><div class="suffix"><input class="inp" id="f_kal" type="number" inputmode="decimal" min="0" max="100"><span class="u">%</span></div></div>
+        </div>
+        <div class="field" style="margin-bottom:0"><label>Επιτρεπόμενο ύψος <span class="opt">(προαιρετικό)</span></label><input class="inp up" id="f_ypsos" type="text" autocomplete="off" placeholder="π.χ. 11μ"></div>
+      </div>
+
+      <div class="field"><label>Περιγραφή / Σημειώσεις <span class="opt">(προαιρετικό)</span></label><textarea id="f_perig" class="up" maxlength="2000"></textarea></div>
+
+      <div class="field">
+        <label>Φωτογραφίες <span class="opt">(έως 8)</span></label>
+        <div class="photo-grid" id="photoGrid"></div>
+        <label class="photo-add" id="photoAdd">📷 Προσθήκη φωτογραφιών
+          <input type="file" id="photoInput" accept="image/*" multiple hidden>
+        </label>
+      </div>
+
+      </div><!-- /step1 -->
+      <div id="contactStep" class="hidden">
+        <div class="sec-ttl">Στοιχεία επικοινωνίας<small>Για να επικοινωνήσουμε μαζί σας για το ακίνητο.</small></div>
+        <div class="field"><label>Ονοματεπώνυμο *</label><input class="inp" id="c_onoma" type="text" autocomplete="name" placeholder="π.χ. Γιώργος Παπαδόπουλος"></div>
+        <div class="field"><label>Τηλέφωνο *</label><input class="inp" id="c_thl" type="tel" inputmode="tel" autocomplete="tel" placeholder="π.χ. 69········"></div>
+        <div class="field"><label>Email <span class="opt">(προαιρετικό)</span></label><input class="inp" id="c_email" type="email" inputmode="email" autocomplete="email" placeholder="name@email.com"></div>
+        <div class="field"><label>Έλεγχος ασφαλείας — <span id="capQ"></span></label><input class="inp" id="c_cap" type="number" inputmode="numeric" autocomplete="off" placeholder="Η απάντηση"></div>
+        <label class="consent"><input type="checkbox" id="c_gdpr"><span>Συγκατατίθεμαι στην επεξεργασία προσωπικών δεδομένων σύμφωνα με την <span class="gdpr-link" id="gdprLink">ενημέρωση GDPR</span> *</span></label>
+      </div>
+      <div id="backRow" class="hidden" style="margin-bottom:10px"><button type="button" class="submit" id="btnBack" style="background:#fff;color:var(--gold-dk);border:1.5px solid var(--gold);box-shadow:none">← Πίσω</button></div>
+      <input class="hp" id="hp_website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="err-txt" id="errTxt"></div>
+      <button class="submit" id="btnSubmit">Υποβολή Ακινήτου</button>
+      <div class="note">Με την υποβολή δηλώνετε ότι έχετε δικαίωμα διάθεσης των στοιχείων του ακινήτου προς συνεργασία με το γραφείο Terra&amp;homes.</div>
+    </div>
+  </div>
+</div>
+
+<div class="gdpr-overlay" id="gdprPage">
+  <div class="wrap">
+    <h2 class="gdpr-h">Ενημέρωση για την επεξεργασία προσωπικών δεδομένων (GDPR)</h2>
+    <div class="gdpr-body">
+      <p>Η εταιρεία <strong>Terra&amp;homes</strong> (Υπεύθυνος Επεξεργασίας) επεξεργάζεται τα προσωπικά δεδομένα που υποβάλλετε (ονοματεπώνυμο, τηλέφωνο, email) καθώς και τα στοιχεία του ακινήτου σας.</p>
+      <h3>Σκοπός</h3><p>Η επικοινωνία μαζί σας και η εξυπηρέτηση του αιτήματός σας για πώληση/διάθεση ακινήτου.</p>
+      <h3>Νομική βάση</h3><p>Η συγκατάθεσή σας (άρθρο 6 παρ. 1 α΄ ΓΚΠΔ).</p>
+      <h3>Αποδέκτες &amp; Διατήρηση</h3><p>Πρόσβαση έχουν μόνο εξουσιοδοτημένοι συνεργάτες του γραφείου. Τα δεδομένα διατηρούνται για όσο χρόνο απαιτείται για την εξυπηρέτηση του αιτήματος και σύμφωνα με την ισχύουσα νομοθεσία, και δεν διαβιβάζονται σε τρίτους χωρίς τη συγκατάθεσή σας.</p>
+      <h3>Τα δικαιώματά σας</h3><p>Έχετε δικαίωμα πρόσβασης, διόρθωσης, διαγραφής, περιορισμού, εναντίωσης και φορητότητας, καθώς και ανάκλησης της συγκατάθεσης οποτεδήποτε, με αίτημα στα στοιχεία επικοινωνίας του γραφείου. Έχετε επίσης δικαίωμα καταγγελίας στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr).</p>
+    </div>
+    <button class="submit" id="gdprBack" style="max-width:280px;margin:18px auto 34px;display:block">← Επιστροφή στη φόρμα</button>
+  </div>
+</div>
+
+<script>
+const SUPA_URL='https://svwnfttwlswwvlksized.supabase.co';
+const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2d25mdHR3bHN3d3Zsa3NpemVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzA1NTcsImV4cCI6MjA5Mzc0NjU1N30.7sH32KIKCY9PYZiwMb_i5Nww-5xl5ukhRFNU5zx3c_Q';
+const FN=SUPA_URL+'/functions/v1/submit-lead';
+const CLOUD_PRESET='terrahomes';
+const CLOUD_URL='https://api.cloudinary.com/v1_1/dfkcv5paq/upload';
+
+const LOGO_ON_LIGHT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAIUAhQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA70maXvRQAlHelooAKKTmlxQAc0c0UgoAWkpaKAENL2oooAQUtFFABSZpaKAENLmiigA5ozRRQAlLRRQAmaKWigA5ooooASjOOaM4614h8V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zXV4oxxigDx2w+HPjrwvLJaeG/FMMemyOSFmiBK++DkZ9cYzT4fhDqlt4x0rXjrou5oZVnu5LhTukkBOQuDwMEAA9K9fxRigDiPiT4Hl8caTawW92ltcWspkQupKtkYIOOR04NJ4S0Lxrp17Ede8Q211YwxGNbaK3AJOMAlupx+tdxijFAHlmofDPWNJ1+41jwVra6c1wS0trKm5CScnHbHsQcdqs6Z4R8cXus2l94j8VDyLWQSLbWcewMR2YjAIPQ5Br0rHOaXFACCloooAKKKKACiiigAooooAKKKKACiiigAooooATFFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//9k=";
+(function(){var lg=document.getElementById('brandLogo'); if(lg){lg.src=LOGO_ON_LIGHT; lg.classList.remove('hidden');} var bm=document.querySelector('.brand-mark'); if(bm) bm.classList.add('hidden');})();
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const TOKEN=(params.get('t')||params.get('a')||'').trim();
+const SRC=(params.get('src')||'').trim();
+const IS_PUBLIC=!!params.get('a')||!!SRC;
+const WANT_CONTACT=IS_PUBLIC||params.get('contact')==='1';
+const T0=Date.now();
+const CD_KEY='th_cd_ak';
+let CAP=0, STEP=1;
+let MODE='sale';
+let photos=[];
+let PERIOCHI_OPTS=[];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+let CO=null;
+function renderAgency(){
+  const a=$('agencyCard'); if(!a||!CO) return;
+  if(!(CO.name||CO.thl||CO.email||CO.website)) return;
+  let h='';
+  if(CO.logo_b64){ const s=CO.logo_b64.startsWith('data:')?CO.logo_b64:('data:image/png;base64,'+CO.logo_b64); h+='<img class="agency-logo" src="'+s+'" alt="">'; }
+  if(CO.name) h+='<div class="agency-name">'+esc(CO.name)+'</div>';
+  let rows='';
+  if(CO.thl) rows+='<a href="tel:'+esc(CO.thl)+'">📞 '+esc(CO.thl)+'</a>';
+  if(CO.email) rows+='<a href="mailto:'+esc(CO.email)+'">✉️ '+esc(CO.email)+'</a>';
+  if(CO.website){ const w=/^https?:\/\//.test(CO.website)?CO.website:('https://'+CO.website); rows+='<a href="'+esc(w)+'" target="_blank" rel="noopener">🌐 '+esc(CO.website)+'</a>'; }
+  h+='<div class="agency-links">'+rows+'</div>';
+  a.innerHTML=h; a.classList.remove('hidden');
+}
+function show(stateId){ ['stLoading','stInvalid','stDone','formWrap'].forEach(s=>$(s).classList.toggle('hidden', s!==stateId)); }
+async function api(payload){
+  const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+ANON},body:JSON.stringify(payload)});
+  return r.json();
+}
+function fillSelect(id, arr){ const el=$(id); if(!el) return; (arr||[]).forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o); }); }
+
+// ── Mode toggle ──
+document.querySelectorAll('#segMode .seg-b').forEach(b=>{
+  b.addEventListener('click',()=>{ document.querySelectorAll('#segMode .seg-b').forEach(x=>x.classList.remove('active')); b.classList.add('active'); MODE=b.dataset.v; });
+});
+
+// ── Oikopedo toggle ──
+function toggleOikopedo(){ $('oikSection').classList.toggle('show', $('f_eidos').value==='Οικόπεδο'); }
+
+// ── Combo (searchable + free text) Περιοχή ──
+function comboFilter(field){
+  const dd=$('dd_'+field), q=($('f_'+field).value||'').trim(), su=q.toUpperCase();
+  const opts=PERIOCHI_OPTS;
+  const filtered = su ? opts.filter(o=>o.toUpperCase().includes(su)) : opts;
+  let html='';
+  if(su && !opts.some(o=>o.toUpperCase()===su)) html += `<div class="combo-add" data-v="${esc(su)}">➕ Χρήση: «${esc(su)}»</div>`;
+  html += filtered.slice(0,60).map(o=>`<div class="combo-opt" data-v="${esc(o)}">${esc(o)}</div>`).join('');
+  dd.innerHTML = html || `<div class="combo-opt" style="pointer-events:none;color:var(--ink2)">Καμία επιλογή</div>`;
+  dd.classList.add('open');
+}
+function comboInit(field){
+  $('dd_'+field).addEventListener('mousedown',e=>{
+    const el=e.target.closest('[data-v]'); if(!el) return;
+    e.preventDefault(); $('f_'+field).value=el.getAttribute('data-v'); $('dd_'+field).classList.remove('open');
+  });
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('.combo')) document.querySelectorAll('.combo-dd').forEach(d=>d.classList.remove('open')); });
+
+// ── Photos ──
+function renderPhotos(){
+  const g=$('photoGrid'); g.innerHTML='';
+  photos.forEach(p=>{
+    const d=document.createElement('div'); d.className='ph';
+    d.innerHTML=`<img src="${p.preview}" alt="">${p.uploading?'<div class="up2">…</div>':''}<button type="button" class="x" aria-label="Αφαίρεση">×</button>`;
+    d.querySelector('.x').addEventListener('click',()=>{ photos=photos.filter(x=>x.id!==p.id); renderPhotos(); });
+    g.appendChild(d);
+  });
+  $('photoAdd').classList.toggle('full', photos.length>=8);
+}
+$('photoInput').addEventListener('change',e=>{
+  const files=Array.from(e.target.files||[]);
+  for(const f of files){ if(photos.length>=8) break; if(!f.type.startsWith('image/')) continue;
+    photos.push({id:Math.random().toString(36).slice(2), file:f, preview:URL.createObjectURL(f), url:null, uploading:false}); }
+  e.target.value=''; renderPhotos();
+});
+function compress(file){
+  return new Promise(res=>{
+    const img=new Image(); const u=URL.createObjectURL(file);
+    img.onload=()=>{ URL.revokeObjectURL(u);
+      const max=1600; let w=img.width,h=img.height;
+      if(w>h && w>max){ h=Math.round(h*max/w); w=max; } else if(h>=w && h>max){ w=Math.round(w*max/h); h=max; }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      c.toBlob(b=>res(b||file),'image/jpeg',0.82);
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(u); res(file); }; img.src=u;
+  });
+}
+async function uploadOne(blob){
+  const fd=new FormData(); fd.append('file',blob); fd.append('upload_preset',CLOUD_PRESET);
+  const r=await fetch(CLOUD_URL,{method:'POST',body:fd}); const j=await r.json();
+  if(j.error) throw new Error(j.error.message||'upload'); return j.secure_url;
+}
+
+// ── Submit ──
+function newCaptcha(){ const a=2+Math.floor(Math.random()*8), b=2+Math.floor(Math.random()*8); CAP=a+b; const q=$('capQ'); if(q) q.textContent='Πόσο κάνει '+a+' + '+b+';'; }
+function gotoStep2(){ STEP=2; $('step1').classList.add('hidden'); $('contactStep').classList.remove('hidden'); $('backRow').classList.remove('hidden'); $('btnSubmit').textContent='✓ Υποβολή'; $('errTxt').textContent=''; window.scrollTo({top:0,behavior:'smooth'}); }
+function gotoStep1(){ STEP=1; $('contactStep').classList.add('hidden'); $('backRow').classList.add('hidden'); $('step1').classList.remove('hidden'); $('btnSubmit').textContent='Επόμενο →'; $('errTxt').textContent=''; }
+
+$('btnSubmit').addEventListener('click',async ()=>{
+  const err=$('errTxt'); err.textContent='';
+  const UP=x=>(x||'').toUpperCase();
+  if(STEP===1){
+    const periochi=$('f_periochi').value.trim(), eidos=$('f_eidos').value, dief=$('f_diefthinsi').value.trim();
+    if(!periochi && !eidos && !dief){ err.textContent='Συμπληρώστε τουλάχιστον Είδος, Περιοχή ή Διεύθυνση.'; return; }
+    if(IS_PUBLIC){
+      const isLand=(eidos==='Οικόπεδο');
+      if(!eidos){ err.textContent='Επιλέξτε Είδος.'; return; }
+      if(!periochi){ err.textContent='Συμπληρώστε Περιοχή.'; return; }
+      if(!dief){ err.textContent='Συμπληρώστε Διεύθυνση ακινήτου.'; return; }
+      if(!$('f_emv_m').value){ err.textContent='Συμπληρώστε Εμβαδό (μεικτό).'; return; }
+      if(!$('f_timi').value){ err.textContent='Συμπληρώστε Τιμή.'; return; }
+      if(!isLand && !$('f_orofos').value){ err.textContent='Επιλέξτε Όροφο.'; return; }
+      if(!isLand && !$('f_domatia').value){ err.textContent='Επιλέξτε Δωμάτια.'; return; }
+    }
+    if(WANT_CONTACT){ gotoStep2(); return; }
+  }
+  let contact=null;
+  if(WANT_CONTACT){
+    const onoma=$('c_onoma').value.trim(), thl=$('c_thl').value.trim(), email=$('c_email').value.trim();
+    if(!onoma||!thl){ err.textContent='Συμπληρώστε ονοματεπώνυμο και τηλέφωνο.'; return; }
+    if(parseInt($('c_cap').value,10)!==CAP){ err.textContent='Λάθος απάντηση στον έλεγχο ασφαλείας.'; newCaptcha(); $('c_cap').value=''; return; }
+    if(!$('c_gdpr').checked){ err.textContent='Απαιτείται η συγκατάθεση για την επεξεργασία προσωπικών δεδομένων (GDPR).'; return; }
+    contact={onoma:onoma.toUpperCase(), thl, email};
+  }
+  if(Date.now()-T0 < 3000){ err.textContent='Παρακαλώ συμπληρώστε τη φόρμα και δοκιμάστε ξανά.'; return; }
+  const last=+(localStorage.getItem(CD_KEY)||0);
+  if(Date.now()-last < 20000){ err.textContent='Μόλις υποβάλατε αίτημα. Περιμένετε λίγο.'; return; }
+  const btn=$('btnSubmit'); btn.disabled=true; const orig=btn.textContent;
+  try{
+    if(photos.length){
+      btn.textContent='Ανέβασμα φωτογραφιών…';
+      for(const p of photos){ if(p.url) continue; p.uploading=true; renderPhotos();
+        const blob=await compress(p.file); p.url=await uploadOne(blob); p.uploading=false; renderPhotos(); }
+    }
+    btn.textContent='Υποβολή…';
+    const data={
+      mode:MODE, eidos:$('f_eidos').value, periochi:UP($('f_periochi').value.trim()), diefthinsi:UP($('f_diefthinsi').value.trim()),
+      emvado_meikto:$('f_emv_m').value, emvado_katharo:$('f_emv_k').value,
+      timi:$('f_timi').value, orofos:$('f_orofos').value, domatia:$('f_domatia').value,
+      asanser:$('f_asanser').value, thesi_stathmeysis:$('f_thesi').value, apothiki:$('f_apothiki').value,
+      kwd_synergati:UP($('f_kwd').value.trim()),
+      etos_kataskevis:$('f_etos').value, perigrafi:UP($('f_perig').value.trim()),
+      emvado_oikopedou:$('f_emoik').value, oroi_domisis:$('f_oroidom').value,
+      syntelestis_domisis:$('f_sd').value, kalypsi_pct:$('f_kal').value, epitr_ypsos:UP($('f_ypsos').value.trim()),
+      photos:photos.map(p=>p.url).filter(Boolean)
+    };
+    const res=await api({action:'submit', type:'ak', token:TOKEN, src:SRC, hp:$('hp_website').value, contact, data});
+    if(res && res.ok){ localStorage.setItem(CD_KEY, Date.now()); show('stDone'); }
+    else { err.textContent = res && res.error==='rate_limit' ? 'Πολλές υποβολές. Δοκιμάστε σε λίγο.' : (res&&res.error==='need_contact'?'Συμπληρώστε στοιχεία επικοινωνίας.':'Κάτι πήγε στραβά. Δοκιμάστε ξανά.'); btn.disabled=false; btn.textContent=orig; }
+  }catch(e){ err.textContent='Σφάλμα σύνδεσης. Ελέγξτε το internet και δοκιμάστε ξανά.'; btn.disabled=false; btn.textContent=orig; }
+});
+const _bb=$('btnBack'); if(_bb) _bb.addEventListener('click',gotoStep1);
+const _gl=$('gdprLink'); if(_gl) _gl.addEventListener('click',()=>$('gdprPage').classList.add('open'));
+const _gb=$('gdprBack'); if(_gb) _gb.addEventListener('click',()=>$('gdprPage').classList.remove('open'));
+
+// ── Init ──
+(async ()=>{
+  if(!TOKEN){ show('stInvalid'); return; }
+  try{
+    const r=await api({action:'resolve', token:TOKEN});
+    if(!r || !r.ok){ show('stInvalid'); return; }
+    $('whoPartner').textContent=r.partner_name||'Συνεργάτης';
+    $('whoAgent').textContent = r.agent_name ? ' · μέσω '+r.agent_name : '';
+    if(r.logo_b64){ const src=r.logo_b64.startsWith('data:')?r.logo_b64:('data:image/png;base64,'+r.logo_b64); const lg=$('brandLogo'); if(lg){ lg.src=src; lg.classList.remove('hidden'); } const bm=document.querySelector('.brand-mark'); if(bm) bm.classList.add('hidden'); }
+    CO=r.company||{name:r.partner_name||'',logo_b64:r.logo_b64||''}; renderAgency();
+    if(IS_PUBLIC){ $('who').style.display='none'; const kf=$('kwdField'); if(kf) kf.classList.add('hidden'); const it=$('introTxt'); if(it){ it.textContent='Εάν ενδιαφέρεστε να πουλήσετε το ακίνητό σας, συμπληρώστε τα παρακάτω στοιχεία και ένας έμπειρος συνεργάτης του γραφείου μας θα επικοινωνήσει μαζί σας. Ευχαριστούμε.'; it.classList.remove('hidden'); } const n=document.querySelector('.note'); if(n) n.textContent='Τα στοιχεία σας χρησιμοποιούνται μόνο για επικοινωνία σχετικά με το ακίνητό σας.'; }
+    else { $('who').style.display='flex'; }
+    const o=r.options||{};
+    fillSelect('f_eidos', o.eidos||[]);
+    PERIOCHI_OPTS = o.periochi||[];
+    fillSelect('f_orofos', o.orofos||[]);
+    fillSelect('f_domatia', o.domatia||[]);
+    fillSelect('f_asanser', o.asanser||[]);
+    fillSelect('f_thesi', o.thesi||[]);
+    fillSelect('f_apothiki', o.apothiki||[]);
+    comboInit('periochi');
+    if(WANT_CONTACT){ $('btnSubmit').textContent='Επόμενο →'; newCaptcha(); }
+    show('formWrap');
+  }catch(e){ show('stInvalid'); }
+})();
+</script>
+</body>
+</html>
