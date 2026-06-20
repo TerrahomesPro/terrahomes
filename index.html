@@ -1268,14 +1268,11 @@ async function uploadToSupabaseStorage(path, blob, contentType) {
 async function cleanupClientCloudinaryMedia(urls) {
   try {
     const cleanUrls = (urls || []).filter(u => typeof u === 'string' && u.includes('cloudinary.com'));
-    if (!cleanUrls.length) { console.log('[cloudinary-cleanup] καμία έγκυρη Cloudinary URL, παράλειψη'); return; }
-    console.log('[cloudinary-cleanup] θα καθαριστούν:', cleanUrls);
-    const { data: { session }, error: sessErr } = await sb.auth.getSession();
-    if (sessErr) console.warn('[cloudinary-cleanup] σφάλμα getSession:', sessErr);
+    if (!cleanUrls.length) return;
+    const { data: { session } } = await sb.auth.getSession();
     const token = session?.access_token;
-    if (!token) { console.warn('[cloudinary-cleanup] δεν βρέθηκε access_token, ακύρωση'); return; }
-    console.log('[cloudinary-cleanup] στέλνω αίτημα στο Edge Function...');
-    const res = await fetch(`${SUPA_URL}/functions/v1/cloudinary-cleanup`, {
+    if (!token) return;
+    await fetch(`${SUPA_URL}/functions/v1/cloudinary-cleanup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1284,8 +1281,6 @@ async function cleanupClientCloudinaryMedia(urls) {
       },
       body: JSON.stringify({ urls: cleanUrls })
     });
-    const resJson = await res.json().catch(()=>null);
-    console.log('[cloudinary-cleanup] απάντηση:', res.status, resJson);
   } catch(e) {
     console.warn('Cloudinary cleanup απέτυχε (μη κρίσιμο — raw αρχεία παραμένουν):', e);
   }
